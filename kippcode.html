@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kippcode — everything, in sync.</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f2f0eb;--bg2:#eae7e0;--bg3:#e0ddd5;--white:#faf9f7;--ink:#1a1916;--ink2:#6b6760;--ink3:#aba8a2;--border:#d4d0c8;--orange:#f05a00;--ora-bg:#fff3ec}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 2.5rem;height:56px;background:#1a1916;border-bottom:1px solid rgba(255,255,255,0.06)}
+.logo{display:flex;align-items:center;gap:0.55rem;cursor:pointer}
+.logo-text{font-size:1rem;font-weight:700;letter-spacing:-0.025em;color:#f2f0eb}
+.nav-center{display:flex;gap:0.1rem}
+.nc{background:none;border:none;color:rgba(242,240,235,0.5);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:0.4rem 0.85rem;border-radius:8px;cursor:pointer;transition:all .15s}
+.nc:hover,.nc.active{background:rgba(255,255,255,0.07);color:#f2f0eb}
+.nav-cta{background:var(--orange);color:#fff;border:none;border-radius:8px;padding:0.45rem 1.1rem;font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.nav-cta:hover{opacity:.85}
+.nav-mobile-btn{display:none;background:rgba(255,255,255,0.08);border:none;color:#f2f0eb;font-size:1.4rem;cursor:pointer;padding:0;line-height:1;width:38px;height:38px;border-radius:8px;align-items:center;justify-content:center}
+
+/* MOBILE MENU */
+.mobile-menu{display:none;position:fixed;inset:0;z-index:9999;background:#1a1916;flex-direction:column;justify-content:center;align-items:center;padding:2rem}
+.mobile-menu.open{display:flex}
+.mobile-menu-close{position:absolute;top:1rem;right:1.25rem;background:none;border:none;color:rgba(242,240,235,0.5);font-size:1.8rem;cursor:pointer}
+.mnc{background:none;border:none;color:rgba(242,240,235,0.7);font-family:'Inter',sans-serif;font-size:1.4rem;font-weight:700;cursor:pointer;padding:1rem 2rem;letter-spacing:-0.03em;width:100%;text-align:center;border-bottom:1px solid rgba(255,255,255,0.06);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.mnc:hover{color:#fff}
+.mobile-cta-btn{margin-top:1.5rem;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:0.9rem 2rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;width:100%;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+/* PAGES */
+#app{min-height:calc(100vh - 56px)}
+.page{display:none;animation:fadeIn .3s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SHARED */
+.s-eyebrow{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem}
+.s-eyebrow-line{width:28px;height:2.5px;background:var(--orange);border-radius:2px;flex-shrink:0}
+.s-eyebrow-text{font-size:0.72rem;font-weight:700;color:var(--orange);letter-spacing:0.08em;text-transform:uppercase}
+.s-eyebrow.inv .s-eyebrow-line{background:rgba(255,255,255,.4)}
+.s-eyebrow.inv .s-eyebrow-text{color:rgba(255,255,255,.55)}
+.s-h{font-size:clamp(1.4rem,2.3vw,2rem);font-weight:700;line-height:1.15;letter-spacing:-0.035em;color:var(--ink);margin-bottom:1rem}
+.s-h em{color:var(--orange);font-style:normal}
+.s-h.inv{color:#fff}.s-h.inv em{color:rgba(255,255,255,.45);font-style:normal}
+.s-p{font-size:0.9rem;color:var(--ink2);line-height:1.75;letter-spacing:-0.005em}
+.s-p.inv{color:rgba(255,255,255,.65)}
+.section-title{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:700;letter-spacing:-0.04em;line-height:1.1;color:var(--ink);margin-bottom:2.5rem}
+.section-title em{color:var(--orange);font-style:normal}
+.section-title.inv{color:#fff}
+.btn-dark{background:var(--ink);color:var(--white);border:none;border-radius:10px;padding:0.78rem 1.7rem;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;letter-spacing:-0.02em;cursor:pointer;transition:opacity .2s}
+.btn-dark:hover{opacity:.8}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--border);border-radius:10px;padding:0.76rem 1.5rem;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;letter-spacing:-0.02em;cursor:pointer;transition:border-color .2s}
+.btn-ghost:hover{border-color:var(--ink3)}
+.btn-orange{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:0.82rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-orange:hover{opacity:.85}
+.btn-white{background:var(--white);color:var(--orange);border:none;border-radius:10px;padding:0.82rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn-white:hover{opacity:.88}
+.cta-banner{background:var(--orange);padding:4rem 3rem;display:flex;justify-content:space-between;align-items:center;gap:2rem;border-top:1px solid var(--border)}
+.cta-h{font-size:clamp(1.5rem,2.5vw,2.1rem);font-weight:700;color:#fff;letter-spacing:-0.04em;line-height:1.15}
+.cta-sub{font-size:0.85rem;color:rgba(255,255,255,.7);margin-top:0.5rem}
+footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.f-logo{font-size:0.9rem;font-weight:700;color:#f2f0eb;display:flex;align-items:center;gap:0.45rem;letter-spacing:-0.02em;cursor:pointer}
+.f-dot{width:7px;height:7px;background:var(--orange);border-radius:50%}
+.f-tag{font-family:'Fira Code',monospace;font-size:0.65rem;color:var(--orange)}
+.f-copy{font-family:'Fira Code',monospace;font-size:0.65rem;color:rgba(242,240,235,0.35)}
+.f-ig{display:flex;align-items:center;gap:0.4rem;color:rgba(242,240,235,0.5);font-size:0.72rem;font-weight:500;text-decoration:none;transition:color .2s}
+.f-ig:hover{color:var(--orange)}
+.f-ig svg{width:14px;height:14px}
+
+/* PAGE HERO */
+.page-hero{padding:5rem 3rem 4.5rem;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.page-hero.light{background:var(--white)}
+.page-hero.dark{background:var(--ink)}
+.page-hero-content{position:relative;z-index:1;max-width:680px}
+.page-tag{display:inline-block;background:var(--ora-bg);border:1px solid rgba(240,90,0,0.22);border-radius:100px;padding:0.28rem 0.85rem;font-size:0.72rem;font-weight:600;color:var(--orange);margin-bottom:1.5rem}
+.page-tag.inv{background:rgba(240,90,0,0.2);border-color:rgba(240,90,0,0.3)}
+.page-h1{font-size:clamp(2.5rem,4.5vw,4rem);font-weight:800;line-height:1.05;letter-spacing:-0.05em;color:var(--ink);margin-bottom:1.2rem}
+.page-h1 em{color:var(--orange);font-style:normal}
+.page-h1.inv{color:#f2f0eb}
+.page-sub{font-size:1rem;color:var(--ink2);line-height:1.72;max-width:520px;letter-spacing:-0.01em}
+.page-sub.inv{color:rgba(242,240,235,0.6)}
+
+/* HOME */
+.hero{min-height:calc(100vh - 56px);display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
+.hero-content{padding:5rem 3.5rem 4rem;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border)}
+.hero-h1{font-size:clamp(2.8rem,4.5vw,4.8rem);font-weight:800;line-height:1.02;letter-spacing:-0.055em;color:var(--ink);margin-bottom:1.5rem}
+.hero-h1 em{color:var(--orange);font-style:normal}
+.hero-sub{font-size:1rem;font-weight:400;color:var(--ink2);line-height:1.72;max-width:460px;margin-bottom:2.8rem;letter-spacing:-0.01em}
+.hero-btns{display:flex;gap:0.65rem;align-items:center}
+.hero-visual{position:relative;overflow:hidden}
+.hero-photo{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&auto=format&fit=crop&q=80');background-size:cover;background-position:center left}
+.hero-fade{position:absolute;inset:0;background:linear-gradient(to right,var(--bg) 0%,rgba(242,240,235,0.05) 35%,transparent 100%)}
+.hero-tint{position:absolute;inset:0;background:rgba(240,90,0,0.06)}
+
+.ticker{background:var(--orange);overflow:hidden;padding:0.7rem 0;display:flex}
+.ticker-track{display:flex;gap:2.5rem;white-space:nowrap;animation:tick 22s linear infinite;align-items:center}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.t-item{font-size:0.72rem;font-weight:700;color:#fff;letter-spacing:0.08em;display:flex;align-items:center;gap:0.6rem}
+.t-sep{color:rgba(255,255,255,.4)}
+
+.section-problem{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.prob{padding:4.5rem 3rem;display:flex;flex-direction:column;justify-content:center}
+.prob.a{background:var(--white);border-right:1px solid var(--border)}
+.prob.b{background:var(--bg2)}
+
+.section-products-home{padding:5.5rem 3rem;background:#2e2b26;border-top:1px solid var(--border)}
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.09);border-radius:16px;overflow:hidden}
+.p-card{background:#3a3730;padding:1.5rem 1.75rem;transition:background .2s;cursor:pointer;border-left:3px solid transparent}
+.p-card:hover{background:#4a4640;border-left-color:var(--orange)}
+.p-tag-pill{display:inline-block;background:rgba(240,90,0,0.18);color:var(--orange);font-size:0.62rem;font-weight:600;border-radius:6px;padding:0.18rem 0.5rem;margin-bottom:0.65rem;letter-spacing:0.04em;text-transform:uppercase}
+.p-name{font-size:1rem;font-weight:700;color:var(--white);letter-spacing:-0.025em;margin-bottom:0.5rem;line-height:1.2}
+.p-desc{font-size:0.78rem;color:rgba(255,255,255,.5);line-height:1.6;letter-spacing:-0.005em;margin-top:0.35rem}
+.p-link{font-size:0.75rem;color:var(--orange);font-weight:600;margin-top:0.6rem;display:inline-flex;align-items:center;gap:0.3rem}
+.products-grid-2{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.09);border-radius:16px;overflow:hidden;margin-top:1.25rem}
+.p-card-sm{background:#33302b;padding:1.25rem 1.75rem;transition:background .2s;display:flex;align-items:center;gap:1rem;cursor:pointer;border-left:3px solid transparent}
+.p-card-sm:hover{background:#3d3a34;border-left-color:var(--orange)}
+.p-sm-name{font-size:0.88rem;font-weight:700;color:var(--white);letter-spacing:-0.02em}
+.p-sm-desc{font-size:0.73rem;color:rgba(255,255,255,.38);margin-top:0.15rem}
+.s-more{font-size:0.82rem;color:var(--orange);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:0.4rem;background:none;border:none}
+.s-more:hover{text-decoration:underline}
+
+.section-features{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.feat-left{background:var(--orange);padding:5rem 3rem;display:flex;flex-direction:column;justify-content:center}
+.feat-right{background:var(--white);padding:2.5rem;display:flex;flex-direction:column;justify-content:center;gap:0.55rem;border-left:1px solid var(--border)}
+.f-row{display:flex;align-items:flex-start;gap:1rem;padding:1.2rem 1.1rem;border:1px solid var(--border);border-radius:12px;background:var(--bg);transition:border-color .2s,background .2s}
+.f-row:hover{border-color:var(--orange);background:var(--ora-bg)}
+.f-ico{width:34px;height:34px;min-width:34px;border:1px solid var(--border);border-radius:9px;background:var(--white);display:grid;place-items:center;font-size:0.9rem;flex-shrink:0}
+.f-t{font-size:0.88rem;font-weight:600;color:var(--ink);letter-spacing:-0.015em}
+.f-s{font-size:0.75rem;color:var(--ink2);margin-top:0.15rem;line-height:1.55}
+
+.section-tagline{padding:9rem 3rem;text-align:center;position:relative;overflow:hidden}
+.tl-photo{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1400&auto=format&fit=crop&q=80');background-size:cover;background-position:center}
+.tl-overlay{position:absolute;inset:0;background:rgba(20,18,15,0.82)}
+.tl-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(240,90,0,0.2) 0%,transparent 70%);pointer-events:none}
+.tl-text{font-size:clamp(2.8rem,6.5vw,5.5rem);font-weight:800;letter-spacing:-0.06em;line-height:1;color:#f2f0eb;position:relative;z-index:1}
+.tl-text em{color:var(--orange);font-style:normal}
+.tl-sub{font-family:'Fira Code',monospace;font-size:0.72rem;color:rgba(242,240,235,0.4);margin-top:1.3rem;letter-spacing:0.05em;position:relative;z-index:1}
+
+.home-contact{background:var(--white);padding:5rem 3rem;display:flex;justify-content:space-between;align-items:center;gap:2rem;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.c-h{font-size:clamp(1.6rem,2.5vw,2.3rem);font-weight:700;color:var(--ink);letter-spacing:-0.04em;line-height:1.12}
+.c-sub{font-size:0.82rem;color:var(--ink3);margin-top:0.6rem}
+.c-form{display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center}
+.c-input{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:0.78rem 1.1rem;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--ink);outline:none;width:235px;transition:border-color .2s}
+.c-input::placeholder{color:var(--ink3)}
+.c-input:focus{border-color:var(--orange)}
+
+/* SOLUCIONES */
+.services-section{padding:5rem 3rem;background:var(--bg);border-top:1px solid var(--border)}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.svc-card{background:var(--white);padding:2rem;transition:background .2s}
+.svc-card:hover{background:var(--bg2)}
+.svc-ico{width:44px;height:44px;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;display:grid;place-items:center;font-size:1.2rem;margin-bottom:1.3rem}
+.svc-n{font-size:1rem;font-weight:700;color:var(--ink);letter-spacing:-0.02em;margin-bottom:0.5rem}
+.svc-p{font-size:0.8rem;color:var(--ink2);line-height:1.65}
+.svc-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1.1rem}
+.svc-tag{background:var(--bg2);color:var(--ink3);font-size:0.65rem;font-weight:600;border-radius:6px;padding:0.2rem 0.55rem}
+.approach-section{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.ap-left{padding:5rem 3rem;background:var(--ink);display:flex;flex-direction:column;justify-content:center}
+.ap-right{padding:5rem 3rem;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;gap:1rem;justify-content:center}
+.check-row{display:flex;align-items:flex-start;gap:0.85rem;padding:1.1rem;border:1px solid var(--border);border-radius:10px;background:var(--bg);transition:border-color .2s}
+.check-row:hover{border-color:var(--orange)}
+.check-ico{width:28px;height:28px;min-width:28px;background:var(--ora-bg);border-radius:8px;display:grid;place-items:center;color:var(--orange);font-size:0.85rem;font-weight:700;flex-shrink:0}
+.check-t{font-size:0.88rem;font-weight:600;color:var(--ink)}
+.check-s{font-size:0.75rem;color:var(--ink2);margin-top:0.1rem;line-height:1.5}
+.tech-section{padding:4rem 3rem;background:var(--bg2);border-top:1px solid var(--border)}
+.tech-grid{display:flex;flex-wrap:wrap;gap:0.65rem;margin-top:1.5rem}
+.tech-pill{background:var(--white);border:1px solid var(--border);border-radius:100px;padding:0.45rem 1.1rem;font-size:0.8rem;font-weight:600;color:var(--ink);transition:border-color .2s}
+.tech-pill:hover{border-color:var(--orange)}
+
+/* PROCESO */
+.steps-section{padding:5rem 3rem;background:var(--bg);border-top:1px solid var(--border)}
+.steps-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.step{display:grid;grid-template-columns:100px 1fr;border-bottom:1px solid var(--border);background:var(--white);transition:background .2s}
+.step:last-child{border-bottom:none}
+.step:hover{background:var(--ora-bg)}
+.step-num{padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;border-right:1px solid var(--border);gap:0.5rem}
+.step-n{font-family:'Fira Code',monospace;font-size:0.65rem;color:var(--orange);letter-spacing:0.05em}
+.step-line{width:1px;flex:1;background:var(--border);min-height:20px}
+.step-body{padding:2.5rem}
+.step-title{font-size:1.05rem;font-weight:700;color:var(--ink);letter-spacing:-0.025em;margin-bottom:0.6rem}
+.step-desc{font-size:0.85rem;color:var(--ink2);line-height:1.75}
+.step-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:1rem}
+.step-tag{background:var(--bg);border:1px solid var(--border);color:var(--ink3);font-size:0.65rem;font-weight:600;border-radius:6px;padding:0.2rem 0.55rem}
+.split-section{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.split-a{padding:5rem 3rem;background:var(--ink);display:flex;flex-direction:column;justify-content:center}
+.split-b{padding:5rem 3rem;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:1.2rem}
+.kpi-row{display:flex;align-items:center;gap:1.2rem;padding:1.2rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;transition:border-color .2s}
+.kpi-row:hover{border-color:var(--orange)}
+.kpi-n{font-size:2rem;font-weight:800;color:var(--orange);letter-spacing:-0.05em;line-height:1;min-width:70px}
+.kpi-l{font-size:0.82rem;font-weight:600;color:var(--ink)}
+.kpi-s{font-size:0.72rem;color:var(--ink3);margin-top:0.1rem}
+
+/* PRODUCTOS */
+.prod-section{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.prod-info{padding:5rem 3rem;display:flex;flex-direction:column;justify-content:center}
+.prod-info.light{background:var(--white)}
+.prod-info.sand{background:var(--bg2)}
+.prod-info.dark-prod{background:#242220}
+.prod-visual{position:relative;overflow:hidden;min-height:380px;display:flex;align-items:center;justify-content:center}
+.prod-visual-overlay{position:absolute;inset:0;pointer-events:none}
+.prod-tag-label{display:inline-block;font-size:0.62rem;font-weight:700;border-radius:7px;padding:0.22rem 0.6rem;margin-bottom:1rem;letter-spacing:0.05em;text-transform:uppercase;background:rgba(240,90,0,0.12);color:var(--orange)}
+.prod-tag-label.dark-label{background:rgba(240,90,0,0.2)}
+.prod-h{font-size:clamp(1.6rem,2.8vw,2.4rem);font-weight:800;line-height:1.1;letter-spacing:-0.04em;color:var(--ink);margin-bottom:0.3rem}
+.prod-h.inv{color:#f2f0eb}
+.prod-subtitle{font-size:0.82rem;font-weight:500;color:var(--ink3);margin-bottom:1.5rem}
+.prod-subtitle.inv{color:rgba(255,255,255,.45)}
+.feat-list{display:flex;flex-direction:column;gap:0.5rem;margin-top:1.5rem}
+.feat-item{display:flex;align-items:center;gap:0.65rem;font-size:0.82rem;color:var(--ink2)}
+.feat-item.inv{color:rgba(255,255,255,.6)}
+.feat-dot{width:5px;height:5px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.prod-btn{margin-top:2rem;background:var(--ink);color:var(--white);border:none;border-radius:10px;padding:0.75rem 1.6rem;font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:opacity .2s;width:fit-content}
+.prod-btn:hover{opacity:.8}
+.prod-btn.inv-btn{background:#f2f0eb;color:var(--ink)}
+.secondary-section{padding:5rem 3rem;background:var(--bg);border-top:1px solid var(--border)}
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.sec-card{background:var(--white);padding:2.5rem;display:flex;flex-direction:column;gap:1rem;transition:background .2s}
+.sec-card:hover{background:var(--bg2)}
+.sec-ico{font-size:2rem}
+.sec-n{font-size:1.1rem;font-weight:700;color:var(--ink);letter-spacing:-0.025em}
+.sec-p{font-size:0.85rem;color:var(--ink2);line-height:1.7}
+.sec-status{display:inline-block;font-size:0.62rem;font-weight:700;border-radius:6px;padding:0.2rem 0.55rem;letter-spacing:0.04em;text-transform:uppercase}
+.status-soon{background:var(--ora-bg);color:var(--orange);border:1px solid rgba(240,90,0,0.2)}
+.status-live{background:#e8f5e9;color:#2e7d32;border:1px solid #c8e6c9}
+
+/* NOSOTROS */
+.manifesto-section{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.man-left{padding:5rem 3rem;background:var(--orange);display:flex;flex-direction:column;justify-content:center}
+.man-right{padding:5rem 3rem;background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:1.5rem}
+.man-h{font-size:clamp(1.6rem,2.8vw,2.4rem);font-weight:800;line-height:1.1;letter-spacing:-0.04em;color:#fff;margin-bottom:1rem}
+.man-h em{color:rgba(255,255,255,.45);font-style:normal}
+.man-p{font-size:0.9rem;color:rgba(255,255,255,.7);line-height:1.75}
+.value-row{padding:1.5rem;background:var(--bg);border:1px solid var(--border);border-radius:12px;transition:border-color .2s}
+.value-row:hover{border-color:var(--orange)}
+.value-n{font-size:0.9rem;font-weight:700;color:var(--ink);margin-bottom:0.35rem}
+.value-p{font-size:0.8rem;color:var(--ink2);line-height:1.6}
+.team-section{padding:5rem 3rem;background:var(--bg);border-top:1px solid var(--border)}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.team-card{background:var(--white);padding:2rem 1.5rem;text-align:center;transition:background .2s}
+.team-card:hover{background:var(--bg2)}
+.team-avatar{width:68px;height:68px;border-radius:50%;background:var(--bg2);margin:0 auto 1rem;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:var(--ink3)}
+.team-name{font-size:0.92rem;font-weight:700;color:var(--ink);margin-bottom:0.2rem}
+.team-role{font-size:0.73rem;color:var(--ink3);line-height:1.4}
+.numbers-section{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)}
+.num-block{padding:3.5rem 2.5rem;text-align:center;border-right:1px solid var(--border);background:var(--white)}
+.num-block:last-child{border-right:none}
+.num-n{font-size:3rem;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-0.06em}
+.num-n em{color:var(--orange);font-style:normal}
+.num-l{font-size:0.82rem;color:var(--ink2);margin-top:0.5rem}
+
+/* CONTACTO */
+.contact-main{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 56px)}
+.contact-left-col{background:var(--ink);padding:5rem 3rem;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.contact-left-inner{position:relative;z-index:1}
+.contact-h{font-size:clamp(2rem,4vw,3.5rem);font-weight:800;line-height:1.05;letter-spacing:-0.05em;color:#f2f0eb;margin-bottom:1.2rem}
+.contact-h em{color:var(--orange);font-style:normal}
+.contact-sub-text{font-size:0.95rem;color:rgba(242,240,235,0.55);line-height:1.7;max-width:380px}
+.contact-info-list{display:flex;flex-direction:column;gap:1.2rem;position:relative;z-index:1}
+.c-info-item{display:flex;align-items:flex-start;gap:1rem}
+.c-ico{width:38px;height:38px;min-width:38px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;display:grid;place-items:center;font-size:1rem}
+.c-lbl{font-size:0.68rem;font-weight:600;color:rgba(242,240,235,0.35);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.18rem;font-family:'Fira Code',monospace}
+.c-val{font-size:0.88rem;font-weight:500;color:#f2f0eb}
+.contact-right-col{background:var(--white);padding:5rem 3.5rem;display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--border)}
+.form-title{font-size:1.3rem;font-weight:700;color:var(--ink);letter-spacing:-0.03em;margin-bottom:0.4rem}
+.form-subtitle{font-size:0.85rem;color:var(--ink3);margin-bottom:2.5rem}
+.form{display:flex;flex-direction:column;gap:1.1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:0.4rem}
+.form-label{font-size:0.72rem;font-weight:600;color:var(--ink2);letter-spacing:0.02em}
+.form-input{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:0.78rem 1rem;font-family:'Inter',sans-serif;font-size:0.88rem;color:var(--ink);outline:none;transition:border-color .2s;width:100%}
+.form-input:focus{border-color:var(--orange);background:var(--white)}
+.form-input::placeholder{color:var(--ink3)}
+.form-textarea{resize:vertical;min-height:120px;font-family:'Inter',sans-serif;line-height:1.6}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23aba8a2' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;cursor:pointer;background-color:var(--bg)}
+.form-submit{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:0.9rem 2rem;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:opacity .2s;align-self:flex-start}
+.form-submit:hover{opacity:.85}
+.form-note{font-size:0.72rem;color:var(--ink3);margin-top:0.75rem}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:0 1.25rem}
+  .nav-center,.nav-cta{display:none}
+  .nav-mobile-btn{display:flex}
+  .hero{grid-template-columns:1fr;position:relative;background:#27231f;min-height:auto}
+  .hero-content{position:relative;z-index:1;padding:2rem 1.5rem 2.5rem;border-right:none}
+  .hero-h1{color:#f2f0eb}
+  .hero-sub{color:rgba(242,240,235,0.65)}
+  .btn-ghost{color:#f2f0eb;border-color:rgba(242,240,235,0.3)}
+  .hero-visual{display:none}
+  .section-problem{grid-template-columns:1fr}
+  .prob{padding:3rem 1.5rem}
+  .prob.a{border-right:none}
+  .section-products-home,.secondary-section,.services-section,.steps-section,.tech-section,.team-section{padding:3.5rem 1.5rem}
+  .products-grid,.products-grid-2,.services-grid,.sec-grid{grid-template-columns:1fr}
+  .p-card,.p-card-sm{padding:1.25rem 1.5rem}
+  .section-features,.approach-section,.manifesto-section,.split-section{grid-template-columns:1fr}
+  .feat-left,.ap-left,.ap-right,.man-left,.man-right,.split-a,.split-b{padding:3rem 1.5rem}
+  .feat-right{padding:2rem 1.5rem}
+  .ap-left{border-right:none}
+  .prod-section{display:flex;flex-direction:column}
+  .prod-visual{min-height:220px;order:-1 !important;flex-shrink:0}
+  .prod-visual-overlay{display:none !important}
+  .prod-info{padding:3rem 1.5rem;order:1}
+  .team-grid{grid-template-columns:1fr 1fr}
+  .numbers-section{grid-template-columns:1fr 1fr}
+  .num-block{border-right:none;border-bottom:1px solid var(--border)}
+  .contact-main{grid-template-columns:1fr}
+  .contact-left-col{padding:3.5rem 1.5rem;min-height:auto;justify-content:flex-start;gap:2rem}
+  .contact-right-col{padding:3rem 1.5rem}
+  .form-row{grid-template-columns:1fr}
+  .cta-banner{flex-direction:column;padding:3rem 1.5rem}
+  .home-contact{flex-direction:column;padding:3.5rem 1.5rem}
+  .c-input{width:100%}
+  .page-hero{padding:3.5rem 1.5rem}
+  footer{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:0.5rem 1.5rem;padding:1.25rem 1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-menu-close" onclick="closeMenu()">✕</button>
+  <button class="mnc" onclick="navigate('home')">Inicio</button>
+  <button class="mnc" onclick="navigate('soluciones')">Soluciones</button>
+  <button class="mnc" onclick="navigate('proceso')">Proceso</button>
+  <button class="mnc" onclick="navigate('productos')">Productos</button>
+  <button class="mnc" onclick="navigate('nosotros')" ontouchstart="navigate('nosotros')">Nosotros</button>
+  <button class="mnc" onclick="navigate('contacto')" ontouchstart="navigate('contacto')">Contacto</button>
+  <button class="mobile-cta-btn" onclick="navigate('contacto')" ontouchstart="navigate('contacto')">Hablar con el equipo →</button>
+</div>
+
+<nav>
+  <div class="logo" onclick="navigate('home')">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="1.5" y="1.5" width="21" height="21" rx="5" stroke="#f2f0eb" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#f05a00"/></svg>
+    <span class="logo-text">kippcode</span>
+  </div>
+  <div class="nav-center">
+    <button class="nc" onclick="navigate('soluciones')">Soluciones</button>
+    <button class="nc" onclick="navigate('proceso')">Proceso</button>
+    <button class="nc" onclick="navigate('productos')">Productos</button>
+    <button class="nc" onclick="navigate('nosotros')">Nosotros</button>
+    <button class="nc" onclick="navigate('contacto')">Contacto</button>
+  </div>
+  <button class="nav-cta" onclick="navigate('contacto')">Hablar con el equipo →</button>
+  <button class="nav-mobile-btn" onclick="openMenu()">☰</button>
+</nav>
+
+<div id="app">
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-h1">Software que se<br>adapta a tu <em>negocio.</em></h1>
+      <p class="hero-sub">Diseñamos y desarrollamos soluciones digitales a medida, construidas sobre las necesidades reales de tu organización. Sin plantillas. Sin compromisos. Solo tecnología que funciona para vos.</p>
+      <div class="hero-btns">
+        <button class="btn-dark" onclick="navigate('soluciones')">Ver soluciones</button>
+        <button class="btn-ghost" onclick="navigate('contacto')">Iniciar proyecto →</button>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-photo"></div>
+      <div class="hero-fade"></div>
+      <div class="hero-tint"></div>
+    </div>
+  </section>
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="t-item">DESARROLLO A MEDIDA <span class="t-sep">·</span></span>
+      <span class="t-item">ARQUITECTURA ESCALABLE <span class="t-sep">·</span></span>
+      <span class="t-item">INTEGRACIÓN DE SISTEMAS <span class="t-sep">·</span></span>
+      <span class="t-item">AUTOMATIZACIÓN DE PROCESOS <span class="t-sep">·</span></span>
+      <span class="t-item">DESARROLLO A MEDIDA <span class="t-sep">·</span></span>
+      <span class="t-item">ARQUITECTURA ESCALABLE <span class="t-sep">·</span></span>
+      <span class="t-item">INTEGRACIÓN DE SISTEMAS <span class="t-sep">·</span></span>
+      <span class="t-item">AUTOMATIZACIÓN DE PROCESOS <span class="t-sep">·</span></span>
+    </div>
+  </div>
+  <section class="section-problem">
+    <div class="prob a">
+      <div class="s-eyebrow"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">El problema</span></div>
+      <h2 class="s-h">Las soluciones genéricas no resuelven <em>problemas reales.</em></h2>
+      <p class="s-p">La mayoría de las empresas fuerzan sus procesos internos para encajar en software estándar. El resultado es fricción, ineficiencia y datos dispersos.</p>
+    </div>
+    <div class="prob b">
+      <div class="s-eyebrow"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Nuestra respuesta</span></div>
+      <h2 class="s-h">Construimos el software que tu empresa <em>necesita.</em></h2>
+      <p class="s-p">Analizamos tus flujos, identificamos los cuellos de botella y diseñamos una solución que encaja perfectamente con tu operación. El software se adapta a vos, no al revés.</p>
+    </div>
+  </section>
+  <section class="section-products-home">
+    <div class="s-eyebrow" style="margin-bottom:0.75rem"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Nuestro ecosistema de productos</span></div>
+    <h2 class="section-title inv" style="margin-bottom:2.5rem">Software propio para cada <em>industria.</em></h2>
+    <div class="products-grid">
+      <div class="p-card" onclick="navigate('productos')"><div class="p-tag-pill">Finanzas · ERP</div><div class="p-name">finHub Business</div><div class="p-desc">Suite ERP para gestión empresarial. Control financiero, operativo y analítico en una sola plataforma.</div><div class="p-link">Ver más →</div></div>
+      <div class="p-card" onclick="navigate('productos')"><div class="p-tag-pill">Finanzas personales</div><div class="p-name">finHub Home</div><div class="p-desc">Gestión de finanzas personales inteligente. Tu economía siempre bajo control.</div><div class="p-link">Ver más →</div></div>
+      <div class="p-card" onclick="navigate('productos')"><div class="p-tag-pill">Administración</div><div class="p-name">BOSS</div><div class="p-desc">Administrador de consorcios profesional. Liquidaciones, cobros y documentación centralizada.</div><div class="p-link">Ver más →</div></div>
+    </div>
+    <div class="products-grid-2">
+      <div class="p-card-sm" onclick="navigate('productos')"><div><div class="p-sm-name">Juegos</div><div class="p-sm-desc">Entretenimiento digital in-house</div></div></div>
+      <div class="p-card-sm" onclick="navigate('productos')"><div><div class="p-sm-name">Apps de productividad</div><div class="p-sm-desc">Herramientas para equipos y profesionales</div></div></div>
+      <div class="p-card-sm" style="background:#2a2824;justify-content:center"><button class="s-more" onclick="navigate('productos')">Ver todos los productos →</button></div>
+    </div>
+  </section>
+  <section class="section-features">
+    <div class="feat-left">
+      <div class="s-eyebrow inv"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Cómo trabajamos</span></div>
+      <h2 class="s-h inv">Tu negocio define<br>la <em>arquitectura.</em></h2>
+      <p class="s-p inv" style="font-size:0.9rem;margin-top:0.5rem">Cada proyecto comienza con un diagnóstico profundo. Mapeamos tus necesidades y construimos con las tecnologías más adecuadas para tu escala.</p>
+      <button class="btn-white" style="margin-top:2rem" onclick="navigate('proceso')">Conocer el proceso</button>
+    </div>
+    <div class="feat-right">
+      <div class="f-row"><div class="f-ico">◎</div><div><div class="f-t">Diagnóstico y discovery</div><div class="f-s">Entendemos tu operación antes de escribir una línea de código</div></div></div>
+      <div class="f-row"><div class="f-ico">⊕</div><div><div class="f-t">Desarrollo iterativo</div><div class="f-s">Entregas parciales y validación continua con tu equipo</div></div></div>
+      <div class="f-row"><div class="f-ico">✦</div><div><div class="f-t">Integración y escalabilidad</div><div class="f-s">Conectamos con tus sistemas actuales y crecemos con vos</div></div></div>
+      <div class="f-row"><div class="f-ico">→</div><div><div class="f-t">Soporte y evolución continua</div><div class="f-s">El software evoluciona a medida que tu negocio crece</div></div></div>
+    </div>
+  </section>
+  <section class="section-tagline">
+    <div class="tl-photo"></div><div class="tl-overlay"></div><div class="tl-glow"></div>
+    <p class="tl-text">everything,<br><em>in sync.</em></p>
+    <p class="tl-sub">kippcode.com</p>
+  </section>
+  <section class="home-contact">
+    <div><h2 class="c-h">¿Tenés un proyecto<br>en mente?</h2><p class="c-sub">Contanos tu desafío y te respondemos en menos de 48 horas.</p></div>
+    <div class="c-form"><input class="c-input" type="email" placeholder="tu@empresa.com"><button class="btn-orange" onclick="navigate('contacto')">Iniciar conversación →</button></div>
+  </section>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+<!-- ══ SOLUCIONES ══ -->
+<div class="page" id="page-soluciones">
+  <section class="page-hero light">
+    <div class="page-hero-content">
+      <div class="page-tag">Soluciones de desarrollo</div>
+      <h1 class="page-h1">Cada problema merece<br>su propia <em>solución.</em></h1>
+      <p class="page-sub">Desarrollamos software a medida para empresas que no quieren adaptarse a herramientas genéricas. Analizamos tu operación y construimos exactamente lo que necesitás.</p>
+    </div>
+  </section>
+  <section class="services-section">
+    <div class="s-eyebrow" style="margin-bottom:1rem"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Qué construimos</span></div>
+    <h2 class="section-title">Soluciones para cada <em>necesidad.</em></h2>
+    <div class="services-grid">
+      <div class="svc-card"><div class="svc-ico">🖥</div><div class="svc-n">Aplicaciones web</div><div class="svc-p">Sistemas de gestión internos, plataformas SaaS y portales de clientes a la medida de tu flujo de trabajo.</div><div class="svc-tags"><span class="svc-tag">React</span><span class="svc-tag">Next.js</span><span class="svc-tag">Node.js</span></div></div>
+      <div class="svc-card"><div class="svc-ico">📱</div><div class="svc-n">Apps móviles</div><div class="svc-p">Aplicaciones nativas y multiplataforma para iOS y Android, desde apps de consumo masivo hasta herramientas de campo.</div><div class="svc-tags"><span class="svc-tag">React Native</span><span class="svc-tag">Flutter</span></div></div>
+      <div class="svc-card"><div class="svc-ico">⚙️</div><div class="svc-n">Automatización de procesos</div><div class="svc-p">Identificamos tareas repetitivas y las automatizamos. Flujos de aprobación, notificaciones y sincronización entre sistemas.</div><div class="svc-tags"><span class="svc-tag">Python</span><span class="svc-tag">APIs</span></div></div>
+      <div class="svc-card"><div class="svc-ico">🔗</div><div class="svc-n">Integración de sistemas</div><div class="svc-p">Conectamos tus herramientas existentes: CRMs, ERPs, plataformas de pago y cualquier servicio con API disponible.</div><div class="svc-tags"><span class="svc-tag">REST</span><span class="svc-tag">GraphQL</span></div></div>
+      <div class="svc-card"><div class="svc-ico">📊</div><div class="svc-n">Business intelligence</div><div class="svc-p">Dashboards ejecutivos y reportes automáticos que convierten tu información en decisiones concretas.</div><div class="svc-tags"><span class="svc-tag">SQL</span><span class="svc-tag">Power BI</span></div></div>
+      <div class="svc-card"><div class="svc-ico">☁️</div><div class="svc-n">Infraestructura y DevOps</div><div class="svc-p">Arquitectura en la nube, CI/CD y monitoreo. Tu producto siempre disponible, seguro y preparado para crecer.</div><div class="svc-tags"><span class="svc-tag">AWS</span><span class="svc-tag">Docker</span></div></div>
+    </div>
+  </section>
+  <section class="approach-section">
+    <div class="ap-left">
+      <div class="s-eyebrow inv"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Nuestro enfoque</span></div>
+      <h2 class="s-h inv">No vendemos horas.<br>Entregamos <em>resultados.</em></h2>
+      <p class="s-p inv" style="margin-top:0.5rem">Cada engagement comienza con discovery donde entendemos tu negocio antes de escribir una sola línea de código.</p>
+    </div>
+    <div class="ap-right">
+      <div class="check-row"><div class="check-ico">✓</div><div><div class="check-t">Discovery antes de desarrollar</div><div class="check-s">Mapeamos tu operación completa antes de proponer soluciones técnicas</div></div></div>
+      <div class="check-row"><div class="check-ico">✓</div><div><div class="check-t">Estimaciones reales</div><div class="check-s">Sin sorpresas de costos. Precios fijos por entregable o retainer mensual</div></div></div>
+      <div class="check-row"><div class="check-ico">✓</div><div><div class="check-t">Código que escala</div><div class="check-s">Arquitectura diseñada para crecer. Tu inversión no queda obsoleta</div></div></div>
+      <div class="check-row"><div class="check-ico">✓</div><div><div class="check-t">Comunicación continua</div><div class="check-s">Acceso directo al equipo técnico, demos semanales y updates en tiempo real</div></div></div>
+    </div>
+  </section>
+  <section class="tech-section">
+    <div class="s-eyebrow"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Stack tecnológico</span></div>
+    <div class="tech-grid"><div class="tech-pill">React</div><div class="tech-pill">Next.js</div><div class="tech-pill">TypeScript</div><div class="tech-pill">Node.js</div><div class="tech-pill">Python</div><div class="tech-pill">Go</div><div class="tech-pill">PostgreSQL</div><div class="tech-pill">MongoDB</div><div class="tech-pill">Redis</div><div class="tech-pill">AWS</div><div class="tech-pill">Google Cloud</div><div class="tech-pill">Docker</div><div class="tech-pill">React Native</div><div class="tech-pill">Flutter</div><div class="tech-pill">GraphQL</div></div>
+  </section>
+  <div class="cta-banner"><div><div class="cta-h">¿Tenés un problema que resolver?</div><div class="cta-sub">Armamos una propuesta sin costo.</div></div><button class="btn-white" onclick="navigate('contacto')">Iniciar conversación →</button></div>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+<!-- ══ PROCESO ══ -->
+<div class="page" id="page-proceso">
+  <section class="page-hero light">
+    <div class="page-hero-content">
+      <div class="page-tag">Cómo trabajamos</div>
+      <h1 class="page-h1">Un proceso diseñado<br>para <em>no fallar.</em></h1>
+      <p class="page-sub">Metodología probada que reduce el riesgo, maximiza la calidad y mantiene a tu equipo siempre en el loop. Sin sorpresas. Sin excusas.</p>
+    </div>
+  </section>
+  <section class="steps-section">
+    <div class="s-eyebrow" style="margin-bottom:1rem"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">El proceso</span></div>
+    <h2 class="section-title">De la idea al <em>producto.</em></h2>
+    <div class="steps-list">
+      <div class="step"><div class="step-num"><div class="step-n">01</div><div class="step-line"></div></div><div class="step-body"><div class="step-title">Discovery y diagnóstico</div><div class="step-desc">Antes de escribir una línea de código, nos sumergimos en tu operación. Entrevistas, mapeo de flujos y definición de KPIs de éxito.</div><div class="step-tags"><span class="step-tag">1–2 semanas</span><span class="step-tag">Workshops</span><span class="step-tag">Requerimientos</span></div></div></div>
+      <div class="step"><div class="step-num"><div class="step-n">02</div><div class="step-line"></div></div><div class="step-body"><div class="step-title">Diseño y arquitectura</div><div class="step-desc">Definimos la arquitectura técnica, el stack y los flujos de usuario. Prototipamos pantallas clave para validar antes de construir.</div><div class="step-tags"><span class="step-tag">1–2 semanas</span><span class="step-tag">Wireframes</span><span class="step-tag">Arquitectura técnica</span></div></div></div>
+      <div class="step"><div class="step-num"><div class="step-n">03</div><div class="step-line"></div></div><div class="step-body"><div class="step-title">Desarrollo iterativo</div><div class="step-desc">Construimos en sprints de dos semanas. Cada sprint termina con una demo funcional. Priorizamos las funcionalidades de mayor impacto primero.</div><div class="step-tags"><span class="step-tag">Sprints de 2 semanas</span><span class="step-tag">Demos constantes</span></div></div></div>
+      <div class="step"><div class="step-num"><div class="step-n">04</div><div class="step-line"></div></div><div class="step-body"><div class="step-title">QA y testing</div><div class="step-desc">Testing automatizado y manual en cada entrega. Cobertura de casos borde y validación de seguridad antes de cualquier deploy.</div><div class="step-tags"><span class="step-tag">Tests automatizados</span><span class="step-tag">QA manual</span></div></div></div>
+      <div class="step"><div class="step-num"><div class="step-n">05</div><div class="step-line"></div></div><div class="step-body"><div class="step-title">Deploy y lanzamiento</div><div class="step-desc">Infraestructura robusta, monitoreo en tiempo real y rollback garantizado. Lanzamos cuando estamos seguros, no cuando se cumple la fecha.</div><div class="step-tags"><span class="step-tag">Infraestructura cloud</span><span class="step-tag">Monitoreo 24/7</span></div></div></div>
+      <div class="step"><div class="step-num"><div class="step-n">06</div></div><div class="step-body"><div class="step-title">Soporte y evolución continua</div><div class="step-desc">El software no termina en el launch. Soporte post-deploy, monitoreo proactivo y ciclos de mejora para que tu producto evolucione con tu negocio.</div><div class="step-tags"><span class="step-tag">SLA garantizado</span><span class="step-tag">Roadmap continuo</span></div></div></div>
+    </div>
+  </section>
+  <section class="split-section">
+    <div class="split-a">
+      <div class="s-eyebrow inv"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Por qué funciona</span></div>
+      <h2 class="s-h inv">Transparencia total<br>en cada <em>etapa.</em></h2>
+      <p class="s-p inv" style="margin-top:0.5rem">Acceso a nuestro board de proyecto, updates semanales y canal directo con el equipo técnico.</p>
+    </div>
+    <div class="split-b">
+      <div class="kpi-row"><div class="kpi-n">2sem</div><div><div class="kpi-l">Primer prototipo funcional</div><div class="kpi-s">Desde el kick-off del proyecto</div></div></div>
+      <div class="kpi-row"><div class="kpi-n">98%</div><div><div class="kpi-l">Proyectos entregados en plazo</div><div class="kpi-s">Con metodología de sprints definidos</div></div></div>
+      <div class="kpi-row"><div class="kpi-n">24hs</div><div><div class="kpi-l">Tiempo de respuesta máximo</div><div class="kpi-s">Para consultas y cambios de prioridad</div></div></div>
+    </div>
+  </section>
+  <div class="cta-banner"><div><div class="cta-h">¿Listo para empezar?</div><div class="cta-sub">El primer paso es una conversación. Sin compromiso.</div></div><button class="btn-white" onclick="navigate('contacto')">Agendar una reunión →</button></div>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+<!-- ══ PRODUCTOS ══ -->
+<div class="page" id="page-productos">
+  <section class="page-hero dark">
+    <div class="page-hero-content">
+      <div class="page-tag inv">Ecosistema de productos</div>
+      <h1 class="page-h1 inv">Software propio para<br>cada <em>industria.</em></h1>
+      <p class="page-sub inv">Además del desarrollo a medida, construimos y mantenemos productos propios para necesidades específicas del mercado.</p>
+    </div>
+  </section>
+  <section class="prod-section">
+    <div class="prod-info light">
+      <div class="prod-tag-label">Finanzas · ERP</div>
+      <div class="prod-h">finHub Business</div>
+      <div class="prod-subtitle">Gestión empresarial integral</div>
+      <p class="s-p">Suite ERP para pymes y empresas en crecimiento que necesitan control total de su operación financiera y administrativa, sin la complejidad de las soluciones enterprise.</p>
+      <div class="feat-list">
+        <div class="feat-item"><div class="feat-dot"></div>Control de ingresos, egresos y flujo de caja</div>
+        <div class="feat-item"><div class="feat-dot"></div>Facturación y gestión de cobros automática</div>
+        <div class="feat-item"><div class="feat-dot"></div>Reportes financieros en tiempo real</div>
+        <div class="feat-item"><div class="feat-dot"></div>Integración con bancos y sistemas contables</div>
+        <div class="feat-item"><div class="feat-dot"></div>Multi-usuario con roles y permisos</div>
+      </div>
+      <button class="prod-btn" onclick="navigate('contacto')">Solicitar demo →</button>
+    </div>
+    <div class="prod-visual" style="background:linear-gradient(135deg,#1a2a4a 0%,#0d1f3c 100%);align-items:flex-end;justify-content:center;padding:0;overflow:hidden">
+      <div style="position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%">
+        <div style="width:54%;max-width:200px;border-radius:18px 18px 0 0;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,0.4);margin-bottom:0;transform:translateY(2px)">
+          <img src="data:image/webp;base64,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" alt="finHub Business app" style="width:100%;display:block">
+        </div>
+      </div>
+      <div class="prod-visual-overlay" style="background:linear-gradient(to left,rgba(13,31,60,0) 30%,var(--white) 100%)"></div>
+    </div>
+  </section>
+  <section class="prod-section" style="border-top:1px solid var(--border)">
+    <div class="prod-visual" style="order:-1;background:linear-gradient(135deg,#1a2e20 0%,#0f1f14 100%);align-items:flex-end;justify-content:center;padding:0;overflow:hidden">
+      <div style="position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center;width:100%;height:100%">
+        <div style="width:54%;max-width:200px;border-radius:18px 18px 0 0;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,0.4);transform:translateY(2px)">
+          <img src="data:image/webp;base64,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" alt="finHub Home app" style="width:100%;display:block">
+        </div>
+      </div>
+      <div class="prod-visual-overlay" style="background:linear-gradient(to right,rgba(15,31,20,0) 30%,var(--bg2) 100%)"></div>
+    </div>
+    <div class="prod-info sand" style="order:1">
+      <div class="prod-tag-label">Suite finHub</div>
+      <div class="prod-h">Dos módulos,<br>un ecosistema.</div>
+      <div class="prod-subtitle">Finanzas personales y empresariales</div>
+      <p class="s-p">finHub nace como una suite integrada con dos productos complementarios, diseñados para distintos contextos pero con la misma filosofía: simplificar el control financiero.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem">
+        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:1.1rem"><div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">Personal</div><div style="font-size:0.95rem;font-weight:700;color:var(--ink);letter-spacing:-0.02em;margin-bottom:0.4rem">finHub Home</div><div style="font-size:0.75rem;color:var(--ink2);line-height:1.5">Ingresos, gastos, objetivos y proyecciones en tu bolsillo.</div></div>
+        <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:1.1rem"><div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">Empresas · ERP</div><div style="font-size:0.95rem;font-weight:700;color:var(--ink);letter-spacing:-0.02em;margin-bottom:0.4rem">finHub Business</div><div style="font-size:0.75rem;color:var(--ink2);line-height:1.5">Control financiero y operativo completo para tu negocio.</div></div>
+      </div>
+      <button class="prod-btn" onclick="navigate('contacto')" style="margin-top:1.75rem">Solicitar acceso →</button>
+    </div>
+  </section>
+  <section style="border-top:1px solid var(--border);background:#242220;padding:5rem 3rem">
+    <div class="prod-tag-label dark-label">Administración</div>
+    <div class="prod-h inv">BOSS</div>
+    <div class="prod-subtitle inv" style="margin-bottom:1.5rem">Administrador de consorcios</div>
+    <p class="s-p inv" style="max-width:600px">La plataforma para administradores de consorcios y propiedades. Centraliza toda la operación: liquidaciones, cobros, reclamos y comunicación con copropietarios.</p>
+    <div class="feat-list" style="max-width:600px">
+      <div class="feat-item inv"><div class="feat-dot"></div>Liquidaciones mensuales automatizadas</div>
+      <div class="feat-item inv"><div class="feat-dot"></div>Portal de copropietarios con historial</div>
+      <div class="feat-item inv"><div class="feat-dot"></div>Gestión de reclamos y mantenimiento</div>
+      <div class="feat-item inv"><div class="feat-dot"></div>Cobros digitales integrados</div>
+      <div class="feat-item inv"><div class="feat-dot"></div>Documentación y actas digitales</div>
+    </div>
+    <button class="prod-btn inv-btn" onclick="navigate('contacto')" style="margin-top:2rem">Solicitar demo →</button>
+  </section>
+  <section class="secondary-section">
+    <div class="s-eyebrow" style="margin-bottom:1rem"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">También desarrollamos</span></div>
+    <h2 class="section-title">Más del <em>ecosistema.</em></h2>
+    <div class="sec-grid">
+      <div class="sec-card"><div class="sec-ico">🎮</div><div class="sec-n">Juegos</div><p class="sec-p">Títulos de entretenimiento digital desarrollados in-house. Desde juegos casuales hasta experiencias más complejas para móvil y web.</p><span class="sec-status status-live">En desarrollo</span></div>
+      <div class="sec-card"><div class="sec-ico">⚡</div><div class="sec-n">Apps de productividad</div><p class="sec-p">Herramientas para mejorar la productividad de equipos y profesionales independientes. Simples, rápidas y sin fricción.</p><span class="sec-status status-soon">Próximamente</span></div>
+    </div>
+  </section>
+  <div class="cta-banner"><div><div class="cta-h">¿Necesitás una solución a medida?</div><div class="cta-sub">Si ningún producto encaja, lo construimos desde cero para vos.</div></div><button class="btn-white" onclick="navigate('contacto')">Hablar con el equipo →</button></div>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+<!-- ══ NOSOTROS ══ -->
+<div class="page" id="page-nosotros">
+  <section class="page-hero light">
+    <div class="page-hero-content">
+      <div class="page-tag">El equipo</div>
+      <h1 class="page-h1">Construimos software<br>con <em>propósito.</em></h1>
+      <p class="page-sub">Somos un equipo de desarrolladores, diseñadores y estrategas apasionados por resolver problemas reales con tecnología bien hecha.</p>
+    </div>
+  </section>
+  <section class="manifesto-section">
+    <div class="man-left">
+      <div class="s-eyebrow inv"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Nuestra filosofía</span></div>
+      <h2 class="man-h">Tecnología que sirve<br>a las <em>personas.</em></h2>
+      <p class="man-p">Creemos que el software debería simplificar la vida de las personas, no complicarla. Cada decisión técnica tiene ese norte como guía.</p>
+    </div>
+    <div class="man-right">
+      <div class="value-row"><div class="value-n">🎯 Foco en el problema</div><div class="value-p">Entendemos el negocio antes de proponer soluciones técnicas. La tecnología es el medio, no el fin.</div></div>
+      <div class="value-row"><div class="value-n">🤝 Transparencia radical</div><div class="value-p">Comunicación directa, estimaciones reales y acceso total al estado del proyecto en todo momento.</div></div>
+      <div class="value-row"><div class="value-n">⚡ Calidad sin excusas</div><div class="value-p">Código limpio, arquitectura sólida y testing riguroso. No entregamos algo que no usaríamos nosotros mismos.</div></div>
+    </div>
+  </section>
+  <section class="team-section">
+    <div class="s-eyebrow" style="margin-bottom:1rem"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">El equipo</span></div>
+    <h2 class="section-title">Las personas detrás del <em>código.</em></h2>
+    <div class="team-grid">
+      <div class="team-card"><div class="team-avatar">MG</div><div class="team-name">Martín G.</div><div class="team-role">CEO & Co-founder<br>Full-stack dev</div></div>
+      <div class="team-card"><div class="team-avatar">SR</div><div class="team-name">Sofía R.</div><div class="team-role">CTO & Co-founder<br>Backend architect</div></div>
+      <div class="team-card"><div class="team-avatar">LP</div><div class="team-name">Lucas P.</div><div class="team-role">Lead Designer<br>UX/UI</div></div>
+      <div class="team-card"><div class="team-avatar">CM</div><div class="team-name">Carolina M.</div><div class="team-role">Project Manager<br>Delivery</div></div>
+    </div>
+  </section>
+  <div class="numbers-section">
+    <div class="num-block"><div class="num-n">8</div><div class="num-l">Años desarrollando software</div></div>
+    <div class="num-block"><div class="num-n">120<em>+</em></div><div class="num-l">Proyectos entregados</div></div>
+    <div class="num-block"><div class="num-n">98<em>%</em></div><div class="num-l">Satisfacción de clientes</div></div>
+    <div class="num-block"><div class="num-n">12</div><div class="num-l">Personas en el equipo</div></div>
+  </div>
+  <div class="cta-banner"><div><div class="cta-h">¿Querés trabajar con nosotros?</div><div class="cta-sub">Siempre buscamos talento excepcional y proyectos desafiantes.</div></div><button class="btn-white" onclick="navigate('contacto')">Escribinos →</button></div>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+<!-- ══ CONTACTO ══ -->
+<div class="page" id="page-contacto">
+  <section class="contact-main">
+    <div class="contact-left-col">
+      <div class="contact-left-inner">
+        <div class="s-eyebrow inv"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Hablemos</span></div>
+        <h1 class="contact-h">El primer paso<br>es una <em>conversación.</em></h1>
+        <p class="contact-sub-text">Contanos qué problema querés resolver. Te respondemos en menos de 48 horas con una propuesta inicial sin costo.</p>
+      </div>
+      <div class="contact-info-list">
+        <div class="c-info-item"><div class="c-ico">✉</div><div><div class="c-lbl">Email</div><div class="c-val">hola@kippcode.com</div></div></div>
+        <div class="c-info-item"><div class="c-ico">💬</div><div><div class="c-lbl">WhatsApp</div><div class="c-val">+54 11 XXXX-XXXX</div></div></div>
+        <div class="c-info-item"><div class="c-ico">⏱</div><div><div class="c-lbl">Respuesta</div><div class="c-val">Menos de 48 horas hábiles</div></div></div>
+        <div class="c-info-item"><div class="c-ico" style="font-size:1.1rem">📷</div><div><div class="c-lbl">Instagram</div><div class="c-val" style="color:var(--orange)">@kippcode</div></div></div>
+      </div>
+    </div>
+    <div class="contact-right-col">
+      <div class="form-title">Contanos sobre tu proyecto</div>
+      <div class="form-subtitle">Cuanto más detalle, mejor podemos ayudarte.</div>
+      <div class="form">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" placeholder="Tu nombre"></div>
+          <div class="form-group"><label class="form-label">Empresa</label><input class="form-input" type="text" placeholder="Tu empresa"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="tu@empresa.com"></div>
+        <div class="form-group">
+          <label class="form-label">¿Qué necesitás?</label>
+          <select class="form-input form-select">
+            <option value="" disabled selected>Seleccioná una opción</option>
+            <option>Desarrollo de software a medida</option>
+            <option>Automatización de procesos</option>
+            <option>Integración de sistemas</option>
+            <option>App móvil</option>
+            <option>Demo de finHub Business</option>
+            <option>Demo de finHub Home</option>
+            <option>Demo de BOSS</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Descripción del proyecto</label><textarea class="form-input form-textarea" placeholder="Contanos qué problema querés resolver, tamaño de tu equipo, plazos y cualquier detalle relevante..."></textarea></div>
+        <button class="form-submit">Enviar mensaje →</button>
+        <div class="form-note">Respondemos en menos de 48 horas hábiles. Sin spam, sin compromiso.</div>
+      </div>
+    </div>
+  </section>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+</div><!-- /#app -->
+
+<script>
+var pages = ['home','soluciones','proceso','productos','nosotros','contacto'];
+var navLabels = {soluciones:'soluciones',proceso:'proceso',productos:'productos',nosotros:'nosotros',contacto:'contacto'};
+function openMenu(){
+  document.getElementById('mobile-menu').classList.add('open');
+}
+function closeMenu(){
+  document.getElementById('mobile-menu').classList.remove('open');
+}
+function navigate(page){
+  // Close menu first
+  closeMenu();
+  // Small delay to let menu close animation complete on iOS
+  setTimeout(function(){
+    // Hide all pages
+    for(var i=0;i<pages.length;i++){
+      var el=document.getElementById('page-'+pages[i]);
+      if(el) el.classList.remove('active');
+    }
+    // Show target page
+    var target=document.getElementById('page-'+page);
+    if(target) target.classList.add('active');
+    // Update nav highlight
+    var navBtns=document.querySelectorAll('.nc');
+    for(var j=0;j<navBtns.length;j++){
+      navBtns[j].classList.remove('active');
+      if(navLabels[page] && navBtns[j].textContent.toLowerCase().trim()===navLabels[page]){
+        navBtns[j].classList.add('active');
+      }
+    }
+    // Scroll to top
+    document.documentElement.scrollTop=0;
+    document.body.scrollTop=0;
+    window.scrollTo(0,0);
+  }, 10);
+}
+</script>
+</body>
+</html>
