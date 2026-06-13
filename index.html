@@ -84,16 +84,15 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .page-sub.inv{color:rgba(242,240,235,0.6)}
 
 /* HOME */
-.hero{min-height:calc(100vh - 56px);display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border)}
-.hero-content{padding:5rem 3.5rem 4rem;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--border)}
+.hero{min-height:calc(100vh - 56px);display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg)}
+.hero-content{padding:5rem 7vw 4rem;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
 .hero-h1{font-size:clamp(2.8rem,4.5vw,4.8rem);font-weight:800;line-height:1.02;letter-spacing:-0.055em;color:var(--ink);margin-bottom:1.5rem}
 .hero-h1 em{color:var(--orange);font-style:normal}
 .hero-sub{font-size:1rem;font-weight:400;color:var(--ink2);line-height:1.72;max-width:460px;margin-bottom:2.8rem;letter-spacing:-0.01em}
 .hero-btns{display:flex;gap:0.65rem;align-items:center}
-.hero-visual{position:relative;overflow:hidden}
-.hero-photo{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=900&auto=format&fit=crop&q=80');background-size:cover;background-position:center left}
-.hero-fade{position:absolute;inset:0;background:linear-gradient(to right,var(--bg) 0%,rgba(242,240,235,0.05) 35%,transparent 100%)}
-.hero-tint{position:absolute;inset:0;background:rgba(240,90,0,0.06)}
+.hero-rotator{display:flex;align-items:center;gap:0.7rem;font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,2.8vw,2.6rem);letter-spacing:-0.03em;color:var(--orange);height:1.3em;margin-bottom:2rem;margin-top:-0.3rem}
+.hero-rotator .rot-slash{font-family:'Fira Code',monospace;font-size:0.8rem;font-weight:500;color:var(--ink3);opacity:0.6}
+.hero-rotator .rot-word{display:inline-block;transition:opacity .45s ease,transform .45s ease}
 
 .ticker{background:var(--orange);overflow:hidden;padding:0.7rem 0;display:flex}
 .ticker-track{display:flex;gap:2.5rem;white-space:nowrap;animation:tick 22s linear infinite;align-items:center}
@@ -237,12 +236,12 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .value-n{font-size:0.9rem;font-weight:700;color:var(--ink);margin-bottom:0.35rem}
 .value-p{font-size:0.8rem;color:var(--ink2);line-height:1.6}
 .team-section{padding:5rem 3rem;background:var(--bg);border-top:1px solid var(--border)}
-.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.team-card{background:var(--white);padding:2rem 1.5rem;text-align:center;transition:background .2s;word-break:break-word}
-.team-card:hover{background:var(--bg2)}
-.team-avatar{width:68px;height:68px;border-radius:50%;background:var(--bg2);margin:0 auto 1rem;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:800;color:var(--ink3)}
-.team-name{font-size:0.92rem;font-weight:700;color:var(--ink);margin-bottom:0.2rem}
-.team-role{font-size:0.73rem;color:var(--ink3);line-height:1.4}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;border-radius:0;overflow:visible}
+.team-card{background:var(--white);padding:2rem 1.5rem;text-align:center;transition:all .25s;word-break:break-word;position:relative;overflow:hidden}
+.team-card:hover{background:var(--white);transform:translateY(-2px);box-shadow:0 8px 32px rgba(26,25,22,0.1)}
+.team-avatar{width:80px;height:80px;border-radius:50%;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;position:relative}
+.team-name{font-size:0.95rem;font-weight:700;color:var(--ink);margin-bottom:0.3rem;letter-spacing:-0.015em}
+.team-role{font-size:0.72rem;color:var(--ink3);line-height:1.4;letter-spacing:0.01em}
 .numbers-section{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)}
 .num-block{padding:3.5rem 2.5rem;text-align:center;border-right:1px solid var(--border);background:var(--white)}
 .num-block:last-child{border-right:none}
@@ -283,12 +282,11 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   nav{padding:0 1.25rem}
   .nav-center,.nav-cta{display:none}
   .nav-mobile-btn{display:flex}
-  .hero{grid-template-columns:1fr;position:relative;background:#27231f;min-height:auto}
+  .hero{grid-template-columns:1fr;position:relative;background:var(--bg);min-height:auto}
   .hero-content{position:relative;z-index:1;padding:2rem 1.5rem 2.5rem;border-right:none}
-  .hero-h1{color:#f2f0eb}
-  .hero-sub{color:rgba(242,240,235,0.65)}
+  .hero-h1{color:var(--ink)}
+  .hero-sub{color:var(--ink2)}
   .btn-ghost{color:#f2f0eb;border-color:rgba(242,240,235,0.3)}
-  .hero-visual{display:none}
   .section-problem{grid-template-columns:1fr}
   .prob{padding:3rem 1.5rem}
   .prob.a{border-right:none}
@@ -306,9 +304,9 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   .prod-info{padding:3rem 1.5rem;order:1}
   .team-grid{grid-template-columns:1fr 1fr !important}
   .numbers-section{grid-template-columns:1fr 1fr}
-  .team-avatar{width:52px;height:52px;font-size:1rem}
+  .team-avatar{width:64px;height:64px;font-size:1.1rem}
   .team-name{font-size:0.82rem}
-  .team-card{padding:1.25rem 0.75rem}
+  .team-card{padding:1.5rem 1rem;border-radius:12px}
   .manifesto-section{grid-template-columns:1fr}
   .num-block{border-right:none;border-bottom:1px solid var(--border);padding:2rem 1.5rem}
   .contact-main{grid-template-columns:1fr}
@@ -361,16 +359,12 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   <section class="hero">
     <div class="hero-content">
       <h1 class="hero-h1">Software que se<br>adapta a tu <em>negocio.</em></h1>
+      <div class="hero-rotator"><span class="rot-slash">//</span><span class="rot-word" id="heroRotator"></span></div>
       <p class="hero-sub">Diseñamos y desarrollamos soluciones digitales a medida, construidas sobre las necesidades reales de tu organización. Sin plantillas. Sin compromisos. Solo tecnología que funciona para vos.</p>
       <div class="hero-btns">
         <button class="btn-dark" onclick="navigate('soluciones')">Ver soluciones</button>
         <button class="btn-ghost" onclick="navigate('contacto')">Iniciar proyecto →</button>
       </div>
-    </div>
-    <div class="hero-visual" aria-hidden="true">
-      <div class="hero-photo"></div>
-      <div class="hero-fade"></div>
-      <div class="hero-tint"></div>
     </div>
   </section>
   <div class="ticker" aria-hidden="true">
@@ -634,41 +628,41 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
     <div class="s-eyebrow" style="margin-bottom:1rem"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">El equipo</span></div>
     <h2 class="section-title">Las personas detrás del <em>código.</em></h2>
     <div class="team-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="team-card">
-        <div class="team-avatar" style="background:linear-gradient(135deg,#f05a00,#c44000);color:#fff;font-size:1.1rem">FR</div>
+      <div class="team-card" style="background:linear-gradient(145deg,#fff 0%,#f9f7f4 100%);border:1.5px solid rgba(240,90,0,0.15);border-radius:16px;padding:2rem 1.25rem">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#f05a00,#c44000);color:#fff;box-shadow:0 0 0 3px #f2f0eb,0 0 0 5px #f05a00,0 8px 24px rgba(240,90,0,0.25)">FR</div>
         <div class="team-name">Facundo R.</div>
-        <div class="team-role" style="color:var(--orange);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">CEO & Co-founder</div>
-        <div class="team-role">Full-stack dev</div>
+        <div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">CEO & Co-founder</div>
+        <div style="font-size:0.72rem;color:var(--ink3);line-height:1.4">Full-stack dev</div>
       </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:linear-gradient(135deg,#1a1916,#3a3730);color:#f2f0eb;font-size:1.1rem">LS</div>
+      <div class="team-card" style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem 1.25rem">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#2a2724,#1a1916);color:#f2f0eb;box-shadow:0 0 0 3px #f2f0eb,0 0 0 5px rgba(26,25,22,0.15),0 8px 20px rgba(26,25,22,0.12)">LS</div>
         <div class="team-name">Lucas S.</div>
-        <div class="team-role" style="color:var(--orange);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">Finanzas</div>
-        <div class="team-role">Finanzas y Tesorería</div>
+        <div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">Finanzas</div>
+        <div style="font-size:0.72rem;color:var(--ink3);line-height:1.4">Finanzas y Tesorería</div>
       </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:linear-gradient(135deg,#1a1916,#3a3730);color:#f2f0eb;font-size:1.1rem">FA</div>
+      <div class="team-card" style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem 1.25rem">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#2a2724,#1a1916);color:#f2f0eb;box-shadow:0 0 0 3px #f2f0eb,0 0 0 5px rgba(26,25,22,0.15),0 8px 20px rgba(26,25,22,0.12)">FA</div>
         <div class="team-name">Federico A.</div>
-        <div class="team-role" style="color:var(--orange);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">Marketing</div>
-        <div class="team-role">Marketing y Comunicación</div>
+        <div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">Marketing</div>
+        <div style="font-size:0.72rem;color:var(--ink3);line-height:1.4">Marketing y Comunicación</div>
       </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:linear-gradient(135deg,#1a1916,#3a3730);color:#f2f0eb;font-size:1.1rem">SS</div>
+      <div class="team-card" style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem 1.25rem">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#2a2724,#1a1916);color:#f2f0eb;box-shadow:0 0 0 3px #f2f0eb,0 0 0 5px rgba(26,25,22,0.15),0 8px 20px rgba(26,25,22,0.12)">SS</div>
         <div class="team-name">Sofía S.</div>
-        <div class="team-role" style="color:var(--orange);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">Project Manager</div>
-        <div class="team-role">Delivery</div>
+        <div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">Project Manager</div>
+        <div style="font-size:0.72rem;color:var(--ink3);line-height:1.4">Delivery</div>
       </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:linear-gradient(135deg,#1a1916,#3a3730);color:#f2f0eb;font-size:1.1rem">JM</div>
+      <div class="team-card" style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem 1.25rem">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#2a2724,#1a1916);color:#f2f0eb;box-shadow:0 0 0 3px #f2f0eb,0 0 0 5px rgba(26,25,22,0.15),0 8px 20px rgba(26,25,22,0.12)">JM</div>
         <div class="team-name">Juan M.</div>
-        <div class="team-role" style="color:var(--orange);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">Legal</div>
-        <div class="team-role">Legales</div>
+        <div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">Legal</div>
+        <div style="font-size:0.72rem;color:var(--ink3);line-height:1.4">Legales</div>
       </div>
-      <div class="team-card">
-        <div class="team-avatar" style="background:linear-gradient(135deg,#1a1916,#3a3730);color:#f2f0eb;font-size:1.1rem">AC</div>
+      <div class="team-card" style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem 1.25rem">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#2a2724,#1a1916);color:#f2f0eb;box-shadow:0 0 0 3px #f2f0eb,0 0 0 5px rgba(26,25,22,0.15),0 8px 20px rgba(26,25,22,0.12)">AC</div>
         <div class="team-name">Alejandro C.</div>
-        <div class="team-role" style="color:var(--orange);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.2rem">Administración</div>
-        <div class="team-role">Administración</div>
+        <div style="font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.3rem">Administración</div>
+        <div style="font-size:0.72rem;color:var(--ink3);line-height:1.4">Administración</div>
       </div>
     </div>
   </section>
@@ -742,6 +736,30 @@ function openMenu(){
 function closeMenu(){
   document.getElementById('mobile-menu').classList.remove('open');
 }
+
+// ââ HERO ROTADOR DE FRASES ââ
+(function() {
+  var phrases = ['unlock your creativity.', 'go beyond.', 'no limits.', 'create.', 'everything, in sync.'];
+  var el = document.getElementById('heroRotator');
+  if (!el) return;
+  var i = 0;
+  el.textContent = phrases[0];
+  function rotate() {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-10px)';
+    setTimeout(function() {
+      i = (i + 1) % phrases.length;
+      el.textContent = phrases[i];
+      el.style.transform = 'translateY(10px)';
+      requestAnimationFrame(function() {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      });
+    }, 450);
+  }
+  setInterval(rotate, 2600);
+})();
+
 function navigate(page){
   // Close menu first
   closeMenu();
