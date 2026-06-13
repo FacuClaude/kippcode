@@ -286,7 +286,7 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   .hero-content{position:relative;z-index:1;padding:2rem 1.5rem 2.5rem;border-right:none}
   .hero-h1{color:var(--ink)}
   .hero-sub{color:var(--ink2)}
-  .btn-ghost{color:#f2f0eb;border-color:rgba(242,240,235,0.3)}
+  .hero-btns{flex-wrap:wrap;justify-content:center}
   .section-problem{grid-template-columns:1fr}
   .prob{padding:3rem 1.5rem}
   .prob.a{border-right:none}
@@ -772,32 +772,63 @@ function irAContacto() {
   }, 50);
 }
 
-// ── CONTACTO: enviar mensaje vía email ──
+// ── CONTACTO: enviar mensaje (Web3Forms) ──
+var WEB3FORMS_KEY = 'd71e83cf-f9f3-4fbf-911c-4e1d537e9065';
+
 function enviarContacto() {
   var nombre = (document.getElementById('cf-nombre').value || '').trim();
   var empresa = (document.getElementById('cf-empresa').value || '').trim();
   var email = (document.getElementById('cf-email').value || '').trim();
   var necesidad = document.getElementById('cf-necesidad').value || '';
   var descripcion = (document.getElementById('cf-descripcion').value || '').trim();
+  var btn = document.querySelector('.form-submit');
 
   if (!nombre || !email || !descripcion) {
     alert('Por favor completá al menos tu nombre, email y una breve descripción.');
     return;
   }
 
-  var asunto = 'Nuevo contacto desde kipp-code.com' + (necesidad ? ' — ' + necesidad : '');
-  var cuerpo =
-    'Nombre: ' + nombre + '\n' +
-    'Empresa: ' + (empresa || '-') + '\n' +
-    'Email: ' + email + '\n' +
-    'Necesidad: ' + (necesidad || '-') + '\n\n' +
-    'Descripción del proyecto:\n' + descripcion;
+  var original = btn.textContent;
+  btn.textContent = 'Enviando…';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
 
-  var mailto = 'mailto:hola@kipp-code.com'
-    + '?subject=' + encodeURIComponent(asunto)
-    + '&body=' + encodeURIComponent(cuerpo);
-
-  window.location.href = mailto;
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
+      subject: 'Nuevo contacto desde kipp-code.com' + (necesidad ? ' — ' + necesidad : ''),
+      from_name: nombre,
+      nombre: nombre,
+      empresa: empresa || '-',
+      email: email,
+      necesidad: necesidad || '-',
+      mensaje: descripcion
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (data.success) {
+      btn.textContent = '✓ Mensaje enviado';
+      btn.style.background = '#1a7a3a';
+      btn.style.opacity = '1';
+      document.getElementById('cf-nombre').value = '';
+      document.getElementById('cf-empresa').value = '';
+      document.getElementById('cf-email').value = '';
+      document.getElementById('cf-necesidad').selectedIndex = 0;
+      document.getElementById('cf-descripcion').value = '';
+      setTimeout(function(){ btn.textContent = original; btn.style.background = ''; btn.disabled = false; }, 4000);
+    } else {
+      throw new Error(data.message || 'Error');
+    }
+  })
+  .catch(function(){
+    btn.textContent = original;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    alert('Hubo un problema al enviar el mensaje. Escribinos directamente a hola@kipp-code.com o por WhatsApp al +54 11 6561-0654.');
+  });
 }
 
 function navigate(page){
