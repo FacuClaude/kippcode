@@ -426,7 +426,7 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   </section>
   <section class="home-contact">
     <div><h2 class="c-h">¿Tenés un proyecto<br>en mente?</h2><p class="c-sub">Contanos tu desafío y te respondemos en menos de 48 horas.</p></div>
-    <div class="c-form"><input class="c-input" type="email" placeholder="tu@empresa.com"><button class="btn-orange" onclick="navigate('contacto')">Iniciar conversación →</button></div>
+    <div class="c-form"><input class="c-input" id="home-email" type="email" placeholder="tu@empresa.com"><button class="btn-orange" onclick="irAContacto()">Iniciar conversación →</button></div>
   </section>
   <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
 </div>
@@ -698,13 +698,13 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
       <div class="form-subtitle">Cuanto más detalle, mejor podemos ayudarte.</div>
       <div class="form">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" placeholder="Tu nombre"></div>
-          <div class="form-group"><label class="form-label">Empresa</label><input class="form-input" type="text" placeholder="Tu empresa"></div>
+          <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" id="cf-nombre" type="text" placeholder="Tu nombre"></div>
+          <div class="form-group"><label class="form-label">Empresa</label><input class="form-input" id="cf-empresa" type="text" placeholder="Tu empresa"></div>
         </div>
-        <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="tu@empresa.com"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cf-email" type="email" placeholder="tu@empresa.com"></div>
         <div class="form-group">
           <label class="form-label">¿Qué necesitás?</label>
-          <select class="form-input form-select">
+          <select class="form-input form-select" id="cf-necesidad">
             <option value="" disabled selected>Seleccioná una opción</option>
             <option>Desarrollo de software a medida</option>
             <option>Automatización de procesos</option>
@@ -716,8 +716,8 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
             <option>Otro</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">Descripción del proyecto</label><textarea class="form-input form-textarea" placeholder="Contanos qué problema querés resolver, tamaño de tu equipo, plazos y cualquier detalle relevante..."></textarea></div>
-        <button class="form-submit">Enviar mensaje →</button>
+        <div class="form-group"><label class="form-label">Descripción del proyecto</label><textarea class="form-input form-textarea" id="cf-descripcion" placeholder="Contanos qué problema querés resolver, tamaño de tu equipo, plazos y cualquier detalle relevante..."></textarea></div>
+        <button class="form-submit" onclick="enviarContacto()">Enviar mensaje →</button>
         <div class="form-note">Respondemos en menos de 48 horas hábiles. Sin spam, sin compromiso.</div>
       </div>
     </div>
@@ -759,6 +759,46 @@ function closeMenu(){
   }
   setInterval(rotate, 2600);
 })();
+
+// ── CONTACTO: pasar email del home al formulario ──
+var _homeEmailPrefill = '';
+function irAContacto() {
+  var inp = document.getElementById('home-email');
+  if (inp && inp.value) { _homeEmailPrefill = inp.value.trim(); }
+  navigate('contacto');
+  setTimeout(function() {
+    var cfEmail = document.getElementById('cf-email');
+    if (cfEmail && _homeEmailPrefill) { cfEmail.value = _homeEmailPrefill; }
+  }, 50);
+}
+
+// ── CONTACTO: enviar mensaje vía email ──
+function enviarContacto() {
+  var nombre = (document.getElementById('cf-nombre').value || '').trim();
+  var empresa = (document.getElementById('cf-empresa').value || '').trim();
+  var email = (document.getElementById('cf-email').value || '').trim();
+  var necesidad = document.getElementById('cf-necesidad').value || '';
+  var descripcion = (document.getElementById('cf-descripcion').value || '').trim();
+
+  if (!nombre || !email || !descripcion) {
+    alert('Por favor completá al menos tu nombre, email y una breve descripción.');
+    return;
+  }
+
+  var asunto = 'Nuevo contacto desde kipp-code.com' + (necesidad ? ' — ' + necesidad : '');
+  var cuerpo =
+    'Nombre: ' + nombre + '\n' +
+    'Empresa: ' + (empresa || '-') + '\n' +
+    'Email: ' + email + '\n' +
+    'Necesidad: ' + (necesidad || '-') + '\n\n' +
+    'Descripción del proyecto:\n' + descripcion;
+
+  var mailto = 'mailto:hola@kipp-code.com'
+    + '?subject=' + encodeURIComponent(asunto)
+    + '&body=' + encodeURIComponent(cuerpo);
+
+  window.location.href = mailto;
+}
 
 function navigate(page){
   // Close menu first
