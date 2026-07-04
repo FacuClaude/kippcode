@@ -94,6 +94,15 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .hero-rotator .rot-slash{font-family:'Fira Code',monospace;font-size:0.8rem;font-weight:500;color:var(--ink3);opacity:0.6}
 .hero-rotator .rot-word{display:inline-block;transition:opacity .45s ease,transform .45s ease}
 
+#kc-calc *{box-sizing:border-box}
+#kc-calc input[type=range].kc-slider{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:rgba(26,25,22,0.14);border-radius:99px;outline:none;cursor:pointer;margin:0}
+#kc-calc input[type=range].kc-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 1px rgba(240,90,0,0.4)}
+#kc-calc input[type=range].kc-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 1px rgba(240,90,0,0.4)}
+#kc-calc .kc-task{transition:all .18s ease}
+#kc-calc .kc-task:hover{border-color:rgba(240,90,0,0.4)!important}
+#kc-calc .kc-btn{transition:transform .15s ease}
+#kc-calc .kc-btn:hover{transform:translateY(-1px)}
+@media(max-width:720px){#kc-calc .kc-cols{grid-template-columns:1fr!important}#kc-calc .kc-result{position:static!important}}
 .ticker{background:var(--orange);overflow:hidden;padding:0.7rem 0;display:flex}
 .ticker-track{display:flex;gap:2.5rem;white-space:nowrap;animation:tick 22s linear infinite;align-items:center}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -469,6 +478,86 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
     <div class="s-eyebrow"><div class="s-eyebrow-line"></div><span class="s-eyebrow-text">Stack tecnológico</span></div>
     <div class="tech-grid"><div class="tech-pill">React</div><div class="tech-pill">Next.js</div><div class="tech-pill">TypeScript</div><div class="tech-pill">Node.js</div><div class="tech-pill">Python</div><div class="tech-pill">Go</div><div class="tech-pill">PostgreSQL</div><div class="tech-pill">MongoDB</div><div class="tech-pill">Redis</div><div class="tech-pill">AWS</div><div class="tech-pill">Google Cloud</div><div class="tech-pill">Docker</div><div class="tech-pill">React Native</div><div class="tech-pill">Flutter</div><div class="tech-pill">GraphQL</div></div>
   </section>
+  <section id="kc-calc" style="background:var(--bg);padding:clamp(2.5rem,6vw,5rem) 7vw;">
+    <div style="max-width:940px;margin:0 auto;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block;"></span>
+        <span style="font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);">Calculadora de tiempo recuperado</span>
+      </div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;line-height:1.03;letter-spacing:-0.03em;margin:0 0 12px;color:var(--ink);">
+        ¿Cuánto tiempo te devuelve<br>ordenar tu operación?
+      </h2>
+      <p style="font-size:16px;line-height:1.6;color:var(--ink2);max-width:560px;margin:0 0 30px;">
+        Marcá las tareas que hoy hace tu equipo a mano y ajustá las horas. Te mostramos cuánto de eso se puede recuperar con software a medida.
+      </p>
+      <div class="kc-cols" style="display:grid;grid-template-columns:1fr 0.85fr;gap:20px;align-items:start;">
+        <div>
+          <div style="font-family:'Fira Code',monospace;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink3);margin-bottom:12px;">
+            1 · Elegí las tareas y sus horas semanales
+          </div>
+          <div id="kc-tasks" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <div style="margin-top:20px;display:flex;flex-direction:column;gap:18px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+                <span style="font-size:13.5px;font-weight:600;color:var(--ink);">Valor de una hora de tu equipo</span>
+                <span id="kc-vh-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--orange);"></span>
+              </div>
+              <input id="kc-valorhora" type="range" min="2000" max="30000" step="500" value="8000" class="kc-slider">
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+                <span style="font-size:13.5px;font-weight:600;color:var(--ink);">Parte que suele automatizarse</span>
+                <span id="kc-auto-label" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--orange);"></span>
+              </div>
+              <input id="kc-auto" type="range" min="40" max="90" step="5" value="70" class="kc-slider">
+              <p style="font-size:11.5px;color:var(--ink3);margin:7px 0 0;">Estimación conservadora. El número real lo definimos en el diagnóstico.</p>
+            </div>
+          </div>
+        </div>
+        <div class="kc-result" style="position:sticky;top:16px;background:var(--ink);color:var(--bg);border-radius:14px;padding:26px 24px;overflow:hidden;">
+          <div style="position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(240,90,0,0.25),transparent 70%);top:-90px;right:-70px;pointer-events:none;"></div>
+          <div style="position:relative;">
+            <div style="font-family:'Fira Code',monospace;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.12em;color:rgba(242,240,235,0.5);margin-bottom:18px;">Lo que recuperás</div>
+            <div style="margin-bottom:20px;">
+              <div style="font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1;letter-spacing:-0.03em;color:var(--orange);">
+                <span id="kc-horas">0</span><span style="font-size:24px;margin-left:4px;">h</span>
+              </div>
+              <div style="font-size:13.5px;color:rgba(242,240,235,0.6);margin-top:4px;">
+                por semana · sobre <span id="kc-horas-tot">0</span>h de tareas manuales
+              </div>
+            </div>
+            <div style="height:1px;background:rgba(242,240,235,0.14);margin:18px 0;"></div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div>
+                <div style="font-size:12px;color:rgba(242,240,235,0.5);margin-bottom:3px;">Equivale al año a</div>
+                <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;line-height:1.05;color:rgba(242,240,235,0.92);"><span id="kc-dias">0</span> jornadas</div>
+                <div style="font-size:11.5px;color:rgba(242,240,235,0.4);margin-top:2px;">de 8 horas liberadas</div>
+              </div>
+              <div>
+                <div style="font-size:12px;color:rgba(242,240,235,0.5);margin-bottom:3px;">Costo mensual de esas horas</div>
+                <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;line-height:1.05;color:rgba(242,240,235,0.92);" id="kc-mensual">$0</div>
+                <div style="font-size:11.5px;color:rgba(242,240,235,0.4);margin-top:2px;">lo que hoy se va en lo repetitivo</div>
+              </div>
+              <div>
+                <div style="font-size:12px;color:rgba(242,240,235,0.5);margin-bottom:3px;">En un año</div>
+                <div style="font-family:'Syne',sans-serif;font-size:30px;font-weight:700;line-height:1.05;color:#fff;" id="kc-anual">$0</div>
+                <div style="font-size:11.5px;color:rgba(242,240,235,0.4);margin-top:2px;">tiempo de tu equipo recuperable</div>
+              </div>
+            </div>
+            <button class="kc-btn" onclick="navigate('contacto')" style="display:block;width:100%;text-align:center;margin-top:22px;background:var(--orange);color:#fff;font-family:'Inter',sans-serif;font-weight:600;font-size:15px;padding:14px 18px;border-radius:8px;border:none;cursor:pointer;">
+              Ver qué se puede ordenar primero →
+            </button>
+            <p style="font-size:11.5px;color:rgba(242,240,235,0.45);text-align:center;margin:12px 0 0;line-height:1.5;">
+              Diagnóstico gratuito. Primero entendemos tu operación,<br>después proponemos.
+            </p>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:11.5px;color:var(--ink3);margin-top:22px;max-width:620px;line-height:1.5;">
+        Es una estimación orientativa para dimensionar la oportunidad, no un presupuesto. Cada negocio es distinto: el porcentaje real automatizable y la prioridad los definimos juntos en el diagnóstico.
+      </p>
+    </div>
+  </section>
   <div class="cta-banner"><div><div class="cta-h">¿Tenés un problema que resolver?</div><div class="cta-sub">Armamos una propuesta sin costo.</div></div><button class="btn-white" onclick="navigate('contacto')">Iniciar conversación →</button></div>
   <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
 </div>
@@ -758,6 +847,78 @@ function closeMenu(){
     }, 450);
   }
   setInterval(rotate, 2600);
+})();
+
+// ── CALCULADORA DE TIEMPO RECUPERADO ──
+(function(){
+  var tareas = [
+    { id:"carga",     label:"Cargar datos a mano en planillas",            emoji:"📋", horas:4, activa:true  },
+    { id:"reportes",  label:"Armar reportes o informes",                    emoji:"📊", horas:3, activa:true  },
+    { id:"wpp",       label:"Responder consultas repetidas por WhatsApp",   emoji:"💬", horas:3, activa:true  },
+    { id:"conciliar", label:"Conciliar información entre sistemas",          emoji:"🔗", horas:2, activa:false },
+    { id:"facturar",  label:"Facturar y seguir cobranzas",                  emoji:"🧾", horas:2, activa:false },
+    { id:"stock",     label:"Controlar stock o inventario",                 emoji:"📦", horas:2, activa:false }
+  ];
+  var valorHora = 8000, automatizable = 70;
+  var ORANGE = "#f05a00";
+  function fmtPesos(n){ return "$" + Math.round(n).toLocaleString("es-AR",{maximumFractionDigits:0}); }
+  var tasksEl = document.getElementById("kc-tasks");
+  if(!tasksEl) return;
+  function renderTasks(){
+    tasksEl.innerHTML = "";
+    tareas.forEach(function(t){
+      var card = document.createElement("div");
+      card.className = "kc-task";
+      card.style.cssText = "background:"+(t.activa?"#fff":"rgba(255,255,255,0.4)")+";border:1px solid "+(t.activa?"rgba(240,90,0,0.35)":"rgba(26,25,22,0.1)")+";border-radius:10px;padding:14px 16px;opacity:"+(t.activa?1:0.72)+";";
+      var row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:12px;";
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.setAttribute("aria-pressed", t.activa);
+      btn.textContent = t.activa ? "✓" : "";
+      btn.style.cssText = "flex-shrink:0;width:24px;height:24px;border-radius:6px;cursor:pointer;border:2px solid "+(t.activa?ORANGE:"rgba(26,25,22,0.25)")+";background:"+(t.activa?ORANGE:"transparent")+";color:#fff;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;";
+      btn.onclick = function(){ t.activa = !t.activa; renderTasks(); recalc(); };
+      var emoji = document.createElement("span");
+      emoji.style.fontSize = "18px"; emoji.textContent = t.emoji;
+      var label = document.createElement("span");
+      label.style.cssText = "flex:1;font-size:14.5px;font-weight:500;"; label.textContent = t.label;
+      var hrs = document.createElement("span");
+      hrs.style.cssText = "font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:"+(t.activa?ORANGE:"rgba(26,25,22,0.4)")+";min-width:46px;text-align:right;";
+      hrs.textContent = t.horas + "h";
+      row.appendChild(btn); row.appendChild(emoji); row.appendChild(label); row.appendChild(hrs);
+      card.appendChild(row);
+      if(t.activa){
+        var slider = document.createElement("input");
+        slider.type = "range"; slider.min = 1; slider.max = 15; slider.value = t.horas;
+        slider.className = "kc-slider"; slider.style.marginTop = "12px";
+        slider.oninput = function(){ t.horas = Number(slider.value); hrs.textContent = t.horas+"h"; recalc(); };
+        card.appendChild(slider);
+      }
+      tasksEl.appendChild(card);
+    });
+  }
+  function recalc(){
+    var horasSemana = tareas.filter(function(t){return t.activa;}).reduce(function(s,t){return s+t.horas;},0);
+    var horasRec = horasSemana * (automatizable/100);
+    var mensual = horasRec * valorHora * 4.33;
+    var anual = horasRec * valorHora * 52;
+    var dias = (horasRec * 52) / 8;
+    document.getElementById("kc-horas").textContent = horasRec.toFixed(1);
+    document.getElementById("kc-horas-tot").textContent = horasSemana;
+    document.getElementById("kc-dias").textContent = Math.round(dias);
+    document.getElementById("kc-mensual").textContent = fmtPesos(mensual);
+    document.getElementById("kc-anual").textContent = fmtPesos(anual);
+  }
+  var vh = document.getElementById("kc-valorhora");
+  var vhLabel = document.getElementById("kc-vh-label");
+  vh.oninput = function(){ valorHora = Number(vh.value); vhLabel.textContent = fmtPesos(valorHora); recalc(); };
+  var au = document.getElementById("kc-auto");
+  var auLabel = document.getElementById("kc-auto-label");
+  au.oninput = function(){ automatizable = Number(au.value); auLabel.textContent = automatizable + "%"; recalc(); };
+  vhLabel.textContent = fmtPesos(valorHora);
+  auLabel.textContent = automatizable + "%";
+  renderTasks();
+  recalc();
 })();
 
 // ── CONTACTO: pasar email del home al formulario ──
