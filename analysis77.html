@@ -1,0 +1,3315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Localization Centre — Management &amp; Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --ink:#16191d; --ink-2:#4d565f; --ink-3:#8b959e;
+  --paper:#eef1f3; --surface:#fff; --surface-2:#f7f9fa;
+  --line:#dde3e7; --line-2:#c6cfd6;
+  --petrol:#1e4d6b; --petrol-bg:#eef4f8; --petrol-line:#b9d2e2;
+  --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
+  --pos:#1a6b47; --neg:#b02a2a;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --cond:'IBM Plex Sans Condensed',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;display:flex;overflow:hidden}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font:inherit;color:inherit}
+
+/* ── RAIL ── */
+.rail{width:296px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;overflow:hidden}
+.rail-head{padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.rail-title{font-family:var(--cond);font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#7fa8c4;margin-top:7px}
+.rail-scroll{flex:1;overflow-y:auto;padding:18px 0 24px}
+.rail-sec{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#6b7883;padding:0 22px;margin:20px 0 10px}
+.rail-sec:first-child{margin-top:0}
+
+.slot{display:flex;gap:11px;align-items:flex-start;padding:9px 22px;cursor:pointer;position:relative;transition:background .13s}
+.slot:hover{background:rgba(255,255,255,.05)}
+.slot.on{background:rgba(126,168,196,.1)}
+.slot.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:#7fa8c4}
+.slot-mark{width:15px;height:15px;border:1.5px solid #4a5560;border-radius:2px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
+.slot.on .slot-mark{background:#7fa8c4;border-color:#7fa8c4;color:var(--ink);font-weight:700}
+.slot.req .slot-mark{border-color:#7a6248}
+.slot-txt{flex:1;min-width:0}
+.slot-name{font-size:12.5px;font-weight:450;line-height:1.3}
+.slot.on .slot-name{color:#fff;font-weight:500}
+.slot-meta{font-family:var(--mono);font-size:9.5px;color:#6b7883;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.on .slot-meta{color:#7fa8c4}
+
+.rail-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.1)}
+.btn-save{width:100%;padding:9px;background:rgba(255,255,255,.09);color:#cfe0ec;border-radius:3px;
+  font-size:12px;font-weight:500;margin-bottom:10px;transition:background .14s}
+.btn-save:hover{background:rgba(255,255,255,.16);color:#fff}
+.slot.saved .slot-mark{border-color:#5f6d78;color:#7fa8c4;font-size:11px}
+.slot-x{opacity:0;color:#6b7883;font-size:15px;padding:0 4px;line-height:1;transition:opacity .12s}
+.slot.saved:hover .slot-x{opacity:1}
+.slot-x:hover{color:#c98b8b}
+.status{font-family:var(--mono);font-size:10px;line-height:1.6;color:#6b7883;letter-spacing:.03em}
+.status b{color:#7fa8c4;font-weight:500}
+.status .ok{color:#8fbf9f}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.crumb{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.subject{font-family:var(--cond);font-size:21px;font-weight:700;margin-top:2px;line-height:1.1}
+.route{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-top:3px}
+.topbar-act{display:flex;gap:8px}
+.btn{padding:8px 15px;border-radius:3px;font-size:12.5px;font-weight:500;transition:all .14s;border:1px solid var(--line-2);background:var(--surface)}
+.btn:hover{background:var(--surface-2);border-color:var(--ink-3)}
+.btn-p{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.btn-p:hover{background:#16394f;border-color:#16394f}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+.canvas{padding:28px 32px 80px;max-width:1180px;width:100%}
+
+/* ── EMPTY ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 32px;text-align:center}
+.empty-fig{width:88px;height:88px;border:2px dashed var(--line-2);border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;font-family:var(--mono);font-size:26px;color:var(--ink-3)}
+.empty-h{font-family:var(--cond);font-size:23px;font-weight:700;margin-bottom:9px}
+.empty-p{color:var(--ink-2);max-width:400px;line-height:1.62;font-size:13.5px}
+
+/* ── ALERTS ── */
+.alerts{margin-bottom:22px;display:flex;flex-direction:column;gap:9px}
+.alert{display:flex;gap:12px;padding:13px 15px;border-radius:4px;font-size:13px;line-height:1.55;border:1px solid;align-items:flex-start}
+.alert-w{background:var(--ochre-bg);border-color:var(--ochre-line);color:#6b3d00}
+.alert-e{background:#fdf0ef;border-color:#eec5c2;color:#7d1e1e}
+.alert-i{background:var(--petrol-bg);border-color:var(--petrol-line);color:#15384f}
+.alert-tag{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;padding:2.5px 6px;border-radius:2px;background:rgba(0,0,0,.07);flex-shrink:0;margin-top:1px;font-weight:600}
+.alert-b{flex:1}
+.alert-b strong{font-weight:600}
+.alert-act{display:flex;gap:7px;margin-top:9px}
+.alert-btn{padding:5px 11px;border-radius:3px;font-size:11.5px;font-weight:600;background:rgba(0,0,0,.075);transition:background .14s}
+.alert-btn:hover{background:rgba(0,0,0,.13)}
+.alert-btn.solid{background:var(--ochre);color:#fff}
+.alert-btn.solid:hover{background:#8d4e00}
+
+/* ── PANEL ── */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:5px;margin-bottom:20px;overflow:hidden}
+.panel-h{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+.panel-t{font-family:var(--cond);font-size:15.5px;font-weight:700;letter-spacing:.01em}
+.panel-n{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.05em}
+.panel-b{padding:6px 20px 16px}
+
+/* ── FIELD GRID ── */
+.note code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);
+  padding:2px 6px;border-radius:3px;display:inline-block;margin:4px 0;line-height:1.7}
+.mini-btn{font:inherit;font-size:11.5px;padding:5px 12px;border:1px solid var(--line);
+  background:#fff;border-radius:3px;cursor:pointer;color:var(--ink-1);white-space:nowrap}
+.mini-btn:hover{border-color:var(--petrol);color:var(--petrol)}
+.mini-btn.solid{background:var(--petrol);color:#fff;border-color:var(--petrol);padding:8px 18px;font-size:12px}
+.mini-btn.solid:hover{opacity:.9;color:#fff}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:0 26px}
+.f{padding:11px 0;border-bottom:1px solid var(--line)}
+.f-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.f-src{font-size:8px;padding:1px 4px;border-radius:2px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-3);letter-spacing:.05em}
+.f-v{font-family:var(--mono);font-size:14px;font-weight:500}
+.f input{width:100%;font-family:var(--mono);font-size:14px;font-weight:500;padding:5px 8px;border:1px solid var(--ochre-line);border-left:2.5px solid var(--ochre);border-radius:2px;background:var(--ochre-bg);outline:none;transition:all .14s}
+.f input:focus{border-color:var(--ochre);background:#fff;box-shadow:0 0 0 2.5px rgba(168,93,0,.11)}
+.f input.blank{border-left-color:var(--neg);background:#fdf0ef}
+.f select{width:100%;font-family:var(--mono);font-size:13px;padding:5px 8px;border:1px solid var(--ochre-line);border-left:2.5px solid var(--ochre);border-radius:2px;background:var(--ochre-bg);outline:none}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:9px 12px;text-align:right;border-bottom:1px solid var(--line-2);vertical-align:bottom;line-height:1.4}
+.tbl th:first-child{text-align:left;width:38%}
+.tbl th.grp{text-align:center;color:var(--petrol);font-weight:600;border-bottom:1px solid var(--petrol-line);padding-bottom:6px}
+.tbl td{padding:8px 12px;text-align:right;font-family:var(--mono);font-size:13px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.tbl td:first-child{text-align:left;font-family:var(--sans);font-size:13px;color:var(--ink-2)}
+.tbl tr:hover td{background:var(--surface-2)}
+.tbl tr.sub td{font-weight:600;color:var(--ink);background:var(--petrol-bg)}
+.tbl tr.sub:hover td{background:#e4eef5}
+.tbl tr.sub td:first-child{color:var(--ink)}
+.tbl tr.tot td{font-weight:600;font-size:14px;background:var(--ink);color:#fff;border-bottom:none}
+.tbl tr.tot td:first-child{color:#fff;font-family:var(--cond);font-size:14.5px;letter-spacing:.01em}
+.tbl tr.tot:hover td{background:var(--ink)}
+.tbl tr.spacer td{padding:0;height:9px;border:none;background:none!important}
+.neg{color:var(--neg)}
+.pos{color:var(--pos)}
+.dim{color:var(--ink-3)}
+
+/* formula reveal */
+.calc{position:relative;cursor:help;border-bottom:1px dotted var(--petrol-line)}
+.calc:hover::after{content:attr(data-f);position:absolute;bottom:calc(100% + 7px);right:0;background:var(--ink);color:#c9dae6;font-family:var(--mono);font-size:10.5px;padding:7px 10px;border-radius:3px;white-space:nowrap;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.22);font-weight:400;letter-spacing:.01em}
+
+.note{font-size:12px;color:var(--ink-2);line-height:1.6;padding:11px 20px 3px;border-top:1px solid var(--line);background:var(--surface-2)}
+.note strong{font-weight:600;color:var(--ink)}
+
+.legend{display:flex;gap:18px;padding:11px 20px;background:var(--surface-2);border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-2);flex-wrap:wrap}
+.lg{display:flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:2px;flex-shrink:0}
+.sw-c{background:var(--petrol-bg);border:1px solid var(--petrol-line);border-left:2.5px solid var(--petrol)}
+.sw-e{background:var(--ochre-bg);border:1px solid var(--ochre-line);border-left:2.5px solid var(--ochre)}
+
+.menu-wrap{position:relative;display:inline-block}
+.menu{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);
+  border:1px solid var(--border2);border-radius:4px;box-shadow:0 8px 28px rgba(0,0,0,.14);
+  min-width:250px;padding:5px;z-index:200}
+.menu.open{display:block}
+.menu-h{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);padding:9px 10px 4px}
+.menu button{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:3px;font-size:12.5px;color:var(--ink)}
+.menu button:hover{background:var(--petrol-bg);color:var(--petrol)}
+.btn.on{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:16px 18px;border-top:2.5px solid var(--petrol)}
+.kpi-n{font-family:var(--cond);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.kpi-l{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-top:7px}
+.kpi-s{font-size:11px;color:var(--ink-2);margin-top:3px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:18px 20px 16px}
+.chart.wide{grid-column:1/-1}
+.chart-t{font-family:var(--cond);font-size:14px;font-weight:700;margin-bottom:2px}
+.chart-s{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-bottom:16px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-r{display:flex;align-items:center;gap:11px;font-size:12px}
+.bar-lab{width:130px;flex-shrink:0;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:15px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;background:var(--petrol);border-radius:2px;transition:width .5s}
+.bar-fill.alt{background:var(--ochre)}
+.bar-v{width:52px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex-shrink:0}
+.cols{display:flex;align-items:flex-end;gap:5px;height:150px;padding-top:8px}
+.col-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.col-b{width:100%;background:var(--petrol);border-radius:2px 2px 0 0;min-height:2px;transition:height .5s}
+.col-v{font-family:var(--mono);font-size:9.5px;color:var(--ink-2)}
+.col-l{font-family:var(--mono);font-size:8.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tbl.diag td{padding:6px 14px;font-size:12px}
+.tbl.diag td.dv{text-align:right;font-family:var(--mono);font-size:11.5px;color:var(--ink)}
+.tbl.diag td.ds{text-align:right;width:170px;font-family:var(--mono);font-size:9.5px;color:var(--ink-3)}
+.tbl.diag tr.miss td{color:var(--neg)}
+.tbl.diag tr.miss td.dv{color:var(--neg);font-style:italic}
+.sub-h{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--petrol);
+  padding:12px 20px 2px;border-top:1px solid var(--line);background:var(--surface-2)}
+.panel-b.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.mini-t{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:8px 0 5px}
+.mini{width:100%;border-collapse:collapse;font-size:12px}
+.mini td{padding:4px 0;border-bottom:1px solid var(--line);color:var(--ink-2)}
+.mini td.n{text-align:right;font-family:var(--mono);color:var(--ink);white-space:nowrap}
+.mini-empty{font-size:12px;color:var(--ink-3);padding:6px 0}
+.calc.ovr{border-bottom:1.5px solid var(--ochre);color:var(--ochre);font-weight:600}
+.undo{margin-left:5px;color:var(--ochre);font-size:12px;line-height:1;opacity:.75}
+.undo:hover{opacity:1}
+.calc{cursor:pointer}
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:13px 16px;margin-bottom:20px;
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.filters label{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-right:-4px}
+.filters select{background:var(--surface-2);border:1px solid var(--border2);border-radius:3px;font-size:12px;padding:5px 8px;outline:none;color:var(--ink)}
+.filters select:focus{border-color:var(--petrol)}
+.f-count{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+.f-count b{color:var(--petrol)}
+.corr{display:flex;flex-direction:column;gap:6px}
+.corr-r{display:flex;align-items:center;gap:10px;font-size:12px}
+.corr-l{width:200px;flex-shrink:0;display:flex;align-items:center;gap:6px;overflow:hidden}
+.corr-a,.corr-b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.corr-b{color:var(--ink);font-weight:500}
+.corr-x{color:var(--ink-3);flex-shrink:0}
+.corr-track{flex:1;height:14px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.corr-fill{height:100%;background:var(--petrol);border-radius:2px}
+.corr-v{width:64px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex-shrink:0}
+.cyc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.cyc-b{text-align:center;padding:14px 8px;background:var(--surface-2);border-radius:4px}
+.cyc-n{font-family:var(--cond);font-size:26px;font-weight:700;line-height:1}
+.cyc-l{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+.cyc-s{font-size:10.5px;color:var(--ink-2);margin-top:2px}
+.rate{display:flex;flex-direction:column;gap:6px}
+.rate-r{display:flex;align-items:center;gap:10px;font-size:12px}
+.rate-l{width:150px;flex-shrink:0;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rate-track{flex:1;height:14px;background:var(--surface-2);border-radius:2px;overflow:hidden;display:flex}
+.rate-seg{height:100%}
+.rate-v{width:88px;text-align:right;font-family:var(--mono);font-size:10.5px;flex-shrink:0}
+.basis{font-family:var(--mono);font-size:9px;color:var(--ink-3);margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.dbtag{font-family:var(--mono);font-size:10px;color:var(--ink-3);padding:5px 20px 14px}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:5px;border:2px solid var(--paper)}
+.rail ::-webkit-scrollbar-thumb{background:#333a41;border-color:var(--ink)}
+input[type=file]{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<aside class="rail">
+  <div class="rail-head">
+    <div class="rail-title">Localization<br>Centre</div>
+    <div class="rail-sub">Management &amp; Analytics</div>
+  </div>
+  <div class="rail-scroll">
+    <div class="rail-sec">Required</div>
+    <div id="slots-req"></div>
+    <div class="rail-sec">Optional</div>
+    <div id="slots-opt"></div>
+  </div>
+  <div id="saved"></div>
+  <div class="rail-foot">
+    <button class="btn-save" id="btn-save" onclick="saveCase()">Save case</button>
+    <div id="status" class="status">No files loaded</div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="crumb" id="crumb">No case loaded</div>
+      <div class="subject" id="subject">—</div>
+      <div class="route" id="route"></div>
+    </div>
+    <div class="topbar-act">
+      <button class="btn" id="nav-start" onclick="setView('start')">Start case</button>
+      <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
+      <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
+      <span style="width:10px"></span>
+      <button class="btn" id="btn-db" onclick="pickDb()">Link database</button>
+      <button class="btn" id="btn-log" disabled onclick="logCase()">Add to database</button>
+      <div class="menu-wrap">
+        <button class="btn btn-p" id="btn-exp" disabled onclick="toggleExp(event)">Export &#9662;</button>
+        <div class="menu" id="exp-menu">
+          <div class="menu-h">Approver 1 &mdash; profile + management output</div>
+          <button onclick="doExp(1,'pdf')">PDF</button><button onclick="doExp(1,'xls')">Excel</button>
+          <div class="menu-h">Approver 2 &mdash; profile + economic analysis</div>
+          <button onclick="doExp(2,'pdf')">PDF</button><button onclick="doExp(2,'xls')">Excel</button>
+          <div class="menu-h">Other outputs</div>
+          <button onclick="doExp('emp','pdf')">Employee output</button>
+          <div class="menu-h">Nova report</div>
+          <button onclick="doExp('nova','pdf')">PDF</button><button onclick="doExp('nova','xls')">Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="body">
+    <div class="empty">
+      <div class="empty-fig">↓</div>
+      <div class="empty-h">Load the case files</div>
+      <div class="empty-p">Start with the SuccessFactors employee profile. Add the vendor returns as they arrive — the analysis recalculates each time.</div>
+    </div>
+  </div>
+</main>
+
+<script>
+"use strict";
+
+/* ═══ CURRENCY BY COUNTRY ═══ */
+const CCY={"Angola":"USD","Argentina":"ARS","Australia":"AUD","Austria":"EUR","Azerbaijan Republic":"AZN","Bahamas":"BSD","Barbados":"BBD","Belgium":"EUR","Belize":"BZD","Brazil":"BRL","Cameroon":"XAF","Canada":"CAD","Chad":"XAF","Chile":"CLP","China":"CNY","Colombia":"COP","Cote d'Ivoire":"XOF","Cyprus":"EUR","Czech Republic":"CZK","Denmark":"DKK","Dominican Republic":"DOP","Ecuador":"USD","Egypt":"EGP","El Salvador":"USD","Equatorial Guinea":"XAF","Fiji":"FJD","Finland":"EUR","France":"EUR","French West Indies":"EUR","Gabon":"XAF","Germany":"EUR","Ghana":"GHS","Greece":"EUR","Guam":"USD","Guatemala":"GTQ","Guyana":"GYD","Hong Kong":"HKD","Hungary":"HUF","India":"INR","Indonesia":"IDR","Iraq":"USD","Iraq-Kurdistan":"IQD","Ireland":"EUR","Italy":"EUR","Japan":"JPY","Kazakhstan Republic":"KZT","Kuwait":"KWD","Liberia":"USD","Libya":"LYD","Luxembourg":"EUR","Madagascar":"MGA","Malaysia":"MYR","Mauritania":"MRU","Mexico":"MXN","Mozambique":"MZN","Netherlands":"EUR","New Caledonia":"XPF","New Zealand":"NZD","Nicaragua":"NIO","Nigeria":"NGN","Norway":"NOK","Panama":"USD","Papua New Guinea":"PGK","Paraguay":"PYG","Peru":"PEN","Philippines":"PHP","Poland":"PLN","Portugal":"EUR","Puerto Rico":"USD","Qatar":"QAR","Romania":"RON","Russia":"RUB","Saudi Arabia":"SAR","Senegal":"XOF","Singapore":"SGD","South Africa":"ZAR","South Korea":"KRW","Spain":"EUR","Sweden":"SEK","Switzerland":"CHF","Taiwan":"TWD","Tanzania":"TZS","Thailand":"THB","Trinidad and Tobago":"TTD","Tunisia":"TND","Turkey":"TRY","Turkmenistan":"USD","Ukraine":"UAH","United Arab Emirates":"AED","United Kingdom":"GBP","United States":"USD","Venezuela":"VEF","Vietnam":"VND","Virgin Islands":"USD"};
+
+/* rough USD parity — only used to sanity-check FX direction, never in the maths */
+const PAR={USD:1,EUR:1.09,GBP:1.27,CHF:1.13,CAD:.73,AUD:.66,NZD:.61,SGD:.74,BRL:.18,ARS:.0011,MXN:.05,CLP:.0011,COP:.00025,PEN:.27,JPY:.0065,CNY:.14,INR:.012,IDR:.000063,MYR:.22,THB:.028,PHP:.018,KRW:.00073,TWD:.031,HKD:.128,VND:.00004,NGN:.00065,ZAR:.055,EGP:.021,GHS:.065,XAF:.00166,XOF:.00166,KZT:.0021,AZN:.59,RUB:.011,TRY:.030,PLN:.25,CZK:.043,HUF:.0027,RON:.22,SEK:.095,NOK:.093,DKK:.146,AED:.272,SAR:.267,QAR:.275,KWD:3.26,MZN:.0157,TZS:.00037,UAH:.024};
+
+/* ═══ NHC PLAN RULES ═══ */
+/* Country names arrive worded differently by each source — SuccessFactors says
+   "US", the request form says "United States". Everything downstream keys off
+   the canonical name, so normalise once here rather than in every lookup. */
+const COUNTRY_ALIAS={
+  "us":"United States","usa":"United States","u s":"United States",
+  "u s a":"United States","united states of america":"United States",
+  "uk":"United Kingdom","gb":"United Kingdom","great britain":"United Kingdom",
+  "uae":"United Arab Emirates","holland":"Netherlands","the netherlands":"Netherlands",
+  "korea":"South Korea","republic of korea":"South Korea","ivory coast":"Cote d'Ivoire",
+  "png":"Papua New Guinea","tt":"Trinidad and Tobago","png ":"Papua New Guinea"
+};
+function canonCountry(v){
+  const raw=String(v??"").trim(); if(!raw)return null;
+  const a=COUNTRY_ALIAS[norm(raw)]; if(a)return a;
+  /* already canonical, or a name we simply do not have a rule for */
+  const hit=Object.keys(CCY).find(c=>norm(c)===norm(raw));
+  return hit||raw;
+}
+
+const NHC_RULES={
+  "United States":{retAge:60,cutoff:45,ls:{55:14.5,58:13.8,60:13.3},mult:.016,erf:{55:.75,58:.90,60:1.00}},
+  "Belgium":{retAge:67,cutoff:52},"Netherlands":{retAge:68,cutoff:53},
+  "France":{retAge:67,cutoff:52},"Singapore":{retAge:60,cutoff:45},
+  "Canada":{retAge:65,cutoff:50},"United Kingdom":{retAge:65,cutoff:50}
+};
+const SCEN=[55,58,60];
+
+/* ═══ FIELD REGISTRY ═══════════════════════════════════════════════════════
+   What the system needs from each team, stated once.
+
+   The request templates are generated from this list, and the parser looks up
+   the same labels, so a field cannot exist in one and be missing from the
+   other. `label` is the exact string written into the template and searched
+   for on the way back in; `alt` are older wordings still accepted so files
+   issued before a wording change keep loading.
+
+   type   text | number | percent | money | date | yesno | choice
+   need   1 the analysis cannot be completed without it
+          0 used when supplied, blank is acceptable
+   when   optional predicate on the case — a field only asked for when it
+          actually applies, so vendors are not sent questions they cannot answer
+*/
+const REGISTRY={
+
+  gcbd:{
+    title:"GC&BD Information Data Request",
+    to:"Compensation & Benefit Design advisor for the original home country",
+    note:"Pension and benefits position in the original home country. Part III drives the "+
+         "pension offset, which is the figure approvers question most.",
+    sections:[
+      {name:"Part I — Standard benefits rate",fields:[
+        {label:"OHC - Standard Benefits Rate (SBR)",alt:["OHC — Standard Benefits Rate (SBR)","OHC Standard Benefits Rate"],type:"percent",need:1,
+         help:"Benefits loading applied to base salary in the original home country."},
+        {label:"NHC - Standard Benefits Rate (SBR)",alt:["NHC — Standard Benefits Rate (SBR)","NHC Standard Benefits Rate"],type:"percent",need:1,
+         help:"Benefits loading applied in the new home country."}
+      ]},
+      {name:"Part II — Alternate forms of pay",fields:[
+        {label:"OHC - Allowance 1",type:"money",need:0,help:"Type, currency and annual amount. Repeat rows 1-5 as needed."},
+        {label:"OHC - Allowance 2",type:"money",need:0},
+        {label:"OHC - Allowance 3",type:"money",need:0},
+        {label:"OHC - Allowance 4",type:"money",need:0},
+        {label:"OHC - Allowance 5",type:"money",need:0},
+        {label:"NHC - Allowance 1",type:"money",need:0},
+        {label:"NHC - Allowance 2",type:"money",need:0},
+        {label:"NHC - Allowance 3",type:"money",need:0},
+        {label:"NHC - Allowance 4",type:"money",need:0},
+        {label:"NHC - Allowance 5",type:"money",need:0}
+      ]},
+      {name:"Part III — Pension plan / DB plan",fields:[
+        {label:"Original Home Country Pension Plan Name",type:"text",need:1},
+        {label:"Is Original Home Country Pension Plan a DB Plan?",type:"yesno",need:1},
+        {label:"Plan Entry Date",type:"date",need:1,help:"Date the employee joined the plan."},
+        {label:"Normal Retirement Age",type:"number",need:1,
+         help:"An age. If the plan states a date instead, give the date and the system converts it."},
+        {label:"Early Retirement Age",type:"number",need:0},
+        {label:"Discount Factors (if applicable)",type:"text",need:0},
+        {label:"Employee Contribution?",type:"yesno",need:0},
+        {label:"Will prior service be recognized in the NHC for Pension purposes?",
+         alt:["Will prior service be recognised in the NHC for pension purposes","Offset in NHC"],type:"yesno",need:1,
+         help:"Drives whether an offset applies at all. No offset is applied when this is No."},
+        {label:"Eligibility criteria",type:"text",need:0},
+        {label:"Formula / Calculation Description",alt:["Formula — description"],type:"text",need:0},
+        {label:"Payment Options",type:"text",need:0},
+        {label:"Vesting Service with Home Country",alt:["Vesting Service"],type:"number",need:1,
+         help:"Years, four decimals. Required by Nova."},
+        {label:"Comments on Pension / DB Plan Integration",alt:["Comments on Pension"],type:"text",need:0}
+      ]},
+      {name:"Part III-A — Origin country pension formula",
+       note:"The offset mirrors the origin country's own pension formula, so state which shape "+
+            "applies and its inputs. Supplying these lets the system compute the offset directly. "+
+            "If you would rather give the amounts, complete Part III-B instead and leave this blank.",
+       fields:[
+        {label:"Pension formula shape",alt:["Formula shape","Pension formula type"],type:"choice",
+         choices:["accrual","tiered"],need:0,
+         help:"accrual = multiplier x lump-sum factor x salary x service x age factor (e.g. Canada). "+
+              "tiered = two accrual rates split at a salary cap x service, no age factor (e.g. Belgium)."},
+        {label:"Pension multiplier",alt:["Origin country pension multiplier","Accrual multiplier"],type:"percent",need:0,
+         help:"accrual shape only. Canada is 1.5%."},
+        {label:"Accrual rate — tier 1",alt:["Accrual rate tier 1"],type:"percent",need:0,help:"tiered shape only."},
+        {label:"Accrual rate — tier 2",alt:["Accrual rate tier 2"],type:"percent",need:0,help:"tiered shape only."},
+        {label:"Salary cap — tier 1",alt:["Salary threshold between tiers"],type:"money",need:0,help:"tiered shape only."},
+        {label:"Salary cap — tier 2",alt:["Salary threshold — tier 2"],type:"money",need:0,help:"tiered shape only."},
+        {label:"Discount factor at age 55",type:"number",need:0,help:"accrual shape only."},
+        {label:"Discount factor at age 58",type:"number",need:0,help:"accrual shape only."},
+        {label:"Discount factor at age 60",type:"number",need:0,help:"accrual shape only."},
+        {label:"Salary basis",type:"text",need:0,help:"e.g. final average earnings, career average."},
+        {label:"Credited service denominator",type:"number",need:0},
+        {label:"Early retirement discount per year",type:"percent",need:0},
+        {label:"Basis and assumptions used",type:"text",need:0}
+      ]},
+      {name:"Part III-B — Estimated OHC offset",
+       note:"Only if Part III-A is not supplied. Amounts in the original home country currency.",
+       fields:[
+        {label:"Estimated OHC offset — retirement at age 55",alt:["OHC Offset Amount @ Age 55"],type:"money",need:0},
+        {label:"Estimated OHC offset — retirement at age 58",alt:["OHC Offset Amount @ Age 58"],type:"money",need:0},
+        {label:"Estimated OHC offset — retirement at age 60",alt:["OHC Offset Amount @ Age 60"],type:"money",need:0}
+      ]},
+      {name:"Part III-C — EMPP affiliate service",
+       note:"Required by Nova for the pension counselling session.",
+       fields:[
+        {label:"Affiliate Pension Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"},
+        {label:"Affiliate Benefit Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"},
+        {label:"Affiliate Vesting Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"}
+      ]},
+      {name:"Part IV — Savings plan / DC plan",fields:[
+        {label:"OHC - Is there a DC / Savings Plan?",alt:["OHC — is there a DC / savings plan?"],type:"yesno",need:0},
+        {label:"NHC - Is there a DC / Savings Plan?",alt:["NHC — is there a DC / savings plan?"],type:"yesno",need:0},
+        {label:"DC plan description",type:"text",need:0}
+      ]},
+      {name:"Part V — Other core benefits / PGPs",fields:[
+        {label:"Other Core Benefits / PGPs Comments",alt:["Other core benefits / PGPs comments"],type:"text",need:0}
+      ]},
+      {name:"Completion",fields:[
+        {label:"Completed by",type:"text",need:0},
+        {label:"Date completed",type:"date",need:0}
+      ]}
+    ]
+  },
+
+  tmo:{
+    title:"TMO Data Request",
+    to:"Cartus",
+    note:"Exchange rate, hypothetical tax and the expatriate benefit build-up.",
+    sections:[
+      {name:"Currency",fields:[
+        {label:"Exchange Rate from OHC to NHC",alt:["Exchange Rate"],type:"number",need:1,
+         help:"Rate that converts one unit of origin country currency into new home country currency. "+
+              "State the direction; the system checks it against currency parity and flags an inversion."},
+        {label:"Exchange Rate Effective Date",type:"date",need:1}
+      ]},
+      {name:"Expatriate cost",fields:[
+        {label:"Hypothetical Taxes",type:"money",need:1},
+        {label:"Full Expatriate Benefits - Premium",alt:["Premium"],type:"money",need:0},
+        {label:"Full Expatriate Benefits - Net IC&S",alt:["Net IC&S"],type:"money",need:0},
+        {label:"Full Expatriate Benefits - Net Housing & Utilities",alt:["Net Housing & Utilities"],type:"money",need:0},
+        {label:"Full Expatriate Benefits - Travel Assistance Allowance",alt:["Travel Assistance Allowance"],type:"money",need:0},
+        {label:"Full Expatriate Benefits - Others",alt:["Others (Transition Payment if applicable)"],type:"money",need:0},
+        {label:"Full Expatriate Benefits - TOTAL",alt:["Full Expatriate Benefits TOTAL"],type:"money",need:1}
+      ]},
+      {name:"Tax equalization",
+       note:"These two come from the cost matrix and are keyed in by the coordinator. "+
+            "Leave blank rather than returning zero — a zero is read as a real figure and understates "+
+            "the cost of remaining an expatriate.",
+       fields:[
+        {label:"Cost to the Company - Home Country Tax",alt:["Home Country Tax"],type:"money",need:0},
+        {label:"Cost to the Company - Host Country Tax",alt:["Host Country Tax"],type:"money",need:0}
+      ]}
+    ]
+  },
+
+  comp:{
+    title:"Compensation Data Request",
+    to:"Compensation advisor for the new home country",
+    note:"Reference pay in the new home country, developed independently of the origin country structure.",
+    sections:[
+      {name:"New home country pay",fields:[
+        {label:"NHC - Annual Base Salary",alt:["NHC — Annual Base Salary","New Home Country Annual Base Salary"],type:"money",need:1},
+        {label:"NHC - Pay Scale Group (CL)",alt:["New Home Country CL (Promotion)"],type:"number",need:0,
+         help:"Classification level on localizing, if it differs from today."}
+      ]}
+    ]
+  },
+
+  exec:{
+    title:"Exec Compensation Data Request",
+    to:"Executive compensation advisor",
+    note:"CL 30 and above only.",
+    when:"execCase",
+    sections:[
+      {name:"Bonus / BBU",fields:[
+        {label:"Original Home Country BBU Guide",alt:["OHC - BBU Guide"],type:"money",need:0},
+        {label:"NHC - BBU Guide",type:"money",need:0}
+      ]}
+    ]
+  },
+
+  tax:{
+    title:"Deloitte Income Tax Estimate Request",
+    to:"Deloitte",
+    note:"Income taxes only, excluding social taxes, on the same basis for both countries. "+
+         "Only the sides this case actually needs are listed below.",
+    when:"needsDeloitte",
+    sections:[
+      {name:"Estimated annual income tax",fields:[
+        {label:"Estimated annual income tax — original home country",alt:["Original Home Country","Estimated Income Tax OHC"],
+         type:"money",need:1,when:"ohcFromDeloitte",
+         help:"Not requested on a Full Localization — the hypothetical tax in the TMO file is used instead."},
+        {label:"Estimated annual income tax — new home country",alt:["New Home Country","Estimated Income Tax NHC"],
+         type:"money",need:1,when:"nhcFromDeloitte",
+         help:"Not requested for moves into the United States — taken from the paycheck calculator."},
+        {label:"Assumptions applied",type:"text",need:0}
+      ]}
+    ]
+  }
+};
+
+/* ═══ U.S. RETIREE MEDICAL ══════════════════════════════════════════════════
+   Company-borne medical cost of keeping the employee to retirement and then
+   through retirement, for moves onto the U.S. payroll. Only the CO (company)
+   share of the PPO B option is counted; the EE share is the employee's.
+
+     while working    active medical + active dental, per year to retirement
+     retired, pre-65  retiree medical + retiree dental, until Medicare age
+     retired, post-65 Medicare supplement + retiree dental, to life expectancy
+
+   RATES ARE REVIEWED ANNUALLY. When the new schedule lands, update the figures
+   and the year below; everything downstream follows. */
+const MEDICAL_US={
+  year:2025,
+  activeMedical:12252, activeDental:720,
+  retireeMedicalPre65:19092, retireeMedicalPost65:3264, retireeDental:444,
+  medicareAge:65
+};
+function medicalUS(d,age,yearsToRet){
+  const m=MEDICAL_US;
+  if(yearsToRet===null||yearsToRet===undefined)return null;
+  const life=d.life??80;
+  const working  = (m.activeMedical+m.activeDental)*Math.max(0,yearsToRet);
+  const pre65    = (m.retireeMedicalPre65+m.retireeDental)*Math.max(0,m.medicareAge-age);
+  const post65   = (m.retireeMedicalPost65+m.retireeDental)*Math.max(0,life-m.medicareAge);
+  return working+pre65+post65;
+}
+
+/* ═══ STYLED XLSX WRITER ═══════════════════════════════════════════════════
+   SheetJS writes values but not formatting, and a request template that lands
+   on a vendor's desk as an unformatted grid invites the wrong cell being
+   filled. This writes the file directly: a stored (uncompressed) zip holding
+   hand-built OOXML, which keeps the app a single file with no extra library. */
+
+const CRC_T=(()=>{const t=new Uint32Array(256);
+  for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0;}
+  return t;})();
+function crc32(buf){let c=0xFFFFFFFF;for(let i=0;i<buf.length;i++)c=CRC_T[(c^buf[i])&0xFF]^(c>>>8);return (c^0xFFFFFFFF)>>>0;}
+const enc=s=>new TextEncoder().encode(s);
+
+/* stored-only zip: Excel accepts it and it avoids pulling in a deflate library */
+function zipStore(files){
+  const parts=[],central=[];let off=0;
+  const u16=n=>[n&255,(n>>8)&255], u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>24)&255];
+  files.forEach(f=>{
+    const name=enc(f.name), data=f.data, crc=crc32(data);
+    const local=[...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),
+      ...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0)];
+    parts.push(new Uint8Array(local),name,data);
+    central.push([...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),
+      ...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),
+      ...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off),...name]);
+    off+=local.length+name.length+data.length;
+  });
+  const cd=[].concat(...central), cdBytes=new Uint8Array(cd);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),
+    ...u16(files.length),...u16(files.length),...u32(cdBytes.length),...u32(off),...u16(0)]);
+  let total=0; parts.forEach(p=>total+=p.length); total+=cdBytes.length+end.length;
+  const out=new Uint8Array(total); let p=0;
+  parts.forEach(x=>{out.set(x,p);p+=x.length;});
+  out.set(cdBytes,p);p+=cdBytes.length; out.set(end,p);
+  return out;
+}
+
+const xesc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+  .replace(/"/g,"&quot;").replace(/'/g,"&apos;").replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,"");
+
+/* Style ids referenced by name when building rows, so the layout code stays readable. */
+const XS={default:0,title:1,meta:2,idLabel:3,idValue:4,section:5,label:6,labelReq:7,
+  input:8,hint:9,help:10,note:11,footer:12,sectionNote:13};
+
+const STYLES_XML=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<numFmts count="0"/>
+<fonts count="9">
+<font><sz val="10.5"/><color rgb="FF23282D"/><name val="Aptos Narrow"/></font>
+<font><b/><sz val="15"/><color rgb="FFFFFFFF"/><name val="Aptos Narrow"/></font>
+<font><sz val="9"/><color rgb="FF7A8288"/><name val="Aptos Narrow"/></font>
+<font><b/><sz val="10.5"/><color rgb="FF23282D"/><name val="Aptos Narrow"/></font>
+<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Aptos Narrow"/></font>
+<font><i/><sz val="9.5"/><color rgb="FF7A8288"/><name val="Aptos Narrow"/></font>
+<font><sz val="9.5"/><color rgb="FF5B6469"/><name val="Aptos Narrow"/></font>
+<font><b/><sz val="10.5"/><color rgb="FF1E4D6B"/><name val="Aptos Narrow"/></font>
+<font><i/><sz val="9.5"/><color rgb="FF1E4D6B"/><name val="Aptos Narrow"/></font>
+</fonts>
+<fills count="6">
+<fill><patternFill patternType="none"/></fill>
+<fill><patternFill patternType="gray125"/></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FF1E4D6B"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FF4A7C8C"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFFDF8EC"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFF4F6F7"/><bgColor indexed="64"/></patternFill></fill>
+</fills>
+<borders count="3">
+<border><left/><right/><top/><bottom/><diagonal/></border>
+<border><left style="thin"><color rgb="FFD8C9A3"/></left><right style="thin"><color rgb="FFD8C9A3"/></right><top style="thin"><color rgb="FFD8C9A3"/></top><bottom style="thin"><color rgb="FFD8C9A3"/></bottom><diagonal/></border>
+<border><left/><right/><top/><bottom style="thin"><color rgb="FFE8E4DE"/></bottom><diagonal/></border>
+</borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="14">
+<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center" indent="1"/></xf>
+<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="2" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="49" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="4" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center" indent="1"/></xf>
+<xf numFmtId="0" fontId="0" fillId="0" borderId="2" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="7" fillId="0" borderId="2" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="0" fillId="4" borderId="1" xfId="0" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" horizontal="left" indent="1"/></xf>
+<xf numFmtId="0" fontId="5" fillId="0" borderId="2" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>
+<xf numFmtId="0" fontId="6" fillId="0" borderId="2" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="8" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center" wrapText="1" indent="1"/></xf>
+<xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="8" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center" wrapText="1" indent="1"/></xf>
+</cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`;
+
+const colLetter=n=>{let s="";n++;while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26;}return s;};
+
+/* rows: [{cells:[{v,s,t}], h}]  — t "n" numeric, otherwise inline string */
+function sheetXml(rows,cols,merges,freeze){
+  const body=rows.map((r,ri)=>{
+    const cs=(r.cells||[]).map((c,ci)=>{
+      if(c===null||c===undefined)return "";
+      const ref=colLetter(ci)+(ri+1), st=c.s?` s="${c.s}"`:"";
+      if(c.v===null||c.v===undefined||c.v==="")return `<c r="${ref}"${st}/>`;
+      if(c.t==="n")return `<c r="${ref}"${st}><v>${c.v}</v></c>`;
+      return `<c r="${ref}"${st} t="inlineStr"><is><t xml:space="preserve">${xesc(c.v)}</t></is></c>`;
+    }).join("");
+    return `<row r="${ri+1}"${r.h?` ht="${r.h}" customHeight="1"`:""}>${cs}</row>`;
+  }).join("");
+  const colXml=cols.map((w,i)=>`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`).join("");
+  const mg=merges.length?`<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join("")}</mergeCells>`:"";
+  const pane=freeze?`<pane ySplit="${freeze}" topLeftCell="A${freeze+1}" activePane="bottomLeft" state="frozen"/>`:"";
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<sheetViews><sheetView showGridLines="0" workbookViewId="0">${pane}</sheetView></sheetViews>
+<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>
+<sheetFormatPr defaultRowHeight="15"/>
+<cols>${colXml}</cols>
+<sheetData>${body}</sheetData>${mg}
+<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>
+<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0" paperSize="9"/>
+</worksheet>`;
+}
+
+function writeStyledXlsx(sheetName,rows,cols,merges,freeze,filename){
+  const files=[
+    {name:"[Content_Types].xml",data:enc(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`)},
+    {name:"_rels/.rels",data:enc(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`)},
+    {name:"xl/workbook.xml",data:enc(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<sheets><sheet name="${xesc(sheetName).slice(0,31)}" sheetId="1" r:id="rId1"/></sheets></workbook>`)},
+    {name:"xl/_rels/workbook.xml.rels",data:enc(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`)},
+    {name:"xl/styles.xml",data:enc(STYLES_XML)},
+    {name:"xl/worksheets/sheet1.xml",data:enc(sheetXml(rows,cols,merges,freeze))}
+  ];
+  const blob=new Blob([zipStore(files)],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+}
+
+/* ═══ REQUEST TEMPLATE GENERATION ═════════════════════════════════════════
+   Builds each team's request file from REGISTRY, so what is asked for is
+   exactly what the system reads back. Case identity is pre-filled and locked
+   in wording, leaving the vendor only their own fields to complete. */
+
+const caseSeed={name:"",ohc:"",nhc:"",type:"Full Localization",cl:"",pernrOHC:"",pernrNHC:""};
+
+const TYPE_HINT={number:"number",percent:"percent, e.g. 1.5%",money:"amount",
+  date:"date",yesno:"Yes / No",text:"text",choice:""};
+
+function seedApplies(f,seed){
+  if(!f.when)return true;
+  const intoUS=String(seed.nhc||"").trim().toLowerCase()==="united states";
+  const full=/full/i.test(seed.type||"");
+  switch(f.when){
+    case "intoUS":          return intoUS;
+    case "execCase":        return seed.cl!==""&&+seed.cl>=30;
+    /* the origin side is only Deloitte's when the employee is not an expatriate;
+       on a Full Localization the TMO hypothetical tax is used */
+    case "ohcFromDeloitte": return !full;
+    /* the destination side is only Deloitte's outside the U.S. */
+    case "nhcFromDeloitte": return !intoUS;
+    case "needsDeloitte":   return !full || !intoUS;
+    default:                return true;
+  }
+}
+
+function buildTemplate(slot,seed){
+  const def=REGISTRY[slot];
+  const rows=[], merges=[];
+  const C=(v,st,t)=>({v,s:st,t});
+  const push=(cells,h)=>{rows.push({cells,h});return rows.length;};   /* returns the 1-based row */
+  const span=(r,a,b)=>merges.push(`${a}${r}:${b}${r}`);
+
+  span(push([C(def.title,XS.title)],30),"A","D");
+  push([C("Requested by Global Mobility",XS.meta),C("",XS.meta),
+        C("Date requested",XS.meta),C(new Date().toISOString().slice(0,10),XS.meta)],16);
+  push([]);
+
+  [["Employee name",seed.name],["Type of localization",seed.type],
+   ["Original Home Country (OHC)",seed.ohc],["Original Home Country PERNR",seed.pernrOHC],
+   ["New Home Country (NHC)",seed.nhc],["New Home Country PERNR",seed.pernrNHC]
+  ].forEach(([k,v])=>span(push([C(k,XS.idLabel),C(v||"",XS.idValue)],18),"B","D"));
+  push([]);
+
+  if(def.note){ span(push([C(def.note,XS.note)],34),"A","D"); push([]); }
+
+  def.sections.forEach(sec=>{
+    const fields=sec.fields.filter(f=>seedApplies(f,seed));
+    if(!fields.length)return;
+    span(push([C(sec.name,XS.section)],22),"A","D");
+    if(sec.note) span(push([C(sec.note,XS.sectionNote)],30),"A","D");
+    fields.forEach(f=>{
+      const hint=f.type==="choice"?(f.choices||[]).join(" / "):(TYPE_HINT[f.type]||"");
+      push([C(f.label+(f.need?" *":""),f.need?XS.labelReq:XS.label),
+            C("",XS.input),C(hint,XS.hint),C(f.help||"",XS.help)],
+           (f.help&&f.help.length>90)?30:19);
+    });
+    push([]);
+  });
+
+  span(push([C("* required \u2014 the analysis cannot be completed without it.",XS.footer)],16),"A","D");
+  span(push([C("Please complete column B only. The wording in column A is what the system matches on, "+
+               "so renaming or reordering a row stops the file loading.",XS.footer)],26),"A","D");
+  return {rows,merges,def,cols:[56,24,17,48],freeze:2};
+}
+
+function genTemplate(slot,seed){
+  seed=seed||effectiveSeed();
+  const {rows,merges,def,cols,freeze}=buildTemplate(slot,seed);
+  const who=(seed.name||"Localization").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"");
+  writeStyledXlsx(def.title,rows,cols,merges,freeze,`${who} - ${def.title}.xlsx`);
+}
+
+function genAllTemplates(){
+  const seed=readSeed();
+  if(!seed.name||!seed.ohc||!seed.nhc){
+    alert("Employee name and both countries are needed before the templates can be issued.\n\n"+
+          "Load the D&S request form and the SuccessFactors profile, or fill them in by hand.");
+    return;
+  }
+  const slots=Object.keys(REGISTRY).filter(s=>{
+    const w=REGISTRY[s].when;
+    return !w||seedApplies({when:w},seed);
+  });
+  slots.forEach((s,i)=>setTimeout(()=>genTemplate(s,seed),i*400));
+  toast(`${slots.length} request templates generated`);
+}
+
+/* What the intake files already answer. The request form and SuccessFactors
+   arrive before any vendor is contacted, so nothing they carry is asked for
+   again — the fields below are only for what is still blank. */
+function seedAuto(){
+  const d=(F.req||F.sf)?(D=resolve()):null;
+  if(!d)return {};
+  return {
+    name:d.name||"", ohc:d.ohc||"", nhc:d.nhc||"", type:d.locType||"",
+    cl:(d.cl!==null&&d.cl!==undefined)?String(d.cl):"",
+    pernrOHC:d.ohcPernr!==null&&d.ohcPernr!==undefined?String(d.ohcPernr):"",
+    pernrNHC:d.nhcPernr!==null&&d.nhcPernr!==undefined?String(d.nhcPernr):""
+  };
+}
+const SEED_SRC={name:"request form / SF",ohc:"request form / SF",nhc:"request form / SF",
+  type:"request form",cl:"request form",pernrOHC:"request form / TMO",pernrNHC:"request form / TMO"};
+
+/* typed value wins; otherwise whatever the intake files carry */
+function effectiveSeed(){
+  const auto=seedAuto(), out={};
+  Object.keys(caseSeed).forEach(k=>{ out[k]=caseSeed[k]||auto[k]||""; });
+  out.__auto=auto;
+  return out;
+}
+
+function readSeed(){
+  ["name","ohc","nhc","type","cl","pernrOHC","pernrNHC"].forEach(k=>{
+    const el=document.getElementById("seed-"+k);
+    if(el)caseSeed[k]=el.value.trim();
+  });
+  return effectiveSeed();
+}
+
+function startCaseHTML(){
+  const seed=effectiveSeed(), auto=seed.__auto||{};
+  const loaded=[F.req?"request form":null,F.sf?"SuccessFactors":null].filter(Boolean);
+
+  const inp=(l,k,ph="")=>{
+    const fromFile=!caseSeed[k]&&auto[k];
+    return `<div class="f"><div class="f-l">${l}${
+      fromFile?`<span class="f-src">${SEED_SRC[k]}</span>`:""}</div>
+      <input id="seed-${k}" value="${esc(caseSeed[k]||auto[k]||"")}" placeholder="${ph}"
+        oninput="readSeed()" onchange="setView('start')" style="width:100%"></div>`;
+  };
+
+  const cards=Object.entries(REGISTRY).map(([slot,def])=>{
+    const fields=def.sections.flatMap(s=>s.fields).filter(f=>seedApplies(f,seed));
+    const req=fields.filter(f=>f.need).length;
+    const skipped=(def.when&&!seedApplies({when:def.when},seed));
+    return `<tr class="${skipped?"miss":""}">
+      <td><strong>${esc(def.title)}</strong><div class="ds">${esc(def.to)}</div></td>
+      <td class="dv">${skipped?"not needed for this case":`${fields.length} fields · ${req} required`}</td>
+      <td style="text-align:right">${skipped?"":`<button class="mini-btn" onclick="genTemplate('${slot}',readSeed())">Generate</button>`}</td>
+    </tr>`;
+  }).join("");
+
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Start a case</div>
+      <div class="panel-n">${loaded.length?"read from "+loaded.join(" + "):"load the intake files on the left"}</div></div>
+    ${loaded.length
+      ? `<div class="note">Taken from the ${loaded.join(" and ")}. Type over anything that needs correcting &mdash;
+         a typed value wins, and clearing it returns to the file.</div>`
+      : `<div class="note"><strong>Load the D&amp;S request form and the SuccessFactors profile first.</strong>
+         Both arrive before any vendor is contacted, so the case details below fill themselves and the
+         templates carry them through. You can also fill them by hand.</div>`}
+    <div class="panel-b"><div class="fgrid">
+      ${inp("Employee name","name")}
+      ${inp("Type of localization","type","Full Localization")}
+      ${inp("Original home country","ohc","Canada")}
+      ${inp("New home country","nhc","United States")}
+      ${inp("Classification level","cl","29")}
+      ${inp("OHC PERNR","pernrOHC")}
+      ${inp("NHC PERNR","pernrNHC")}
+    </div></div>
+    <table class="tbl diag"><tbody>${cards}</tbody></table>
+    <div class="note"><strong>These files are the ones the system reads back.</strong>
+      Every field asked for here is one the analysis uses, and every field the analysis needs is asked for
+      here. Column A wording is what the parser matches on, so ask vendors to complete column B and leave
+      the labels alone. Fields that only apply to some cases &mdash; EMPP affiliate service for U.S. moves,
+      executive compensation at CL 30 and above &mdash; appear only when the case above calls for them.</div>
+    <div class="panel-b"><button class="mini-btn solid" onclick="genAllTemplates()">Generate all templates</button></div>
+  </div>`;
+}
+
+/* ═══ FILE SLOTS ═══ */
+const SLOTS=[
+  {id:"req", name:"D&S localization request form",   req:1, hint:"Intake — profile, POT, service, justification"},
+  {id:"sf",  name:"SuccessFactors employee profile", req:1, hint:"Employee Profile (Non Sensitive)"},
+  {id:"tmo", name:"TMO data request",                req:1, hint:"Cartus — FX, hypo tax, expat benefits"},
+  {id:"gcbd",name:"GC&BD information data request",  req:1, hint:"SBR, pension, offset, DC plans"},
+  {id:"comp",name:"Compensation data request",       req:1, hint:"NHC salary and pay scale"},
+  {id:"exec",name:"Exec compensation data request",  req:1, hint:"CL 30 and above only"},
+  {id:"tax", name:"Deloitte income tax estimate",    req:0, hint:"OHC and NHC estimated income tax"}
+];
+
+const F={};       // raw parsed pairs per slot
+const FILEMETA={};
+let D=null;       // resolved case data
+let overrides={};
+
+/* ═══ HELPERS ═══ */
+const norm=s=>String(s??"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const num=v=>{
+  if(v===null||v===undefined||v==="")return null;
+  if(typeof v==="number")return isFinite(v)?v:null;
+  let s=String(v).trim().replace(/[$€£¥]/g,"").replace(/\s/g,"");
+  if(!s||/^(n\/?a|tbd|select|none|-|–|—)$/i.test(s))return null;
+  let neg=/^\(.*\)$/.test(s); if(neg)s=s.slice(1,-1);
+  s=s.replace(/,/g,"");
+  if(s.endsWith("%")){const p=parseFloat(s);return isFinite(p)?(neg?-p:p)/100:null;}
+  const n=parseFloat(s);
+  return isFinite(n)?(neg?-n:n):null;
+};
+const fmt=(n,d=0)=>n===null||n===undefined||!isFinite(n)?"—":
+  (n<0?"(":"")+Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d})+(n<0?")":"");
+const pct=n=>n===null||!isFinite(n)?"—":(n*100).toFixed(2)+"%";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* Vendors and forms word the three localization types many ways. */
+function classifyLoc(v){
+  const t=String(v??"").toLowerCase().trim();
+  if(!t)return null;
+  if(/3rd|third/.test(t))                         return "Direct from 3rd Country";
+  if(/full|resident expat/.test(t))               return "Full Localization";
+  if(/direct.*home|from home|home country/.test(t))return "Direct from Home Country";
+  if(/direct/.test(t))                            return "Direct from Home Country";
+  return null;
+}
+
+const xlDate=v=>{
+  /* An empty cell must read as "no date". Left to itself new Date(null) returns
+     1 January 1970, which then looks like a real date and quietly turns into
+     decades of service, so the empty cases are rejected before any parsing. */
+  if(v===null||v===undefined||v==="")return null;
+  if(v instanceof Date)return isNaN(v)?null:v;
+  if(typeof v==="number"){
+    if(v>20000&&v<60000)return new Date(Date.UTC(1899,11,30+Math.floor(v)));
+    return null;                       /* a bare number is not a date */
+  }
+  const t=String(v).trim();
+  if(!t||/^(n\/?a|none|tbc|tbd|-|—)$/i.test(t))return null;
+  const d=new Date(t);
+  if(isNaN(d))return null;
+  /* nothing in this process legitimately predates the company or sits centuries out */
+  const y=d.getUTCFullYear();
+  return (y<1920||y>2100)?null:d;
+};
+const dstr=d=>d?d.toISOString().slice(0,10):"";
+/* Vendors send dates as Date objects, serials or free text. Reports show the day only. */
+const dOnly=v=>{
+  if(v===null||v===undefined||v==="")return null;
+  if(v instanceof Date)return v.toISOString().slice(0,10);
+  if(typeof v==="number"&&v>20000&&v<60000)
+    return new Date(Date.UTC(1899,11,30+Math.floor(v))).toISOString().slice(0,10);
+  const t=String(v).trim();
+  const iso=/^(\d{4}-\d{2}-\d{2})/.exec(t); if(iso)return iso[1];
+  const d2=new Date(t); return isNaN(d2)?t:d2.toISOString().slice(0,10);
+};
+const yearFrac=(a,b)=>!a||!b?null:(b-a)/(365.2425*864e5);
+/* Excel DAYS360, US/NASD method — the day-count convention the old .xlsm template
+   used for tenure (30-day months, 360-day year), not a calendar year fraction. */
+function days360(d1,d2){
+  let y1=d1.getUTCFullYear(),m1=d1.getUTCMonth()+1,day1=d1.getUTCDate();
+  let y2=d2.getUTCFullYear(),m2=d2.getUTCMonth()+1,day2=d2.getUTCDate();
+  if(day1===31)day1=30;
+  if(day2===31&&day1===30)day2=30;
+  return (y2-y1)*360+(m2-m1)*30+(day2-day1);
+}
+/* Years of service the way the old template computed it:
+   ROUND(DAYS360(hire date, as-of date − 1 day)/360, 4). */
+const yosDays360=(hireDate,asOf)=>{
+  if(!hireDate||!asOf)return null;
+  return +(days360(hireDate,new Date(asOf.getTime()-864e5))/360).toFixed(4);
+};
+
+/* ═══ PARSE ═══ */
+function sheetPairs(ws){
+  const g=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+  const out=[];
+  g.forEach((row,ri)=>{
+    if(!row)return;
+    for(let c=0;c<row.length;c++){
+      const lab=row[c];
+      if(typeof lab!=="string"||!lab.trim()||lab.trim().length<3)continue;
+      for(let k=c+1;k<Math.min(row.length,c+7);k++){
+        const v=row[k];
+        if(v!==null&&v!==undefined&&v!=="")
+          {out.push({k:norm(lab),raw:lab.trim(),v,ri,ci:k});break;}
+      }
+    }
+  });
+  return out;
+}
+function parseWB(wb){
+  const pairs=[]; const grids={};
+  wb.SheetNames.forEach(n=>{
+    const ws=wb.Sheets[n];
+    grids[n]=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+    sheetPairs(ws).forEach(p=>pairs.push({...p,sheet:n}));
+  });
+  return {pairs,grids,names:wb.SheetNames};
+}
+/* Request form: label sits in col B, answer in col C. Column D holds help text,
+   so a loose scan would read the hint as the answer when a field is left blank. */
+function reqPairs(){
+  const g=F.req?.grids; if(!g)return null;
+  let best=null;
+  for(const n of Object.keys(g)){
+    const rows=g[n]; if(!rows)continue;
+    const out=[];
+    rows.forEach(r=>{
+      if(!r)return;
+      const lab=r[1], val=r[2];
+      if(typeof lab!=="string"||lab.trim().length<3)return;
+      out.push({k:norm(lab),raw:lab.trim(),v:(val===""||val===undefined)?null:val});
+    });
+    if(!best||out.length>best.length)best=out;
+  }
+  return best;
+}
+function pickReq(...keys){
+  const P=reqPairs(); if(!P)return null;
+  for(const key of keys){
+    const nk=norm(key);
+    const h=P.find(p=>p.k===nk&&p.v!==null); if(h)return h.v;
+  }
+  for(const key of keys){
+    const nk=norm(key);
+    const h=P.find(p=>p.v!==null&&(p.k.startsWith(nk)||p.k.includes(nk)));
+    if(h)return h.v;
+  }
+  return null;
+}
+const pickReqN=(...k)=>num(pickReq(...k));
+
+/* Career history block — Country | Dates | Position Held */
+function careerRows(){
+  const g=F.req?.grids; if(!g)return [];
+  for(const n of Object.keys(g)){
+    const rows=g[n]; if(!rows)continue;
+    let hdr=-1;
+    rows.forEach((r,i)=>{
+      if(!r)return;
+      const joined=r.map(c=>norm(c)).join("|");
+      if(joined.includes("country")&&joined.includes("dates")&&joined.includes("position"))hdr=i;
+    });
+    if(hdr<0)continue;
+    const out=[];
+    for(let i=hdr+1;i<Math.min(rows.length,hdr+14);i++){
+      const r=rows[i]; if(!r)continue;
+      const a=r[1],b=r[2],c=r[3];
+      if(typeof a==="string"&&/^\d\./.test(a.trim()))break;
+      if([a,b,c].every(v=>v===null||v===undefined||v===""))continue;
+      out.push({country:a??"",dates:b??"",position:c??""});
+    }
+    if(out.length)return out;
+  }
+  return [];
+}
+
+
+/* Redesigned vendor templates: label in col A, answer in col B, unit in C, guidance in D.
+   A loose scan would read the guidance as the answer whenever a field is left blank. */
+function strictPairs(slot){
+  const g=F[slot]?.grids; if(!g)return null;
+  let best=null;
+  for(const n of Object.keys(g)){
+    const rows=g[n]; if(!rows)continue;
+    const out=[];
+    rows.forEach(r=>{
+      if(!r)return;
+      const lab=r[0], val=r[1];
+      if(typeof lab!=="string"||lab.trim().length<3)return;
+      out.push({k:norm(lab),v:(val===""||val===undefined)?null:val,u:r[2]??null});
+    });
+    if(!best||out.length>best.length)best=out;
+  }
+  return best;
+}
+function pickStrict(slot,...keys){
+  const P=strictPairs(slot); if(!P)return null;
+  for(const key of keys){
+    const nk=norm(key); const h=P.find(p=>p.k===nk&&p.v!==null); if(h)return h.v;
+  }
+  for(const key of keys){
+    const nk=norm(key); const h=P.find(p=>p.v!==null&&p.k.includes(nk)); if(h)return h.v;
+  }
+  return null;
+}
+const pickStrictN=(s,...k)=>num(pickStrict(s,...k));
+
+function pick(slot,...keys){
+  const P=F[slot]?.pairs; if(!P)return null;
+  for(const key of keys){
+    const nk=norm(key);
+    let h=P.find(p=>p.k===nk); if(h)return h.v;
+  }
+  for(const key of keys){
+    const nk=norm(key);
+    let h=P.find(p=>p.k.startsWith(nk)||nk.startsWith(p.k)&&p.k.length>8);
+    if(h)return h.v;
+  }
+  for(const key of keys){
+    const nk=norm(key);
+    let h=P.find(p=>p.k.includes(nk));
+    if(h)return h.v;
+  }
+  return null;
+}
+const pickN=(s,...k)=>num(pick(s,...k));
+
+/* SF grid → header-mapped row */
+function sfRow(){
+  const g=F.sf?.grids; if(!g)return null;
+  for(const n of Object.keys(g)){
+    const rows=g[n]; if(!rows||rows.length<2)continue;
+    const hdr=rows[0]; if(!hdr)continue;
+    const idx={}; hdr.forEach((h,i)=>{if(typeof h==="string")idx[norm(h)]=i;});
+    if(idx["person id"]===undefined&&idx["last name"]===undefined)continue;
+    const data=rows.slice(1).filter(r=>r&&r.some(c=>c!==null&&c!==""));
+    if(!data.length)continue;
+    return {idx,rows:data,get(r,...ks){for(const k of ks){const i=this.idx[norm(k)];if(i!==undefined&&r[i]!==null&&r[i]!=="")return r[i];}return null;}};
+  }
+  return null;
+}
+
+/* ═══ RESOLVE ═══ */
+function resolve(){
+  const d={warn:[],err:[]};
+  const sf=sfRow();
+
+  /* -- identity & org -- */
+  if(sf){
+    const r=sf.rows[0];
+    d.multi=sf.rows.length>1;
+    const fn=sf.get(r,"First Name"),ln=sf.get(r,"Last Name"),mn=sf.get(r,"Middle Name");
+    d.name=[fn,mn,ln].filter(Boolean).join(" ").replace(/\s+/g," ").trim()||null;
+    d.pid=sf.get(r,"Person ID");
+    d.dob=xlDate(sf.get(r,"Date Of Birth"));
+    d.ohc=String(sf.get(r,"Country/Region")||"").trim()||null;
+    d.nhc=String(sf.get(r,"Host Country")||"").trim()||null;
+    d.cl=num(sf.get(r,"CL"));
+    d.yeAge=num(sf.get(r,"YE Age"));
+    d.yee=num(sf.get(r,"YE Experience"));
+    d.ohcSalary=num(sf.get(r,"Annualized Salary (beqom)","Annualized Salary"));
+    d.hireSF=xlDate(sf.get(r,"Employment Date / Original Date of Hire","Employment Date","Original Date of Hire",
+      "Original Hire Date","Hire Date","Date of Hire","Company Service Date","Service Date","Seniority Date",
+      "Continuous Service Date","Original Start Date","Start Date"));
+    d.posTitle=sf.get(r,"Position Title");
+    d.company=sf.get(r,"Company Name");
+    d.bizLine=sf.get(r,"Business Line");
+    d.workerClass=String(sf.get(r,"Simplified Worker Class")||"").trim();
+    d.nationality=sf.get(r,"Nationality");
+    d.marital=sf.get(r,"Marital Status");
+    d.email=sf.get(r,"Business Email Address");
+  }
+
+  /* SuccessFactors "Country/Region" is where the employee sits today, which for an
+     expatriate is the host country, not the origin. The vendor files state both
+     explicitly, so they win. */
+  const asCountry=v=>{
+    if(v===null||v===undefined)return null;
+    const t=String(v).trim();
+    if(!t||/^[A-Z]{3}$/.test(t))return null;      // a currency code, not a country
+    return CCY[t]!==undefined?t:t;
+  };
+  const fromFiles=(...keys)=>{
+    for(const slot of ["tmo","gcbd","comp","exec"]){
+      const P=[...(strictPairs(slot)||[]),...((F[slot]&&F[slot].pairs)||[])];
+      for(const key of keys){
+        const nk=norm(key);
+        for(const pr of P){
+          if(pr.k!==nk&&!pr.k.startsWith(nk))continue;
+          const c=asCountry(pr.v)||asCountry(pr.u);
+          if(c)return c;
+        }
+      }
+      /* the label row may carry currency then country across the row */
+      const g=F[slot]?.grids;
+      if(g)for(const n of Object.keys(g))for(const r of (g[n]||[])){
+        if(!r||typeof r[0]!=="string"&&typeof r[1]!=="string")continue;
+        const lab=norm(r[0]||r[1]);
+        if(!keys.some(k=>lab===norm(k)||lab.startsWith(norm(k))))continue;
+        for(let i=1;i<Math.min(r.length,6);i++){const c=asCountry(r[i]);if(c)return c;}
+      }
+    }
+    return null;
+  };
+  const ohcFile = asCountry(pickReq("Original Home Country (OHC) payroll","Original Home Country")) ||
+                  fromFiles("Original Home Country (OHC)","Original Home Country");
+  const nhcFile = asCountry(pickReq("New Home Country (NHC) payroll","New Home Country")) ||
+                  fromFiles("New Home Country (NHC)","New Home Country");
+  d.ohcSrc = ohcFile?"file":(d.ohc?"SF":null);
+  d.nhcSrc = nhcFile?"file":(d.nhc?"SF":null);
+  if(ohcFile) d.ohc=ohcFile;
+  if(nhcFile) d.nhc=nhcFile;
+  if(d.nhc) d.nhc=String(d.nhc).trim();
+  d.ohc=canonCountry(d.ohc); d.nhc=canonCountry(d.nhc);
+  /* an expatriate whose SF country equals the destination has no origin on record */
+  if(d.ohc&&d.nhc&&d.ohc===d.nhc&&d.ohcSrc==="SF")d.ohcUnclear=true;
+
+  d.ohcCcy=CCY[d.ohc]||null;
+  d.nhcCcy=CCY[d.nhc]||null;
+
+  /* Currently on an expatriate assignment? Drives which of the three types applies. */
+  d.isExpat = d.workerClass ? /expat|impatriate|rotator|assignee/i.test(d.workerClass) : null;
+  d.sfHost  = d.nhc;                       /* SF host country, before the form may replace it */
+
+  /* -- TMO -- */
+  const tmoS=(...k)=>pickStrict("tmo",...k)??pick("tmo",...k);
+  const tmoN=(...k)=>num(tmoS(...k));
+  d.fxRaw   = tmoN("Exchange Rate from OHC to NHC","Exchange Rate");
+  d.fxDate  = tmoS("Exchange Rate Effective Date");
+  d.hypoTax = tmoN("Hypothetical Taxes");
+  d.premium = tmoN("Full Expatriate Benefits - Premium","Premium");
+  d.ics     = tmoN("Full Expatriate Benefits - Net IC&S","Net IC&S");
+  d.housing = tmoN("Full Expatriate Benefits - Net Housing & Utilities","Net Housing & Utilities");
+  d.travel  = tmoN("Full Expatriate Benefits - Travel Assistance Allowance","Travel Assistance Allowance");
+  d.expatOther = tmoN("Full Expatriate Benefits - Others","Others (Transition Payment if applicable)");
+  d.expatTotalRaw = tmoN("Full Expatriate Benefits - TOTAL","Full Expatriate Benefits TOTAL");
+  {
+    const parts=[d.premium,d.ics,d.housing,d.travel,d.expatOther].filter(v=>v!==null&&v!==0);
+    const sumParts=parts.length?parts.reduce((a,b)=>a+b,0):null;
+    /* vendors often leave the TOTAL cell at zero while the components are filled in */
+    d.expatTotal = (d.expatTotalRaw!==null&&d.expatTotalRaw!==0) ? d.expatTotalRaw : sumParts;
+    d.expatTotalFixed = (d.expatTotalRaw===0&&sumParts!==null);
+  }
+  /* Tax equalization comes from the cost matrix and is keyed in by hand.
+     TMO leaves these at zero, so a zero there is a blank, not an answer. */
+  const tmoHome=tmoN("Cost to the Company - Home Country Tax","Home Country Tax");
+  const tmoHost=tmoN("Cost to the Company - Host Country Tax","Host Country Tax");
+  d.homeTax = (tmoHome!==null&&tmoHome!==0)?tmoHome:null;
+  d.hostTax = (tmoHost!==null&&tmoHost!==0)?tmoHost:null;
+  d.taxeqFromMatrix = true;
+
+  /* -- GC&BD -- */
+  d.ohcPernr = pickReq("Original Home Country PERNR") ??
+               pickStrict("tmo","Original Home Country PERNR") ?? pick("tmo","Original Home Country PERNR") ??
+               pickStrict("gcbd","Original Home Country PERNR") ?? pick("gcbd","Original Home Country PERNR") ?? d.pid;
+  d.nhcPernr = pickReq("New Home Country PERNR") ??
+               pickStrict("tmo","New Home Country PERNR") ?? pick("tmo","New Home Country PERNR") ??
+               pickStrict("gcbd","New Home Country PERNR") ?? pick("gcbd","New Home Country PERNR");
+  if(d.nhcPernr===0||d.nhcPernr==="0")d.nhcPernr=null;
+
+  const gS=(...k)=>pickStrict("gcbd",...k)??pick("gcbd",...k);
+  const gN=(...k)=>{const v=gS(...k);return num(v);};
+  /* GC&BD sometimes gives retirement age as a target DATE (the day the plan's
+     age is reached) instead of a plain number. A number outside a plausible
+     age range is treated as a date — including a raw Excel serial — and
+     converted to an age against date of birth. */
+  const gAge=(...k)=>{
+    const raw=gS(...k); if(raw===null||raw===undefined||raw==="")return null;
+    const n=num(raw);
+    if(n!==null&&n>0&&n<120)return n;
+    const dt=xlDate(raw);
+    return (dt&&d.dob)?+yearFrac(d.dob,dt).toFixed(2):null;
+  };
+  d.ohcSBR = gN("OHC — Standard Benefits Rate (SBR)","OHC - Standard Benefits Rate (SBR)","OHC Standard Benefits Rate");
+  d.nhcSBR = gN("NHC — Standard Benefits Rate (SBR)","NHC - Standard Benefits Rate (SBR)","NHC Standard Benefits Rate");
+  d.offset = String(gS("Will prior service be recognised in the NHC for pension purposes",
+                       "Will prior service be recognized in the NHC for Pension purposes","Offset in NHC")||"").trim();
+  /* GC&BD templates ship with "Select Yes/No" in the cell; an unreturned answer
+     is not a No, so it is treated as unanswered and the offset stays blank. */
+  if(/^select\s*yes\s*\/?\s*no$/i.test(d.offset)||/^(n\/?a|tbc|tbd|-)$/i.test(d.offset))d.offset="";
+  if(overrides.offset)d.offset=overrides.offset;
+  d.offsetSrc = overrides.offset?"entered by hand":(d.offset?"GC&BD":null);
+  d.retAgeG= gAge("Normal retirement age","Normal Retirement Age");
+  d.earlyRet = gAge("Early retirement age");
+  d.planStatus = gS("Plan status");
+  /* Part III-A — the origin country's own pension formula, supplied by GC&BD */
+  d.par={
+    method:gS("Pension formula shape","Formula shape","Pension formula type"),
+    mult:gN("Pension multiplier","Origin country pension multiplier","Accrual multiplier"),
+    rate1:gN("Accrual rate — tier 1","Accrual rate tier 1"),
+    rate2:gN("Accrual rate — tier 2","Accrual rate tier 2"),
+    thresh:gN("Salary threshold between tiers","Salary cap — tier 1"),
+    thresh2:gN("Salary threshold — tier 2","Salary cap — tier 2"),
+    basis:gS("Salary basis"),
+    denom:gN("Credited service denominator"),
+    discPerYr:gN("Early retirement discount per year"),
+    f55:gN("Discount factor at age 55"),
+    f58:gN("Discount factor at age 58"),
+    f60:gN("Discount factor at age 60")
+  };
+  d.offsetBasis = gS("Basis and assumptions used");
+  d.gc={
+    planStatus:gS("Plan status"),
+    entry:gS("Plan entry date"),
+    elig:gS("Eligibility criteria"),
+    retNotes:gS("Notes on retirement ages"),
+    empContrib:gS("Employee contribution?","Employee Contribution"),
+    payOpts:gS("Payment options","Payment Options"),
+    formula:gS("Formula — description","Formula / Calculation Description"),
+    dcOHC:gS("OHC — is there a DC / savings plan?","OHC - Is there a DC / Savings Plan"),
+    dcNHC:gS("NHC — is there a DC / savings plan?","NHC - Is there a DC / Savings Plan"),
+    dcDesc:gS("DC plan description"),
+    other:gS("Other core benefits / PGPs comments","Other Core Benefits / PGPs Comments"),
+    by:gS("Completed by"), when:gS("Date completed"),
+    pensionPlanName:gS("Original Home Country Pension Plan Name","Original Home Country Pension Plan name"),
+    isDBPlan:gS("Is Original Home Country Pension Plan a DB Plan","Is original home country pension plan a DB plan"),
+    discFactors:gS("Discount Factors (if applicable)","Discount Factors"),
+    vestingSvc:gN("Vesting Service with Home Country","Vesting Service")
+  };
+  /* allowance detail for display, not just the totals */
+  d.afpRows=[];
+  {
+    const g=F.gcbd?.grids;
+    if(g)Object.keys(g).forEach(n=>(g[n]||[]).forEach(r=>{
+      if(!r||typeof r[0]!=="string")return;
+      const m=/^\s*(OHC|NHC)\s*[\u2014-]\s*Allowance\s*(\d)/i.exec(r[0]);
+      if(!m)return;
+      const amt=num(r[4])??num(r[3])??num(r[2]);
+      const typ=(typeof r[1]==="string"&&r[1].trim())?r[1].trim():null;
+      const ccy=(typeof r[3]==="string"&&/^[A-Z]{3}$/.test(r[3].trim()))?r[3].trim():
+                (typeof r[2]==="string"&&/^[A-Z]{3}$/.test(r[2].trim())?r[2].trim():null);
+      if(amt!==null||typ)d.afpRows.push({side:m[1].toUpperCase(),n:+m[2],type:typ,ccy,amt});
+    }));
+  }
+  d.pensionNote = pick("gcbd","Comments on Pension / DB Plan Integration","Comments on Pension");
+  d.ohcAFP=[],d.nhcAFP=[];
+  {
+    const g=F.gcbd?.grids; const amt={};
+    if(g)Object.keys(g).forEach(n=>(g[n]||[]).forEach(r=>{
+      if(!r||typeof r[0]!=="string")return;
+      const m=/^\s*(OHC|NHC)\s*[—-]\s*Allowance\s*(\d)/i.exec(r[0]);
+      if(!m)return;
+      const v=num(r[4])??num(r[3])??num(r[2]);
+      if(v!==null)amt[m[1].toUpperCase()+m[2]]=(amt[m[1].toUpperCase()+m[2]]||0)+v;
+    }));
+    for(let i=1;i<=5;i++){
+      d.ohcAFP.push(amt["OHC"+i]??num(pick("gcbd",`OHC - Allowance ${i}`))??0);
+      d.nhcAFP.push(amt["NHC"+i]??num(pick("gcbd",`NHC - Allowance ${i}`))??0);
+    }
+  }
+  d.ohcOffset={};
+  SCEN.forEach(a=>{
+    const ovKey=overrides["ohcOffset"+a];
+    d.ohcOffset[a]=(ovKey!==undefined&&ovKey!==null&&ovKey!=="")?num(ovKey):
+      gN(`Estimated OHC offset — retirement at age ${a}`,
+                      `OHC Offset Amount @ Age ${a}`,`Estimated OHC Offset ${a}`);
+  });
+
+  /* -- Compensation -- */
+  const cmpN=(...k)=>num(pickStrict("comp",...k)??pick("comp",...k)??pickStrict("exec",...k)??pick("exec",...k));
+  d.nhcSalary = cmpN("NHC - Annual Base Salary","NHC — Annual Base Salary","New Home Country Annual Base Salary");
+  d.clNew     = cmpN("New Home Country CL (Promotion)","NHC - Pay Scale Group (CL)");
+  d.ohcBBU    = pickN("exec","Original Home Country BBU Guide","OHC - BBU Guide");
+  d.nhcBBU    = pickN("exec","NHC - BBU Guide")??pickN("comp","NHC - BBU Guide");
+
+  /* -- Tax -- */
+  const tS=(...k)=>pickStrict("tax",...k)??pick("tax",...k);
+  d.taxOHCDel = num(tS("Estimated annual income tax — original home country","Original Home Country","Estimated Income Tax OHC"));
+  d.taxNHCDel = num(tS("Estimated annual income tax — new home country","New Home Country","Estimated Income Tax NHC"));
+  d.taxAssump = tS("Assumptions applied");
+
+  /* -- NHC plan rules -- */
+  const R=NHC_RULES[d.nhc]||{};
+  d.rule=R;
+  d.retAge = d.retAgeG ?? R.retAge ?? null;
+  d.cutoff = R.cutoff ?? (d.retAge?d.retAge-15:null);
+  d.intoUS = d.nhc==="United States";
+
+  /* -- D&S request form: authoritative for profile data -- */
+  d.reqDate    = xlDate(pickReq("Date of request"));
+  d.requestor  = pickReq("Requestor name (From)","Requestor name");
+  d.reqName    = pickReq("Employee name");
+  d.reqType    = pickReq("Type of localization");
+  d.reqOHC     = pickReq("Original Home Country (OHC) payroll","Original Home Country");
+  d.reqNHC     = pickReq("New Home Country (NHC) payroll","New Home Country");
+  d.reqCL      = pickReqN("Current Classification Level (CL)","Current Classification Level");
+  d.reqCLNew   = pickReqN("New Home Country CL (Promotion?)","New Home Country CL");
+  d.reqPerf    = pickReq("Last 3 Performance Assessment (PA) Ratings","Last 3 Performance Assessment");
+  d.reqPot     = pickReq("Potential (POT)","Potential");
+  d.reqAge     = pickReqN("Age");
+  d.reqYOS     = pickReqN("Years of service");
+  d.reqBizLine = pickReq("Business line / Function","Business line");
+  d.reqNat     = pickReq("Nationality");
+  d.visaType   = pickReq("Type of visa / immigration comments","Type of visa");
+  d.visaExp    = pickReq("Visa expiration date");
+  d.education  = pickReq("Educational background");
+  d.justif     = pickReq("Request justification / business case","Request justification");
+  d.reviewedBy = pickReq("Reviewed by (B/L HR Manager name)","Reviewed by");
+  d.futureAssign=pickReq("Future assignments after localization","Future assignments");
+  d.curPos     = pickReq("Current position title & description","Current position title");
+  d.futPos     = pickReq("Future position title");
+  d.futAffil   = pickReq("Future company affiliate");
+  d.futFunc    = pickReq("Future position function");
+  d.futDept    = pickReq("Future position department");
+  d.reportsNow = pickReq("Number of current direct & indirect reports","Number of current direct");
+  d.reportsFut = pickReq("Number of future direct & indirect reports","Number of future direct");
+  d.peers      = pickReq("Peers of comparison");
+  d.costCenter = pickReq("Billing cost center");
+  d.companyCode= pickReq("Billing company code");
+  d.signedBy   = pickReq("Signed by");
+  d.signedDate = pickReq("Date signed");
+  d.career     = careerRows();
+
+  /* the form fills what SuccessFactors does not carry */
+  if(d.reqName&&!d.name)d.name=String(d.reqName).trim();
+  if(d.reqOHC&&!d.ohc){d.ohc=canonCountry(d.reqOHC);d.ohcCcy=CCY[d.ohc]||null;}
+  if(d.reqNHC&&!d.nhc){d.nhc=canonCountry(d.reqNHC);d.nhcCcy=CCY[d.nhc]||null;}
+
+  /* Fall back to the country defaults for any parameter GC&BD left blank, and
+     record which ones came from there so the panel can flag them. */
+  d.parFromDefaults=[];
+  {
+    const dflt=planDefaults(d.ohc);
+    if(dflt)Object.keys(dflt).forEach(k=>{
+      if(d.par[k]===null||d.par[k]===undefined||d.par[k]===""){
+        d.par[k]=dflt[k]; d.parFromDefaults.push(k);
+      }
+    });
+  }
+  /* SuccessFactors carries the level as of today, which may already have moved.
+     The request form states the level the case was raised on, so it wins. */
+  d.clSF=d.cl;
+  if(d.reqCL!==null&&d.reqCL!==undefined)d.cl=d.reqCL;
+  d.clMoved=(d.clSF!==null&&d.reqCL!==null&&d.clSF!==d.reqCL)?{form:d.reqCL,sf:d.clSF}:null;
+  if(d.reqCLNew!==null&&d.clNew===null)d.clNew=d.reqCLNew;
+  /* ── Type of localization ────────────────────────────────────────────────
+     Three types, and which one applies changes the tax routing, whether a
+     transition payment can arise, and what the expatriate column contains.
+
+       Full Localization        already on a resident expatriate assignment in
+                                the country being localized to
+       Direct from Home Country not an expatriate; moves straight from the
+                                original home country
+       Direct from 3rd Country  on assignment somewhere that is neither the
+                                origin nor the destination
+
+     The intake form states it, so the form wins. GC&BD restates it and is used
+     when the form is silent. Failing both, it is inferred from the worker class
+     in SuccessFactors, and an inference is labelled as such rather than
+     presented as fact. */
+  d.locTypeAlt = classifyLoc(pickStrict("gcbd","Type of Localization")??pick("gcbd","Type of Localization"));
+  const formType = classifyLoc(d.reqType);
+  if(formType){ d.locType=formType; d.locTypeSrc="request form"; }
+  else if(d.locTypeAlt){ d.locType=d.locTypeAlt; d.locTypeSrc="GC&BD file"; }
+  else if(d.isExpat!==null){
+    /* an expatriate whose assignment country is not where they are being
+       localized to is sitting in a third country */
+    d.locType = !d.isExpat ? "Direct from Home Country"
+              : (d.sfHost&&d.nhc&&d.sfHost!==d.nhc) ? "Direct from 3rd Country"
+              : "Full Localization";
+    d.locTypeSrc="inferred from worker class";
+  } else { d.locType=null; d.locTypeSrc=null; }
+  if(overrides.locType){ d.locType=overrides.locType; d.locTypeSrc="entered by hand"; }
+  /* the form and GC&BD disagreeing is worth surfacing, not silently resolving */
+  d.locTypeClash=(formType&&d.locTypeAlt&&formType!==d.locTypeAlt)?{form:formType,gcbd:d.locTypeAlt}:null;
+
+  /* Estimated income tax — where each side comes from depends on the case.
+
+     Original home country
+       Full Localization      the hypothetical tax TMO already reports, so the
+                              expatriate column and this line cannot disagree
+       Direct from home / 3rd Deloitte calculates it
+
+     New home country
+       into the U.S.          keyed in from the paycheck calculator
+       elsewhere              Deloitte calculates it */
+  d.intoUS = d.nhc==="United States";          /* recheck: the form may have set nhc */
+
+  d.ohcSalarySF = d.ohcSalary;
+  const fullLoc = d.locType==="Full Localization";
+  d.taxOHCSrc = fullLoc?"TMO hypothetical tax":"Deloitte";
+  d.taxOHC    = fullLoc ? d.hypoTax : d.taxOHCDel;
+  d.taxNHCSrc = d.intoUS?"paycheck calculator, by hand":"Deloitte";
+  d.taxNHC    = d.intoUS ? null : d.taxNHCDel;
+
+  /* -- manual -- */
+  d.hireDate=d.hireSF??null; d.life=80;
+  /* Years of service is computed from the employment date on the same day-count
+     basis as the old template. The request form's figure is often rounded or
+     stale, so it is only a fallback and is always overridable. */
+  d.yos=null;
+  /* Performance and potential are always keyed in by hand — the request form's
+     text is free-form and inconsistent, so it is not used as a source. */
+  d.pot=null; d.perfCur=null; d.perfY1=null; d.perfY2=null;
+
+  Object.assign(d,overrides);
+  if(typeof d.hireDate==="string"&&d.hireDate)d.hireDate=xlDate(d.hireDate);
+
+  /* derived */
+  d.age = d.dob?yearFrac(d.dob,new Date()):(d.reqAge??d.yeAge??null);
+  /* age at 31 December of the current year, which is what the template calls Year End Age */
+  d.ageYE = overrides.yeAge ?? d.yeAge ?? (d.dob?(new Date().getFullYear()-d.dob.getUTCFullYear()):(d.reqAge??null));
+  /* Years of service: DAYS360 from hire date, same convention as the old template.
+     Anchored on an "as of" date the coordinator can pin — defaults to today. */
+  /* The target effective localization date anchors years of service, the same
+     way the old template's G55 did, and is what Nova asks for. One field. */
+  d.targetDate = overrides.targetDate?xlDate(overrides.targetDate):null;
+  d.yosAsOf = d.targetDate || (overrides.yosAsOf?xlDate(overrides.yosAsOf):new Date());
+  if(d.yos===null||d.yos===undefined){
+    const calc=yosDays360(d.hireDate,d.yosAsOf);
+    d.yos = calc ?? d.reqYOS ?? null;
+    d.yosSrc = calc!==null&&calc!==undefined ? "calculated from employment date"
+             : (d.reqYOS!==null&&d.reqYOS!==undefined ? "request form" : null);
+  } else d.yosSrc="entered by hand";
+
+  /* performance is entered per year against a fixed category list; potential is a single number */
+  d.perfYears=[new Date().getFullYear(),new Date().getFullYear()-1,new Date().getFullYear()-2];
+  d.perfText=[["perfCur",d.perfYears[0]],["perfY1",d.perfYears[1]],["perfY2",d.perfYears[2]]]
+    .filter(([k])=>d[k]).map(([k,y])=>y+": "+d[k]).join(" · ")||null;
+
+  /* ── FX direction check ── */
+  d.fx=d.fxRaw; d.fxFlip=false;
+  if(d.fxRaw!==null&&d.ohcCcy&&d.nhcCcy&&d.ohcCcy!==d.nhcCcy){
+    const po=PAR[d.ohcCcy],pn=PAR[d.nhcCcy];
+    if(po&&pn){
+      const expect=po/pn;
+      const eF=Math.abs(Math.log(d.fxRaw/expect));
+      const eI=Math.abs(Math.log((1/d.fxRaw)/expect));
+      d.fxExpect=expect;
+      if(eI<eF-.5){d.fxFlip=true;d.fx=overrides.fx!==undefined?overrides.fx:1/d.fxRaw;}
+    }
+  }
+  if(overrides.fx!==undefined)d.fx=overrides.fx;
+  if(d.ohcCcy&&d.nhcCcy&&d.ohcCcy===d.nhcCcy&&d.fx===null)d.fx=1;
+
+  /* Original home country salary. SuccessFactors is not always right, and what
+     it holds is not always stated in the origin country's currency, so the
+     amount is editable and its currency can be declared. Runs after the
+     overrides and after the rate is settled, or the conversion would be undone. */
+  d.ohcSalarySrc = (overrides.ohcSalary!==undefined&&overrides.ohcSalary!==null&&overrides.ohcSalary!=="")
+    ? "entered by hand" : "SuccessFactors";
+  d.ohcSalaryCcy = overrides.ohcSalaryCcy || d.ohcCcy || null;
+  d.ohcSalaryConv = false;
+  if(d.ohcSalary!==null&&d.ohcSalary!==undefined&&d.nhcCcy&&d.fx&&
+     d.ohcSalaryCcy===d.nhcCcy&&d.ohcCcy!==d.nhcCcy){
+    /* stated in destination currency — bring it back to origin currency, because
+       everything downstream converts OHC → NHC exactly once */
+    d.ohcSalary=d.ohcSalary/d.fx; d.ohcSalaryConv=true;
+  }
+
+  /* -- Nova report -- fields Nova requires that no vendor file supplies today.
+     Kept as manual overrides (namespace "nova:") so they persist with the case
+     but stay clearly separate from the calculated figures above. */
+  const nOv=(key,fb)=>{
+    const v=overrides["nova:"+key];
+    return (v!==undefined&&v!==null&&v!=="")?v:(fb===undefined?null:fb);
+  };
+  d.nova={
+    date:        nOv("date",null),
+    estLocDate:  nOv("estLocDate",d.targetDate?dstr(d.targetDate):null),
+    exec:        nOv("exec",d.cl!==null?(d.cl>=30?"Executive":"Non-Executive"):null),
+    planName:    nOv("planName",d.gc.pensionPlanName),
+    isDBPlan:    nOv("isDBPlan",d.gc.isDBPlan),
+    dbBenefit:   nOv("dbBenefit",[d.gc.elig,d.gc.payOpts,d.gc.dcDesc].filter(v=>v&&String(v).trim()).join("\n\n")||null),
+    affPension:  nOv("affPension",null),
+    affBenefit:  nOv("affBenefit",null),
+    affVesting:  nOv("affVesting",null),
+    vestingSvc:  nOv("vestingSvc",d.gc.vestingSvc),
+    usSince:     nOv("usSince",null),
+    spouseDob:   nOv("spouseDob",null),
+    maritalStatus:nOv("maritalStatus",null),
+    ssnAvail:    nOv("ssnAvail",null)
+  };
+
+  return d;
+}
+
+/* ═══ CALC ═══ */
+/* A computed figure the coordinator has replaced by hand. Kept apart from the
+   inputs so the formula stays visible and the override can be undone. */
+function ov(key,computed){
+  const k="calc:"+key;
+  return (overrides[k]!==undefined&&overrides[k]!==null)?overrides[k]:computed;
+}
+const isOv=key=>overrides["calc:"+key]!==undefined&&overrides["calc:"+key]!==null;
+
+/* Parameters seen before, by origin country. These are a starting point only:
+   GC&BD remains the source of record, and anything they return overrides what
+   is here. Plan rules change and vary by plan, not just by country, so a value
+   that came from this table is labelled as needing confirmation. */
+const OHC_PLANS={
+  "canada":{method:"accrual",mult:0.015,f55:0.75,f58:0.88,f60:0.94},
+  "belgium":{method:"tiered",rate1:0.0625,rate2:0.23125,thresh:54000,thresh2:54500}
+};
+function planDefaults(country){
+  const k=norm(country||"");
+  return OHC_PLANS[k]||null;
+}
+
+/* ── Origin country pension formula ──────────────────────────────────────────
+   The offset mirrors the pension formula of the employee's origin country, so
+   the shape differs by country, not just the numbers. Two shapes cover the
+   cases seen so far; GC&BD states which one applies and supplies its inputs.
+
+     "accrual"  multiplier x lump-sum factor x salary x service x age discount
+                (Canada: 0.015 multiplier, 0.75/0.88/0.94 discount factors)
+     "tiered"   two accrual rates split at a salary cap, x service, no age
+                discount (Belgium: 6.25% up to the cap, 23.125% above it —
+                which is why all three ages return the same amount)
+
+   Returns null when the parameters are not there, so the figure reads blank
+   rather than as a confident zero. */
+function ohcOffsetFormula(d,age,yearsToRet){
+  const f=d.par||{}, sal=d.ohcSalary;
+  if(sal===null||sal===undefined||d.yos===null||d.yos===undefined)return null;
+  const method=String(f.method||"").toLowerCase();
+
+  if(method.startsWith("tier")){
+    if(f.rate1===null||f.rate2===null)return null;
+    const cap1=f.thresh, cap2=f.thresh2??f.thresh;
+    if(cap1===null||cap1===undefined)return null;
+    const lower=f.rate1*Math.min(sal,cap1);
+    /* the template applies the upper rate to the whole salary when it sits
+       below the cap; reproduced rather than corrected — flagged in the panel */
+    const upper=f.rate2*(sal>cap2?sal-cap2:sal);
+    return (lower+upper)*d.yos;
+  }
+
+  /* default: accrual with an age-dependent discount */
+  if(f.mult===null||f.mult===undefined||yearsToRet===null)return null;
+  const disc={55:f.f55,58:f.f58,60:f.f60}[age];
+  const ls=(d.rule&&d.rule.ls)?d.rule.ls[age]:null;
+  if(disc===null||disc===undefined||ls===null)return null;
+  /* Returned in origin-country currency. The old template converted here AND
+     again in Economic Analysis, dividing the salary by the rate twice; the
+     conversion is applied once, by the caller, like every other OHC figure. */
+  return f.mult*ls*sal*(d.yos+yearsToRet)*disc;
+}
+
+function calc(d){
+  const c={};
+  const fx=d.fx, S=v=>v===null||fx===null?null:v*fx;   // OHC → NHC, always ×
+  const sum=a=>{const f=a.filter(v=>v!==null&&isFinite(v));return f.length?f.reduce((x,y)=>x+y,0):null;};
+
+  /* Cost to company — column B (OHC + expat) / column C (localized in NHC) */
+  c.b={}; c.c={};
+  c.b.salary = ov("b.salary",S(d.ohcSalary));
+  c.c.salary = ov("c.salary",d.nhcSalary);
+  c.b.abic   = (d.cl!==null&&d.cl<30)?0:S(d.ohcBBU??0);
+  c.c.abic   = ((d.clNew??d.cl)!==null&&(d.clNew??d.cl)<30)?0:(d.nhcBBU??0);
+  c.b.afp    = ov("b.afp",S(sum(d.ohcAFP)??0));
+  c.c.afp    = ov("c.afp",sum(d.nhcAFP)??0);
+  c.b.ben    = ov("b.ben",(c.b.salary!==null&&d.ohcSBR!==null)?c.b.salary*d.ohcSBR-(c.b.afp??0):null);
+  c.c.ben    = ov("c.ben",(c.c.salary!==null&&d.nhcSBR!==null)?c.c.salary*d.nhcSBR-(c.c.afp??0):null);
+  c.b.expat = ov("b.expat",d.expatTotal);
+  c.c.expat  = 0;
+  c.b.taxeq = ov("b.taxeq",sum([d.homeTax,d.hostTax]));
+  c.c.taxeq  = 0;
+  /* A column with no salary has nothing to total. Summing the zeros around it
+     would report a real figure where there is none, and the delta would look
+     catastrophic rather than unknown. */
+  c.b.total  = c.b.salary===null?null:sum([c.b.salary,c.b.abic,c.b.afp,c.b.ben,c.b.expat,c.b.taxeq]);
+  c.c.total  = c.c.salary===null?null:sum([c.c.salary,c.c.abic,c.c.afp,c.c.ben,c.c.expat,c.c.taxeq]);
+  c.delta    = {};
+  ["salary","abic","afp","ben","expat","taxeq","total"].forEach(k=>{
+    c.delta[k]=(c.c[k]===null||c.b[k]===null)?null:c.c[k]-c.b[k];
+  });
+
+  /* Employee perspective — three columns: as expatriate, remain in OHC, localized */
+  c.e={x:{},o:{},l:{}};
+  c.e.x.salary = ov("e.x.salary",S(d.ohcSalary));
+  c.e.o.salary = ov("e.o.salary",S(d.ohcSalary));
+  c.e.l.salary = ov("e.l.salary",d.nhcSalary);
+  c.e.x.afp    = S(sum(d.ohcAFP)??0);     c.e.o.afp    = S(sum(d.ohcAFP)??0); c.e.l.afp    = sum(d.nhcAFP)??0;
+  c.e.x.tax    = ov("e.x.tax",d.taxOHC!==null?-Math.abs(d.taxOHC):null);
+  c.e.o.tax    = ov("e.o.tax",c.e.x.tax);
+  c.e.l.tax    = ov("e.l.tax",d.taxNHC!==null?-Math.abs(d.taxNHC):null);
+  ["x","o","l"].forEach(k=>{
+    c.e[k].sub = c.e[k].salary===null?null:sum([c.e[k].salary,c.e[k].afp,c.e[k].tax]);
+  });
+  /* expatriate benefits reach the employee only while on assignment */
+  c.e.x.premium=d.premium; c.e.x.ics=d.ics; c.e.x.housing=d.housing; c.e.x.travel=d.travel;
+  c.e.x.benSub = sum([d.premium,d.ics,d.housing,d.travel]) ?? d.expatTotal;
+  c.e.o.benSub = 0; c.e.l.benSub = 0;
+  c.e.x.cash = c.e.x.sub===null?null:sum([c.e.x.sub,c.e.x.benSub]);
+  c.e.o.cash = c.e.o.sub;
+  c.e.l.cash = c.e.l.sub;
+  c.e.deltaPct = (c.e.o.cash&&c.e.l.cash!==null)?(c.e.l.cash-c.e.o.cash)/Math.abs(c.e.o.cash):null;
+
+  /* Transition payments — the employee's cash gap on localizing, not the company's cost gap.
+     Full localization only, and only where localizing leaves the employee worse off. */
+  const full = d.locType==="Full Localization";
+  const gap  = (c.e.x.cash!==null&&c.e.l.cash!==null)?c.e.x.cash-c.e.l.cash:null;
+  c.tp={applies:full&&gap!==null&&gap>0, gap:gap, y1:0, y2:0, total:0, m1:0, m2:0,
+        basis:(c.e.x.cash===null||c.e.l.cash===null)?"needs the Deloitte income tax estimate":null};
+  if(c.tp.applies){
+    c.tp.y1=gap; c.tp.y2=gap/2; c.tp.total=gap*1.5;
+    c.tp.m1=gap/12; c.tp.m2=gap/24;
+  }
+
+  /* Pension scenarios */
+  c.scen={};
+  SCEN.forEach(age=>{
+    const s={age};
+    /* The template works from the year-end age as a whole number, so the
+       scenarios land on whole years. Using the exact age shifts every figure. */
+    /* Years to retirement runs off the exact age, not the year-end integer.
+       Checked against the old template: exact age reproduces its pension figures
+       to within 0.01%, the rounded age drifts about half a percent high. */
+    s.yearsToRet = (d.age!==null&&d.age!==undefined)?age-d.age
+                 : (d.ageYE!==null&&d.ageYE!==undefined?age-d.ageYE:null);
+    /* An employee already past this age cannot retire into it. The scenario is
+       reported as not applicable rather than with negative years. */
+    s.passed = s.yearsToRet!==null&&s.yearsToRet<0;
+    if(s.passed){
+      s.annual=null;s.subtotal=null;s.tp=null;s.nhcPension=null;
+      s.ohcOffset=null;s.incr=null;s.medical=null;s.total=null;
+      c.scen[age]=s; return;
+    }
+    s.annual     = c.c.total;
+    s.subtotal   = (s.yearsToRet!==null&&s.annual!==null)?s.yearsToRet*s.annual:null;
+    s.tp         = c.tp.applies?c.tp.total:0;
+
+    /* NHC pension — US EMPP only; other NHCs are entered by hand */
+    const R=d.rule;
+    if(d.intoUS&&R.ls&&c.c.salary!==null&&s.yearsToRet!==null&&d.yos!==null){
+      s.nhcPension = R.ls[age]*R.mult*c.c.salary*(s.yearsToRet+d.yos)*R.erf[age];
+      s.nhcAuto=true;
+    }else{
+      s.nhcPension = overrides["nhcPension"+age] ?? null;
+      s.nhcAuto=false;
+    }
+
+    /* OHC offset — supplied by GC&BD, or rebuilt from the origin country's own
+       pension formula when GC&BD gives the parameters instead of the amount.
+       Reproduces the old template's Economic Analysis figures exactly. */
+    /* An explicit No means no offset applies, so zero is the right answer.
+       No answer at all is different: the figure is unknown, and reporting it as
+       zero would overstate the incremental pension the company is taking on. */
+    const ans=String(d.offset||"").trim();
+    const offYes=/^y/i.test(ans), offNo=/^n/i.test(ans);
+    let offBase = d.ohcOffset[age];
+    if(offBase===null||offBase===undefined)offBase=ohcOffsetFormula(d,age,s.yearsToRet);
+    s.ohcOffset = ov("ohcOffset"+age, offNo?0:(offYes?S(offBase):null));
+
+    s.incr    = (s.nhcPension!==null&&s.ohcOffset!==null)?s.nhcPension-s.ohcOffset:null;
+    /* Retiree medical is a company cost only where the U.S. plan applies. */
+    s.medical = overrides["medical"+age] ?? (d.intoUS?medicalUS(d,age,s.yearsToRet):0);
+    s.subtotal = ov("sub"+age,s.subtotal);
+
+    /* corrected total — no double counting */
+    s.total = sum([s.subtotal,s.tp,s.incr,s.medical]);
+    c.scen[age]=s;
+  });
+  c.scenPassed = SCEN.filter(a=>c.scen[a].passed);
+
+  return c;
+}
+
+/* ═══ GATE ═══ */
+function gate(d,c){
+  const A=[];
+  if(d.multi)A.push({t:"w",tag:"Data",h:"The SuccessFactors export has more than one employee.",
+    b:"Only the first row was read. Filter the report to a single Person ID and load it again."});
+
+  if(d.intoUS&&MEDICAL_US.year<new Date().getFullYear()-1)A.push({t:"n",tag:"MEDICAL",
+    h:`The retiree medical rates are from ${MEDICAL_US.year}.`,
+    b:`Medical cost is built from the U.S. PPO B company rates, which are reissued each year.
+       The figures in use are ${MEDICAL_US.year}. If a newer schedule exists, the rates want updating,
+       or key the medical figures in directly on the scenario table.`});
+  if(d.locTypeClash)A.push({t:"w",tag:"TYPE",
+    h:`The request form and GC&BD state different localization types.`,
+    b:`The form says <strong>${esc(d.locTypeClash.form)}</strong>, GC&amp;BD says
+       <strong>${esc(d.locTypeClash.gcbd)}</strong>. The form is being used. The type decides where the
+       income tax figures come from and whether a transition payment can arise, so it is worth settling.`});
+  if(d.yos!==null&&d.yos!==undefined&&(d.yos>45||d.yos<0))A.push({t:"w",tag:"SERVICE",
+    h:`Years of service looks wrong.`,
+    b:`The employment date read as <strong>${dstr(d.hireDate)||"blank"}</strong>, giving
+       <strong>${(+d.yos).toFixed(2)}</strong> years. Check the employment date in the file, or key the
+       service in directly below.`});
+  if(d.hireDate&&d.dob&&d.hireDate<=d.dob)A.push({t:"w",tag:"SERVICE",
+    h:`The employment date is not after the date of birth.`,
+    b:`Employment <strong>${dstr(d.hireDate)}</strong>, born <strong>${dstr(d.dob)}</strong>.
+       One of the two is being read from the wrong column.`});
+  if(d.fxFlip)A.push({t:"w",tag:"FX",
+    h:`The exchange rate looks inverted.`,
+    b:`TMO supplied <strong>${d.fxRaw}</strong>, but ${d.ohcCcy}→${d.nhcCcy} should be near <strong>${d.fxExpect.toFixed(4)}</strong>. It has been inverted to <strong>${d.fx.toFixed(6)}</strong> for this analysis.`,
+    acts:[{l:"Keep inverted",f:"ackFx()",solid:1},{l:`Use ${d.fxRaw} as supplied`,f:"keepFx()"}]});
+
+  const miss=[];
+  if(d.yos===null)miss.push("years of service");
+  if(d.age===null)miss.push("age");
+  if(d.ohcSBR===null)miss.push("OHC benefits rate");
+  if(d.nhcSBR===null)miss.push("NHC benefits rate");
+  if(d.fx===null&&d.ohcCcy!==d.nhcCcy)miss.push("exchange rate");
+  if(d.nhcSalary===null)miss.push("NHC salary");
+  if(miss.length)A.push({t:"e",tag:"Missing",h:"The analysis is incomplete.",
+    b:"Still needed: <strong>"+miss.join(", ")+"</strong>. Fill the amber fields or load the file that carries them."});
+
+  if(d.age!==null&&d.cutoff!==null){
+    const ok=d.age<=d.cutoff;
+    A.push({t:ok?"i":"w",tag:"Cut-off",
+      h:ok?`Age ${d.age.toFixed(1)} is within the ${d.nhc} cut-off of ${d.cutoff}.`
+          :`Age ${d.age.toFixed(1)} is past the ${d.nhc} cut-off of ${d.cutoff}.`,
+      b:ok?`Plan retirement age ${d.retAge} less the 15-year runtime rule.`
+          :`Late-in-career principle applies. This case needs an explicit exception before it goes forward.`});
+  }
+
+  if(d.locType==="Full Localization"&&d.homeTax===null&&d.hostTax===null)
+    A.push({t:"w",tag:"Cost matrix",
+      h:"Tax equalization has not been entered.",
+      b:"These two figures come from the cost matrix and are keyed in by hand — TMO returns them as zero. "+
+        "Until they are entered the cost of remaining an expatriate is understated, which flatters the case for localizing."});
+
+  if(c.scenPassed&&c.scenPassed.length)A.push({t:"w",tag:"Scenarios",
+    h:`The employee is already past age ${c.scenPassed.join(" and ")}.`,
+    b:`Those scenarios cannot be modelled and are left out of the analysis. `+
+      (c.scenPassed.length===SCEN.length
+        ? "No retirement scenario remains, which on its own is a reason to question whether this case should proceed."
+        : `The remaining scenario${SCEN.length-c.scenPassed.length>1?"s":""} still apply.`)});
+
+  if(!d.intoUS&&d.nhc)A.push({t:"i",tag:"Pension",
+    h:`${d.nhc} pension is entered by hand.`,
+    b:"The automatic formula covers the U.S. plan only. Take the NHC pension figures from GC&BD and enter them in the scenario table."});
+
+  return A;
+}
+
+/* ═══ RENDER ═══ */
+function railHTML(){
+  const html=g=>SLOTS.filter(s=>s.req===g).map(s=>{
+    const on=!!F[s.id], m=FILEMETA[s.id];
+    return `<div class="slot ${on?"on":""} ${s.req&&!on?"req":""}" onclick="pickFile('${s.id}')">
+      <div class="slot-mark">${on?"✓":""}</div>
+      <div class="slot-txt"><div class="slot-name">${s.name}</div>
+      <div class="slot-meta">${on?esc(m.n):s.hint}</div></div></div>`;
+  }).join("");
+  document.getElementById("slots-req").innerHTML=html(1);
+  document.getElementById("slots-opt").innerHTML=html(0);
+  const req=SLOTS.filter(s=>s.req), got=req.filter(s=>F[s.id]).length;
+  const opt=SLOTS.filter(s=>!s.req).filter(s=>F[s.id]).length;
+  document.getElementById("status").innerHTML =
+    got===0 ? "No files loaded"
+    : `<b>${got} of ${req.length}</b> required${opt?` · <b>${opt}</b> optional`:""}` +
+      (got===req.length?'<br><span class="ok">Ready to export</span>':"<br>Recalculates as you load");
+}
+
+const PERF_CATS=["OPwD","OP","EP","VG","GP","NI","NSI"];
+function fieldsHTML(d){
+  const f=(l,v,src)=>`<div class="f"><div class="f-l">${l}${src?`<span class="f-src">${src}</span>`:""}</div><div class="f-v">${v??"—"}</div></div>`;
+  const ed=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
+    <input class="${val===null||val===""?"blank":""}" value="${val??""}" placeholder="${ph}"
+      onchange="setOv('${key}',this.value)"></div>`;
+  const sel=(l,key,val)=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
+    <select class="${val?"":"blank"}" onchange="setOv('${key}',this.value)">
+      <option value=""${val?"":" selected"}>—</option>
+      ${PERF_CATS.map(c=>`<option value="${c}"${val===c?" selected":""}>${c}</option>`).join("")}
+    </select></div>`;
+
+  const hasReq=!!F.req;
+  const career=d.career&&d.career.length?d.career:null;
+
+  return `
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">Case</div><div class="panel-n">SuccessFactors + request form</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("Employee",esc(d.name),"SF")}
+      ${f("Person ID",esc(d.pid),"SF")}
+      ${f("Date of birth",dstr(d.dob),"SF")}
+      ${f("Age today",d.age!==null?d.age.toFixed(2):null,d.dob?"calc":"form")}
+      ${f("Classification level",d.cl?"CL "+d.cl:null,d.reqCL!==null?"form":"SF")}
+      ${f("Origin country",esc(d.ohc)+(d.ohcCcy?` · ${d.ohcCcy}`:""),"SF")}
+      ${f("New home country",esc(d.nhc)+(d.nhcCcy?` · ${d.nhcCcy}`:""),d.nhc&&!d.reqNHC?"SF":"form")}
+      <div class="f"><div class="f-l">Localization type<span class="f-src">${esc(d.locTypeSrc||"not stated")}</span></div>
+        <select onchange="setOv('locType',this.value)">
+          ${["","Full Localization","Direct from Home Country","Direct from 3rd Country"].map(o=>
+            `<option value="${esc(o)}"${d.locType===o||(!d.locType&&!o)?" selected":""}>${esc(o||"—")}</option>`).join("")}
+        </select></div>
+      ${f("Plan retirement age",d.retAge,d.retAgeG?"GC&BD":"rules")}
+      ${f("Cut-off age",d.cutoff!==null&&d.cutoff!==undefined
+        ?`${d.cutoff} — through the day before turning ${d.cutoff+1}`:null,"rules")}
+      ${f("Prior service recognised",esc(d.offset),"GC&BD")}
+      ${f("New home country CL",d.clNew?"CL "+d.clNew:null,"form")}
+    </div></div>
+    <div class="legend">
+      <div class="lg"><div class="sw sw-c"></div>Calculated — hover any figure to see its formula</div>
+      <div class="lg"><div class="sw sw-e"></div>Editable — everything else is locked</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">Performance &amp; potential</div>
+      <div class="panel-n">always keyed in by hand</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${sel(String(d.perfYears[0]),"perfCur",d.perfCur)}
+      ${sel(String(d.perfYears[1]),"perfY1",d.perfY1)}
+      ${sel(String(d.perfYears[2]),"perfY2",d.perfY2)}
+      ${ed("Potential","pot",d.pot??"","e.g. 34")}
+    </div></div>
+  </div>
+
+  ${hasReq?`
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">From the request form</div>
+      <div class="panel-n">submitted by ${esc(d.requestor||"D&S")}${d.reqDate?" · "+dstr(d.reqDate):""}</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("Years of service",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(2):null)}
+      ${f("Nationality",esc(d.reqNat))}
+      ${f("Business line / function",esc(d.reqBizLine))}
+      ${f("Visa type",esc(d.visaType))}
+      ${f("Visa expiry",esc(d.visaExp))}
+      ${f("Direct &amp; indirect reports — now",esc(d.reportsNow))}
+      ${f("Direct &amp; indirect reports — future",esc(d.reportsFut))}
+      ${f("Peers of comparison",esc(d.peers))}
+      ${f("Billing cost centre",esc(d.costCenter))}
+      ${f("Billing company code",esc(d.companyCode))}
+      ${f("Reviewed by",esc(d.reviewedBy))}
+      ${f("Future position",esc(d.futPos))}
+      ${f("Future affiliate",esc(d.futAffil))}
+    </div></div>
+    ${d.justif?`<div class="note"><strong>Business case.</strong> ${esc(String(d.justif).slice(0,600))}</div>`:""}
+    ${career?`<div class="note"><strong>Career history.</strong> ${career.map(r=>`${esc(r.country)} ${esc(r.dates)} — ${esc(r.position)}`).join(" · ")}</div>`:""}
+  </div>`:`
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">Request form not loaded</div><div class="panel-n">fill by hand meanwhile</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${ed("Years of service","yos",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(2):null,"e.g. 16.40")}
+    </div></div>
+  </div>`}
+
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">Assumptions you can override</div><div class="panel-n">everything else is locked</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${ed("Employment date","hireDate",dstr(d.hireDate),"YYYY-MM-DD — drives years of service")}
+      ${ed("OHC annual salary","ohcSalary",overrides.ohcSalary??(d.ohcSalarySF??""),
+        "overrides SuccessFactors")}
+      <div class="f"><div class="f-l">Currency that salary is stated in<span class="f-src">manual</span></div>
+        <select onchange="setOv('ohcSalaryCcy',this.value)">
+          <option value=""${!overrides.ohcSalaryCcy?" selected":""}>${esc(d.ohcCcy||"origin currency")} — as held</option>
+          ${d.nhcCcy&&d.nhcCcy!==d.ohcCcy?`<option value="${esc(d.nhcCcy)}"${overrides.ohcSalaryCcy===d.nhcCcy?" selected":""}>${esc(d.nhcCcy)} — convert back at the TMO rate</option>`:""}
+        </select></div>
+      ${ed("Target effective localization date","targetDate",dstr(d.targetDate),
+        "anchors years of service; defaults to today")}
+      ${ed("Life expectancy","life",d.life,"80")}
+      ${ed("Tax equalization — home country","homeTax",d.homeTax,"from the cost matrix")}
+      ${ed("Tax equalization — host country","hostTax",d.hostTax,"from the cost matrix")}
+      ${ed("Estimated income tax — original home country","taxOHC",d.taxOHC,
+        d.taxOHCSrc||"")}
+      ${ed("Estimated income tax — new home country","taxNHC",d.taxNHC,
+        d.taxNHCSrc||"")}
+      ${ed("Year end age","yeAge",d.ageYE,"drives the retirement scenarios")}
+    </div>
+    <div class="fgrid" style="grid-template-columns:1fr">
+      ${ed("Educational background","education",overrides.education??(d.education||""),"degree, institution, years")}
+      ${ed("ExxonMobil work history","workHistory",overrides.workHistory??"","one entry per line: date · position · location")}
+      ${hasReq?ed("Years of service — override","yos",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(2):null,"from form"):""}
+    </div></div>
+  </div>`;
+}
+
+
+/* Every computed figure carries its formula and can be replaced by hand.
+   An overridden figure is marked so it is obvious the calculation was set aside. */
+function cell(key,val,formula,cls=""){
+  const o=isOv(key);
+  return `<td class="${cls}"><span class="calc ${o?"ovr":""}" data-f="${esc(formula)}"
+    onclick="editCell('${key}',this)" title="Click to replace by hand">${fmt(val)}</span>${
+    o?`<button class="undo" title="Restore the calculated value" onclick="event.stopPropagation();clearOv('${key}')">&#8630;</button>`:""}</td>`;
+}
+function editCell(key,el){
+  const cur=el.textContent.replace(/[(),]/g,m=>m===","?"":m).replace(/[()]/g,"");
+  const raw=prompt("Replace the calculated value.\n\n"+el.dataset.f+"\n\nLeave blank to restore the calculation.",
+                   isOv(key)?overrides["calc:"+key]:"");
+  if(raw===null)return;
+  if(raw.trim()===""){clearOv(key);return;}
+  const n=num(raw);
+  if(n===null){alert("That is not a number.");return;}
+  overrides["calc:"+key]=n; render();
+}
+function clearOv(key){ delete overrides["calc:"+key]; render(); }
+
+/* What each file actually yielded. Most "wrong" figures are missing inputs,
+   and without this there is no way to tell the two apart. */
+function diagHTML(d,c){
+  const rows=[
+    ["Employee name",d.name,"request form / SF"],
+    ["Origin country",d.ohc,d.ohcSrc==="file"?"vendor file":"SuccessFactors"],
+    ["New home country",d.nhc,d.nhcSrc==="file"?"vendor file":"SuccessFactors"],
+    ["OHC PERNR",d.ohcPernr,"request form / TMO"],
+    ["NHC PERNR",d.nhcPernr,"request form / TMO"],
+    ["OHC annual salary",d.ohcSalary!==null?fmt(d.ohcSalary)+" "+(d.ohcCcy||""):null,
+      (d.ohcSalarySrc||"SuccessFactors")+(d.ohcSalaryConv?", converted":"")],
+    ["NHC annual salary",d.nhcSalary!==null?fmt(d.nhcSalary)+" "+(d.nhcCcy||""):null,"Compensation"],
+    ["Exchange rate",d.fx!==null?d.fx.toFixed(6):null,"TMO"],
+    ["OHC benefits rate",d.ohcSBR!==null?pct(d.ohcSBR):null,"GC&BD"],
+    ["NHC benefits rate",d.nhcSBR!==null?pct(d.nhcSBR):null,"GC&BD"],
+    ["Expatriate benefits",d.expatTotal!==null?fmt(d.expatTotal):null,"TMO"],
+    ["Tax equalization",(d.homeTax!==null||d.hostTax!==null)?fmt((d.homeTax||0)+(d.hostTax||0)):null,"cost matrix, by hand"],
+    ["Income tax OHC",d.taxOHC!==null?fmt(d.taxOHC):null,d.taxOHCSrc||"Deloitte"],
+    ["Income tax NHC",d.taxNHC!==null?fmt(d.taxNHC):null,d.taxNHCSrc||"Deloitte"],
+    ["Prior service recognised",d.offset||null,"GC&BD"],
+    ["OHC offset @55",(c&&c.scen&&c.scen[55]&&c.scen[55].ohcOffset!==null&&c.scen[55].ohcOffset!==undefined)
+        ?fmt(c.scen[55].ohcOffset)
+        :(d.ohcOffset&&d.ohcOffset[55]!==null&&d.ohcOffset[55]!==undefined?fmt(d.ohcOffset[55]):null),
+      (d.ohcOffset&&d.ohcOffset[55]!==null&&d.ohcOffset[55]!==undefined)?"GC&BD"
+        :(d.par&&d.par.method?"calculated from the origin country formula":"GC&BD")],
+    ["Retirement age NHC",d.retAge,"GC&BD / country rules"],
+    ["Years of service",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(4):null,d.yosSrc||"request form"],
+    ["Year end age",d.ageYE,"SuccessFactors"],
+    ["Classification level",d.cl?"CL "+d.cl:null,d.reqCL!==null?"request form":"SuccessFactors"],
+    ["Performance",d.perfText,"manual"],
+    ["Potential",d.pot,"manual"]
+  ];
+  const missing=rows.filter(r=>r[1]===null||r[1]===undefined||r[1]==="").length;
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">What was read</div>
+      <div class="panel-n">${rows.length-missing} of ${rows.length} inputs present</div></div>
+    <table class="tbl diag"><tbody>${rows.map(([k,v,src])=>{
+      const has=!(v===null||v===undefined||v==="");
+      return `<tr class="${has?"":"miss"}"><td>${esc(k)}</td>
+        <td class="dv">${has?esc(String(v)):"not loaded"}</td>
+        <td class="ds">${esc(src)}</td></tr>`;
+    }).join("")}</tbody></table>
+    ${missing?`<div class="note"><strong>${missing} input${missing>1?"s are":" is"} missing.</strong>
+      A figure that depends on a missing input is reported blank rather than as zero. Load the file that carries it,
+      or key it in where the field allows.</div>`:""}
+  </div>`;
+}
+
+function gcbdHTML(d){
+  if(!F.gcbd)return "";
+  const g=d.gc||{};
+  const f=(l,v)=>`<div class="f"><div class="f-l">${l}</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
+  const p=d.par||{};
+  const money=(v,ccy)=>v===null||v===undefined?"—":fmt(v)+(ccy?" "+ccy:"");
+  const afp=(side)=>{
+    const rows=(d.afpRows||[]).filter(r=>r.side===side&&(r.amt||r.type));
+    if(!rows.length)return `<div class="mini-empty">None reported</div>`;
+    return `<table class="mini"><tbody>${rows.map(r=>
+      `<tr><td>${r.n}. ${esc(r.type||"—")}</td><td class="n">${money(r.amt,r.ccy)}</td></tr>`).join("")}</tbody></table>`;
+  };
+  const anyPar=Object.values(p).some(v=>v!==null&&v!==undefined&&v!=="");
+  const fromD=new Set(d.parFromDefaults||[]);
+  const fp=(l,key,v)=>`<div class="f"><div class="f-l">${l}${
+    fromD.has(key)?`<span class="f-src">country default</span>`:(v===null||v===undefined||v===""?"":`<span class="f-src">GC&amp;BD</span>`)
+  }</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">GC&amp;BD</div>
+      <div class="panel-n">${g.by?esc(String(g.by))+" · ":""}${g.when?esc(String(g.when)):"as returned"}</div></div>
+
+    <div class="sub-h">Part I — Standard benefits rate</div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("OHC — SBR",d.ohcSBR!==null?pct(d.ohcSBR):null)}
+      ${f("NHC — SBR",d.nhcSBR!==null?pct(d.nhcSBR):null)}
+    </div></div>
+
+    <div class="sub-h">Part II — Alternate forms of pay</div>
+    <div class="panel-b two">
+      <div><div class="mini-t">Origin country</div>${afp("OHC")}</div>
+      <div><div class="mini-t">New home country</div>${afp("NHC")}</div>
+    </div>
+
+    <div class="sub-h">Part III — Pension plan / defined benefit</div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("Plan status",g.planStatus)}
+      ${f("Plan entry date",dOnly(g.entry))}
+      ${f("Normal retirement age",d.retAgeG)}
+      ${f("Early retirement age",d.earlyRet)}
+      ${f("Employee contribution",g.empContrib)}
+      ${f("Payment options",g.payOpts)}
+      ${f("Prior service recognised in NHC",d.offset)}
+    </div></div>
+    ${g.elig?`<div class="note"><strong>Eligibility.</strong> ${esc(String(g.elig))}</div>`:""}
+    ${g.formula?`<div class="note"><strong>Formula.</strong> ${esc(String(g.formula))}</div>`:""}
+    ${g.retNotes?`<div class="note"><strong>Notes on retirement ages.</strong> ${esc(String(g.retNotes))}</div>`:""}
+
+    ${anyPar?`<div class="sub-h">Part III-A — Origin country pension formula</div>
+    <div class="panel-b"><div class="fgrid">
+      ${fp("Formula shape","method",p.method)}
+      ${fp("Pension multiplier","mult",p.mult!==null&&p.mult!==undefined?pct(p.mult):null)}
+      ${fp("Accrual rate — tier 1","rate1",p.rate1!==null&&p.rate1!==undefined?pct(p.rate1):null)}
+      ${fp("Accrual rate — tier 2","rate2",p.rate2!==null&&p.rate2!==undefined?pct(p.rate2):null)}
+      ${fp("Salary cap — tier 1","thresh",p.thresh!==null&&p.thresh!==undefined?fmt(p.thresh):null)}
+      ${fp("Salary cap — tier 2","thresh2",p.thresh2!==null&&p.thresh2!==undefined?fmt(p.thresh2):null)}
+      ${fp("Salary basis","basis",p.basis)}
+      ${fp("Service denominator","denom",p.denom)}
+      ${fp("Discount per year","discPerYr",p.discPerYr!==null&&p.discPerYr!==undefined?pct(p.discPerYr):null)}
+      ${fp("Factor at 55","f55",p.f55)} ${fp("Factor at 58","f58",p.f58)} ${fp("Factor at 60","f60",p.f60)}
+    </div></div>
+    <div class="note">${String(p.method||"").toLowerCase().startsWith("tier")
+      ? `<strong>Tiered accrual</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
+         <code>(rate&nbsp;1 &times; salary up to the cap &nbsp;+&nbsp; rate&nbsp;2 &times; salary above it) &times; years of service</code><br>
+         There is no age factor, so all three retirement ages return the same amount.`
+      : `<strong>Accrual with an age discount</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
+         <code>multiplier &times; lump-sum factor &times; salary &times; (years of service + years to retirement)
+         &times; the discount factor for that age</code><br>
+         The discount factors are why the three retirement ages give different amounts.`}
+      </div>
+    <div class="note">These parameters come from GC&amp;BD. They are only used when Part III-B below is left
+      empty: if GC&amp;BD send the offset amounts outright, those are used instead and this is ignored.</div>
+    ${(d.parFromDefaults&&d.parFromDefaults.length)?`<div class="note"><strong>Marked
+      <em>country default</em> above: ${d.parFromDefaults.length} parameter${d.parFromDefaults.length>1?"s":""}
+      GC&amp;BD did not return.</strong> These come from what ${esc(d.ohc||"this country")} used on earlier
+      cases and are a starting point, not confirmation. Plan rules vary by plan, not only by country, so ask
+      GC&amp;BD to state them for this case before the figures go into an endorsement.</div>`:""}`:""}
+
+    <div class="sub-h">Part III-B — Estimated OHC offset</div>
+    <div class="panel-b"><div class="fgrid">
+      <div class="f"><div class="f-l">Prior service recognised in the NHC<span class="f-src">${esc(d.offsetSrc||"not answered")}</span></div>
+        <select onchange="setOv('offset',this.value)">
+          ${["","Yes","No"].map(o=>`<option value="${o}"${(d.offset||"")===o?" selected":""}>${o||"— not answered"}</option>`).join("")}
+        </select></div>
+    </div></div>
+    <div class="note">${/^y/i.test(d.offset||"")
+      ? `Prior service is recognised, so an offset applies. Leave the amounts empty to let the origin country formula fill them.`
+      : /^n/i.test(d.offset||"")
+      ? `Prior service is not recognised, so the offset is zero and the full new home country pension is incremental cost.`
+      : `<strong>Not answered yet.</strong> Until GC&amp;BD confirm, the offset is left blank rather than zero &mdash;
+         a zero here would overstate the incremental pension the company takes on.`}</div>
+    <div class="panel-b"><div class="fgrid">
+      ${SCEN.map(a=>`<div class="f"><div class="f-l">At age ${a}${d.ohcCcy?" · "+d.ohcCcy:""}<span class="f-src">manual</span></div>
+        <input style="width:100%" value="${d.ohcOffset[a]??""}" placeholder="from GC&BD, or key in the old template's figure"
+          onchange="setOv('ohcOffset${a}',this.value)"></div>`).join("")}
+    </div></div>
+    ${d.offsetBasis?`<div class="note"><strong>Basis.</strong> ${esc(String(d.offsetBasis))}</div>`:""}
+
+    <div class="sub-h">Part IV — Savings plan / defined contribution</div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("OHC — DC plan",g.dcOHC)} ${f("NHC — DC plan",g.dcNHC)}
+    </div></div>
+    ${g.dcDesc?`<div class="note">${esc(String(g.dcDesc))}</div>`:""}
+
+    ${g.other?`<div class="sub-h">Part V — Other core benefits / PGPs</div>
+      <div class="note">${esc(String(g.other))}</div>`:""}
+    ${d.pensionNote?`<div class="note"><strong>Comments on pension / DB plan integration.</strong> ${esc(String(d.pensionNote))}</div>`:""}
+  </div>`;
+}
+
+function novaHTML(d){
+  const rows=novaRows(d);
+  const pendingN=rows.filter(r=>r.pending).length;
+  const f=(l,v)=>`<div class="f"><div class="f-l">${l}</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
+  const ed=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
+    <input class="${val===null||val===""?"blank":""}" value="${esc(val??"")}" placeholder="${ph}"
+      onchange="setOv('nova:${key}',this.value)"></div>`;
+  const ta=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
+    <textarea rows="5" style="width:100%;font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);
+      border-radius:3px;resize:vertical" placeholder="${ph}"
+      onchange="setOv('nova:${key}',this.value)">${esc(val??"")}</textarea></div>`;
+  const n=d.nova||{};
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Nova report</div>
+      <div class="panel-n">${pendingN?pendingN+" field"+(pendingN>1?"s":"")+" pending":"ready to export"}</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${ed("Date","date",n.date,"defaults to today if left blank")}
+      ${ed("Estimated potential localization date","estLocDate",n.estLocDate,"YYYY-MM-DD")}
+      ${ed("Executive or non-executive","exec",n.exec,"Executive / Non-Executive")}
+      ${ed("OHC pension plan name","planName",n.planName,"from GC&BD, or type here")}
+      ${ed("Is OHC pension plan a DB plan?","isDBPlan",n.isDBPlan,"Yes/No")}
+      ${ed("Vesting service with home country","vestingSvc",n.vestingSvc,"years, e.g. 18.3111")}
+      ${ed("Employee has been in the US since","usSince",n.usSince,"YYYY-MM-DD")}
+      ${ed("Spouse DOB","spouseDob",n.spouseDob,"YYYY-MM-DD")}
+      ${ed("Marital status","maritalStatus",n.maritalStatus,"Married / Single / ...")}
+      ${ed("US SSN available?","ssnAvail",n.ssnAvail,"Yes/No")}
+    </div>
+    <div class="sub-h">Affiliate service recognized under US EMPP at localization date</div>
+    <div class="fgrid">
+      ${ed("Pension service","affPension",n.affPension,"Yes/No — confirm with GC&BD/Ben Design")}
+      ${ed("Benefit service","affBenefit",n.affBenefit,"Yes/No — confirm with GC&BD/Ben Design")}
+      ${ed("Vesting service","affVesting",n.affVesting,"Yes/No — confirm with GC&BD/Ben Design")}
+    </div>
+    <div class="fgrid" style="grid-template-columns:1fr">
+      ${ta("Original Home Country DB Benefit","dbBenefit",n.dbBenefit,
+        "auto-filled from GC&BD eligibility criteria + payment options + DC plan comments — edit freely")}
+    </div></div>
+    <div class="legend"><div class="lg"><div class="sw sw-e"></div>Manual — not supplied by any vendor file today</div></div>
+  </div>`;
+}
+
+function empHTML(d,c){
+  const cc=d.nhcCcy||"USD";
+  const row=(lab,k,f,cls="")=>`<tr class="${cls}">
+    <td>${lab}</td>${cell("e.x."+k,c.e.x[k],f)}${cell("e.o."+k,c.e.o[k],f)}${cell("e.l."+k,c.e.l[k],f)}</tr>`;
+  const fxs=d.fx!==null?d.fx.toFixed(6):"fx";
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Cash to the employee</div>
+      <div class="panel-n">annual · ${cc} · drives the transition payment</div></div>
+    <table class="tbl">
+      <thead><tr><th></th>
+        <th class="grp">As expatriate<br><span style="font-weight:400;color:var(--ink-3)">in new home country</span></th>
+        <th class="grp">Remain<br><span style="font-weight:400;color:var(--ink-3)">in origin country</span></th>
+        <th class="grp">Localized<br><span style="font-weight:400;color:var(--ink-3)">in new home country</span></th></tr></thead>
+      <tbody>
+      ${row("Base salary","salary",`OHC salary × ${fxs}`)}
+      ${row("Alternate forms of pay","afp",`sum of OHC allowances × ${fxs}`)}
+      ${row("Estimated income tax","tax","from the Deloitte estimate, shown negative")}
+      ${row("Subtotal","sub","salary + alternate pay − income tax","sub")}
+      ${row("Expatriate benefits","benSub","premium + IC&S + housing + travel")}
+      ${row("Cash to employee","cash","subtotal + expatriate benefits","tot")}
+      </tbody></table>
+    ${c.e.deltaPct!==null?`<div class="note"><strong>Change in cash on localizing:</strong>
+      ${(c.e.deltaPct*100).toFixed(2)}% against remaining in ${esc(d.ohc||"the origin country")}.</div>`:""}
+  </div>`;
+}
+
+function costHTML(d,c){
+  const cc=d.nhcCcy||"USD";
+  const K=["salary","abic","afp","ben","expat","taxeq","total"];
+  let ki=-1;
+  const row=(lab,f,b,cv,dv,cls="")=>{ ki++; const k=K[ki]||("r"+ki);
+    return `<tr class="${cls}"><td>${lab}</td>${cell("b."+k,b,f.b)}${cell("c."+k,cv,f.c)}
+    <td class="${dv===null?"":dv<0?"neg":"pos"}">${fmt(dv)}</td></tr>`;};
+  const fxs=d.fx!==null?d.fx.toFixed(6):"fx";
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Cost to company</div>
+      <div class="panel-n">annual · ${cc}${d.fx!==null&&d.ohcCcy!==d.nhcCcy?` · ${d.ohcCcy}→${d.nhcCcy} at ${fxs}`:""}</div></div>
+    <table class="tbl">
+      <thead><tr><th></th>
+        <th class="grp">Origin country<br><span style="font-weight:400;color:var(--ink-3)">+ expat in NHC</span></th>
+        <th class="grp">Localized<br><span style="font-weight:400;color:var(--ink-3)">in new home country</span></th>
+        <th>Delta</th></tr></thead>
+      <tbody>
+      ${row("Base salary",{b:`OHC salary × ${fxs}`,c:"NHC salary as supplied"},c.b.salary,c.c.salary,c.delta.salary)}
+      ${row("Above base incentive compensation",{b:d.cl<30?"nil below CL 30":`OHC BBU × ${fxs}`,c:"NHC BBU"},c.b.abic,c.c.abic,c.delta.abic)}
+      ${row("Alternate forms of pay",{b:`sum of OHC allowances × ${fxs}`,c:"sum of NHC allowances"},c.b.afp,c.c.afp,c.delta.afp)}
+      ${row("Benefits",{b:`base salary × ${pct(d.ohcSBR)} − alternate pay`,c:`base salary × ${pct(d.nhcSBR)} − alternate pay`},c.b.ben,c.c.ben,c.delta.ben)}
+      ${row("Full expatriate benefits",{b:"premium + IC&S + housing + travel",c:"nil once localized"},c.b.expat,c.c.expat,c.delta.expat)}
+      ${row("Tax equalization",{b:"home country tax + host country tax",c:"nil once localized"},c.b.taxeq,c.c.taxeq,c.delta.taxeq)}
+      ${row("Total annual cost",{b:"sum of the six lines above",c:"sum of the six lines above"},c.b.total,c.c.total,c.delta.total,"tot")}
+      </tbody></table>
+    ${c.tp.applies?`<div class="note"><strong>Transition payments apply.</strong>
+      Cash to the employee falls from ${fmt(c.e.x.cash)} as an expatriate to ${fmt(c.e.l.cash)} once localized,
+      a gap of ${fmt(c.tp.gap)} ${cc}. Year one pays the full gap in twelve instalments of ${fmt(c.tp.m1)};
+      year two pays half, in twelve of ${fmt(c.tp.m2)}. Total ${fmt(c.tp.total)} ${cc}.</div>`
+      :c.tp.basis
+      ?`<div class="note"><strong>Transition payments cannot be assessed yet.</strong> The calculation compares cash to the
+        employee before and after, which ${c.tp.basis}.</div>`
+      :d.locType==="Full Localization"
+      ?`<div class="note"><strong>No transition payments.</strong> Localizing does not leave the employee with less cash.</div>`
+      :`<div class="note"><strong>No transition payments.</strong> They apply to full localizations only.</div>`}
+  </div>`;
+}
+
+function scenHTML(d,c){
+  const cc=d.nhcCcy||"USD";
+  const R=d.rule;
+  const line=(lab,k,ff,cls="")=>`<tr class="${cls}"><td>${lab}</td>`+
+    SCEN.map(a=>c.scen[a].passed
+      ? `<td class="dim" style="text-align:right">&mdash;</td>`
+      : cell(k+a,c.scen[a][k],ff(a,c.scen[a]))).join("")+"</tr>";
+
+  /* Calculated for U.S. moves from the annual rate schedule, and overridable. */
+  const medicalRow=()=>{
+    if(!d.intoUS)return line("Medical costs","medical",()=>"the U.S. retiree medical plan does not apply");
+    return '<tr><td>Medical costs</td>'+SCEN.map(a=>{
+      const ovr=overrides["medical"+a];
+      const val=c.scen[a].medical;
+      return `<td><input style="text-align:right;width:100%" value="${ovr??(val===null||val===undefined?"":Math.round(val))}"
+        placeholder="—" title="${MEDICAL_US.year} rates: active ${fmt(MEDICAL_US.activeMedical+MEDICAL_US.activeDental)}/yr to retirement, then ${fmt(MEDICAL_US.retireeMedicalPre65+MEDICAL_US.retireeDental)}/yr to ${MEDICAL_US.medicareAge} and ${fmt(MEDICAL_US.retireeMedicalPost65+MEDICAL_US.retireeDental)}/yr to ${d.life??80}"
+        onchange="setOv('medical${a}',this.value)"></td>`;
+    }).join("")+'</tr>';
+  };
+
+  const pensionRow=()=>{
+    if(d.intoUS)return line("Estimated NHC pension","nhcPension",
+      a=>`${R.ls[a]} × ${(R.mult*100).toFixed(1)}% × NHC salary × (${(c.scen[a].yearsToRet??0).toFixed(1)} + ${(d.yos??0).toFixed(1)} yrs) × ${R.erf[a]}`);
+    return `<tr><td>Estimated NHC pension</td>`+SCEN.map(a=>
+      `<td><input style="text-align:right;width:100%" value="${overrides["nhcPension"+a]??""}"
+        placeholder="from GC&BD" onchange="setOv('nhcPension${a}',this.value)"></td>`).join("")+"</tr>";
+  };
+
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Retirement scenarios</div>
+      <div class="panel-n">${cc} · ${/^y/i.test(d.offset||"")?"offset applies":"no offset in NHC"}</div></div>
+    <table class="tbl">
+      <thead><tr><th></th>${SCEN.map(a=>`<th class="grp">Age ${a}${
+        c.scen[a].passed?'<br><span style="font-weight:400;color:var(--ink-3)">already passed</span>':""}</th>`).join("")}</tr></thead>
+      <tbody>
+      ${line("Years to retirement","yearsToRet",a=>`${a} − age today`)}
+      ${line("Annual cost once localized","annual",()=>"total annual cost, localized column")}
+      ${line("Cost over the period","subtotal",a=>`years to retirement × annual cost`,"sub")}
+      ${line("Transition payments","tp",()=>c.tp.applies?"year one plus year two":"not applicable")}
+      ${pensionRow()}
+      ${line("Estimated OHC offset","ohcOffset",a=>/^y/i.test(d.offset||"")?`GC&BD offset at ${a} × ${d.fx?d.fx.toFixed(6):"fx"}`:"prior service not recognised")}
+      ${line("Incremental pension","incr",()=>"NHC pension − OHC offset","sub")}
+      ${medicalRow()}
+      ${line("Total employment / retirement cost","total",
+        ()=>"cost over the period + transition payments + incremental pension + medical","tot")}
+      </tbody></table>
+    <div class="note"><strong>How the total is built.</strong>
+      Cost over the period, plus transition payments, plus the incremental pension, plus medical costs.
+      The incremental pension is already the NHC pension net of the OHC offset, and the cost over the period
+      already contains the annual cost — so neither is added a second time.</div>
+  </div>`;
+}
+
+function render(){
+  if(VIEW==="analytics"){renderAnalytics();return;}
+  D=resolve(); const c=calc(D);
+  document.getElementById("crumb").textContent=D.locType||"Case";
+  document.getElementById("subject").textContent=D.name||"—";
+  document.getElementById("route").textContent=
+    D.ohc&&D.nhc?`${D.ohc} → ${D.nhc}${D.intoUS?"  ·  into US":""}`:"";
+  document.getElementById("btn-exp").disabled=false;
+  document.getElementById("btn-log").disabled=!(D&&D.name);
+
+  const A=gate(D,c);
+  document.getElementById("body").innerHTML=`<div class="canvas">
+    ${A.length?`<div class="alerts">${A.map(a=>`
+      <div class="alert alert-${a.t}"><span class="alert-tag">${a.tag}</span>
+      <div class="alert-b"><strong>${a.h}</strong><br>${a.b}
+      ${a.acts?`<div class="alert-act">${a.acts.map(x=>`<button class="alert-btn ${x.solid?"solid":""}" onclick="${x.f}">${x.l}</button>`).join("")}</div>`:""}
+      </div></div>`).join("")}</div>`:""}
+    ${fieldsHTML(D)}
+    ${diagHTML(D,c)}
+    ${gcbdHTML(D)}
+    ${novaHTML(D)}
+    ${empHTML(D,c)}
+    ${costHTML(D,c)}
+    ${scenHTML(D,c)}
+  </div>`;
+  railHTML();
+}
+
+/* ═══ EVENTS ═══ */
+
+/* ═══ REPORT MODEL — one shape, both exporters read it ═══ */
+/* Nova report — fixed row order, matches the Nova template column A exactly.
+   `pending` marks manual fields that are still blank so the app and the exports
+   can flag them instead of silently sending Nova a dash. */
+const NOVA_PENDING_KEYS=new Set(["Estimated Potential Localization Date","Original Home Country Pension Plan name",
+  "Is original home country pension plan a DB plan?","Original Home Country DB Benefit",
+  "Affiliate Pension Service Recognized under US EMPP at Localization Date",
+  "Affiliate Benefit Service Recognized under US EMPP at Localization Date",
+  "Affiliate Vesting Service Recognized under US EMPP at Localization Date",
+  "Vesting Service with Home Country","The employee has been in the US since",
+  "Original Home Country Employment Date","Original Home Country Pension Plan Participation Date",
+  "Spouse DOB","Marital status","US SSN available?"]);
+const NOVA_NUMERIC=new Set(["Vesting Service with Home Country",
+  "US Annual Pay upon localization","US Monthly Pay upon localization"]);
+function novaRows(d){
+  const g=d.gc||{}, n=d.nova||{};
+  const yn=v=>v===null||v===undefined||v===""?null:/^y/i.test(String(v))?"Yes":/^n/i.test(String(v))?"No":String(v);
+  const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"2-digit",day:"2-digit"});
+  const rows=[
+    ["Date",n.date||today],
+    ["Participant's Name",d.name],
+    ["Date of Birth",dOnly(d.dob)],
+    ["Estimated Potential Localization Date",dOnly(n.estLocDate)],
+    ["Executive or Non-Executive",n.exec],
+    ["Original Home Country",d.ohc],
+    ["Original Home Country Pension Plan name",n.planName],
+    ["Is original home country pension plan a DB plan?",yn(n.isDBPlan)],
+    ["Original Home Country DB Benefit",n.dbBenefit],
+    ["Affiliate Pension Service Recognized under US EMPP at Localization Date",yn(n.affPension)],
+    ["Affiliate Benefit Service Recognized under US EMPP at Localization Date",yn(n.affBenefit)],
+    ["Affiliate Vesting Service Recognized under US EMPP at Localization Date",yn(n.affVesting)],
+    ["Pension/Credited Service with home country Defined Benefit Pension Plan",yn(d.offset)],
+    ["Vesting Service with Home Country",(n.vestingSvc!==null&&n.vestingSvc!==undefined&&n.vestingSvc!==""&&num(n.vestingSvc)!==null)?num(n.vestingSvc).toFixed(4):null],
+    ["US Annual Pay upon localization",d.nhcSalary!==null&&d.nhcSalary!==undefined?fmt(d.nhcSalary,2):null],
+    ["US Monthly Pay upon localization",d.nhcSalary!==null&&d.nhcSalary!==undefined?fmt(d.nhcSalary/12,2):null],
+    ["The employee has been in the US since",dOnly(n.usSince)],
+    ["Original Home Country Employment Date",dOnly(d.hireDate)],
+    ["Original Home Country Pension Plan Participation Date",dOnly(g.entry)],
+    ["Spouse DOB",dOnly(n.spouseDob)],
+    ["Marital status",n.maritalStatus],
+    ["US SSN available?",yn(n.ssnAvail)]
+  ];
+  return rows.map(([label,value])=>{
+    const blank=(value===null||value===undefined||value==="");
+    return {label,value:blank?null:value,pending:blank&&NOVA_PENDING_KEYS.has(label),
+      /* Excel gets the raw number so the cell stays computable, not a text string */
+      xls:blank?null:(NOVA_NUMERIC.has(label)?num(value):value)};
+  });
+}
+
+function reports(){
+  const d=D, c=calc(D), cc=d.nhcCcy||"USD";
+  const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+  const ctry=(n,p)=>n?(p?`${n} (PERNR ${p})`:n):"—";
+  const N=v=>v===null||v===undefined||!isFinite(v)?null:Math.round(v);
+
+  const profile=[
+    ["EMPLOYEE PROFILE REPORT",null],
+    ["Report Date",today],
+    [null,null],
+    ["Employee Name",d.name],
+    ["Type of Localization",d.locType],
+    ["Original Home Country (OHC)",ctry(d.ohc,d.ohcPernr)],
+    ["New Home Country (NHC)",ctry(d.nhc,d.nhcPernr)],
+    ["Person ID",d.pid],
+    ["§Business Case Justification",null],
+    ["Request Justification",d.justif],
+    ["Reviewed By",d.reviewedBy],
+    ["Future Assignments After Localization",d.futureAssign],
+    ["§Immigration Strategy",null],
+    ["Type of Visa",d.visaType],
+    ["Visa Expiration Date",dOnly(d.visaExp)],
+    ["Current Direct & Indirect Reports",d.reportsNow],
+    ["Future Direct & Indirect Reports",d.reportsFut],
+    ["§General Employee Data",null],
+    ["Date of Birth",dstr(d.dob)],
+    ["Employment Date",dstr(d.hireDate)],
+    ["Year End Age",d.ageYE??null],
+    ["Age Today",d.age!==null?(+d.age).toFixed(2):null],
+    ["Years of Service",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(2):null],
+    ["Year End Experience",d.yee],
+    ["Nationality",d.reqNat||d.nationality],
+    ["§Sensitive Employee Data",null],
+    ["Classification Level (CL)",d.cl?"CL "+d.cl:null],
+    ["New Home Country CL",d.clNew?"CL "+d.clNew:null],
+    ["Performance — Last Three Years",d.perfText],
+    ["Potential",d.pot],
+    ["§Current & Future Position",null],
+    ["Current Position Title",d.curPos||d.posTitle],
+    ["Current Company / Affiliate",d.company],
+    ["Business Line / Function",d.reqBizLine||d.bizLine],
+    ["Future Position Title",d.futPos],
+    ["Future Company / Affiliate",d.futAffil],
+    ["Future Position Function",d.futFunc],
+    ["Future Position Department",d.futDept],
+    ["§Education",null],
+    ["Educational Background",d.education||overrides.education||null],
+    ["§ExxonMobil Work History",null],
+    ...( (d.career&&d.career.length)
+        ? d.career.map(r=>[[r.country,r.dates].filter(Boolean).join(" · ")||"—", r.position||"—"])
+        : [["Work history",overrides.workHistory||null]] )
+  ];
+
+  const cols=["Original Home Country + Expat in NHC","Localized in New Home Country","Delta"];
+  const cost=[
+    ["Base Salary",N(c.b.salary),N(c.c.salary),N(c.delta.salary)],
+    ["Above Base Incentive Compensation",N(c.b.abic),N(c.c.abic),N(c.delta.abic)],
+    ["Alternate Forms of Pay",N(c.b.afp),N(c.c.afp),N(c.delta.afp)],
+    ["Benefits",N(c.b.ben),N(c.c.ben),N(c.delta.ben)],
+    ["Full Expatriate Benefits",N(c.b.expat),N(c.c.expat),N(c.delta.expat)],
+    ["Tax Equalization",N(c.b.taxeq),N(c.c.taxeq),N(c.delta.taxeq)],
+    ["*Total Annual Cost",N(c.b.total),N(c.c.total),N(c.delta.total)]
+  ];
+
+  const scen=[
+    ["Years to Retirement",...SCEN.map(a=>c.scen[a].yearsToRet!==null?+c.scen[a].yearsToRet.toFixed(1):null)],
+    ["Annual Cost Once Localized",...SCEN.map(a=>N(c.scen[a].annual))],
+    ["Cost Over the Period",...SCEN.map(a=>N(c.scen[a].subtotal))],
+    ["Transition Payments",...SCEN.map(a=>N(c.scen[a].tp))],
+    ["Estimated NHC Pension",...SCEN.map(a=>N(c.scen[a].nhcPension))],
+    ["Estimated OHC Offset",...SCEN.map(a=>N(c.scen[a].ohcOffset))],
+    ["Incremental Pension",...SCEN.map(a=>N(c.scen[a].incr))],
+    ["Medical Costs",...SCEN.map(a=>N(c.scen[a].medical))],
+    ["*Total Employment / Retirement Cost",...SCEN.map(a=>N(c.scen[a].total))]
+  ];
+
+  const R2=d.rule||{};
+  const assum=[
+    ["OHC Currency",d.ohcCcy],
+    ["NHC Currency",d.nhcCcy||(d.intoUS?"USD":null)],
+    ["Exchange Rate (OHC to NHC)",d.fx!==null?+d.fx.toFixed(6):null],
+    ["OHC — Standard Benefits Rate",d.ohcSBR!==null?pct(d.ohcSBR):null],
+    ["NHC — Standard Benefits Rate",d.nhcSBR!==null?pct(d.nhcSBR):null],
+    ["Retirement Age in NHC",d.retAge??R2.retAge??null],
+    ["Cut-off Age",d.cutoff??null],
+    ["Life Expectancy",d.life],
+    ["Prior Service Recognised in NHC",d.offset||null],
+    ...(d.intoUS&&R2.ls?[
+      ["US Lump Sum Factor at 55",R2.ls[55]],
+      ["US Lump Sum Factor at 58",R2.ls[58]],
+      ["US Lump Sum Factor at 60",R2.ls[60]],
+      ["US Pension Multiplier",(R2.mult*100).toFixed(2)+"%"],
+      ["Early Retirement Factor at 55 / 58 / 60",[R2.erf[55],R2.erf[58],R2.erf[60]].join(" / ")]
+    ]:[])
+  ];
+
+  const emp=[
+    ["Base Salary",N(c.e.x.salary),N(c.e.o.salary),N(c.e.l.salary)],
+    ["Alternate Forms of Pay",N(c.e.x.afp),N(c.e.o.afp),N(c.e.l.afp)],
+    ["Estimated Income Tax",N(c.e.x.tax),N(c.e.o.tax),N(c.e.l.tax)],
+    ["SubTotal",N(c.e.x.sub),N(c.e.o.sub),N(c.e.l.sub)],
+    ["Full Expatriate Benefits",N(c.e.x.benSub),N(c.e.o.benSub),N(c.e.l.benSub)],
+    ["*Cash To Employee",N(c.e.x.cash),N(c.e.o.cash),N(c.e.l.cash)]
+  ];
+  const empCols=["As Expatriate in NHC","Remain in OHC","Localized in NHC"];
+
+  const tp=c.tp.applies?[
+    ["Year 1",N(c.tp.y1),N(c.tp.m1)],
+    ["Year 2",N(c.tp.y2),N(c.tp.m2)],
+    ["*Total Estimated Transition Payments",N(c.tp.total),N(c.tp.m1+c.tp.m2)]
+  ]:null;
+
+  return {d,c,cc,today,profile,cols,cost,scen,assum,tp,emp,empCols,nova:novaRows(d)};
+}
+
+/* ═══ PDF ═══ */
+/* Approver 1 sees the management output; approver 2 sees the economic analysis.
+   Both always see the employee profile. */
+function toggleExp(e){
+  e.stopPropagation();
+  document.getElementById("exp-menu").classList.toggle("open");
+}
+document.addEventListener("click",()=>{
+  const m=document.getElementById("exp-menu"); if(m)m.classList.remove("open");
+});
+/* Called straight from the button so the print window keeps the user gesture.
+   A confirm() in between makes the browser treat the window as unsolicited. */
+function doExp(pack,fmt){
+  document.getElementById("exp-menu").classList.remove("open");
+  if(!D){alert("Load the case files first.");return;}
+  if(fmt==="xls")exportXlsx(pack); else exportPdf(pack);
+}
+
+function exportPdf(pack){
+  if(!D){alert("Load the case files first.");return;}
+  const R=reports(), d=D, c=R.c, cc=R.cc;
+  const money=v=>v===null||v===undefined?"&mdash;":(v<0?"(":"")+Math.abs(v).toLocaleString("en-US")+(v<0?")":"");
+  const val=v=>v===null||v===undefined||v===""?"&mdash;":esc(String(v));
+
+  /* key/value block — labels left, figures right, hairline between */
+  const kv=rows=>{
+    let out="",open=false;
+    rows.forEach(([k,v])=>{
+      if(k===null){ if(open){out+="</dl>";open=false;} return; }
+      if(String(k).startsWith("\u00a7")){
+        if(open){out+="</dl>";open=false;}
+        out+=`<h3>${esc(k.slice(1))}</h3>`; return;
+      }
+      if(!open){out+="<dl>";open=true;}
+      out+=`<div class="kv"><dt>${esc(k)}</dt><dd>${val(v)}</dd></div>`;
+    });
+    return out+(open?"</dl>":"");
+  };
+
+  /* figure table — no fills except the total rule */
+  const grid=(head,rows,unit,note)=>`
+    <table class="fig">
+      <thead><tr><th class="rowhead"></th>${head.map(h=>{
+        const parts=String(h).split("|");
+        return `<th><span class="h1">${esc(parts[0])}</span>${parts[1]?`<span class="h2">${esc(parts[1])}</span>`:""}</th>`;
+      }).join("")}</tr>
+      <tr class="unit"><td></td>${head.map(()=>`<td>${esc(unit)}</td>`).join("")}</tr></thead>
+      <tbody>${rows.map(r=>{
+        const isTot=String(r[0]).startsWith("*");
+        const lab=isTot?r[0].slice(1):r[0];
+        return `<tr class="${isTot?"total":""}"><td class="rowhead">${esc(lab)}</td>${
+          r.slice(1).map(v=>`<td class="${typeof v==="number"&&v<0?"neg":""}">${money(v)}</td>`).join("")}</tr>`;
+      }).join("")}</tbody>
+    </table>${note?`<p class="tnote">${note}</p>`:""}`;
+
+  /* headline figures */
+  const lede=(items)=>`<div class="lede">${items.map(([n,l,s2])=>
+    `<div><div class="lede-n">${n}</div><div class="lede-l">${esc(l)}</div>${s2?`<div class="lede-s">${esc(s2)}</div>`:""}</div>`
+  ).join("")}</div>`;
+
+  const route=`${esc(d.ohc||"—")} <span class="arw">&#8594;</span> ${esc(d.nhc||"—")}`;
+  const head=(title,idx)=>`
+    <header>
+      <div class="eyebrow"><span>ExxonMobil &middot; Global Mobility</span><span>Private</span></div>
+      <h1>${title}</h1>
+      <div class="subject">
+        <div class="who"><div class="nm">${esc(d.name||"—")}</div><div class="rt">${route}</div></div>
+        <dl class="meta">
+          <div class="kv"><dt>Type</dt><dd>${val(d.locType)}</dd></div>
+          <div class="kv"><dt>Report date</dt><dd>${R.today}</dd></div>
+          ${d.cl?`<div class="kv"><dt>Career level</dt><dd>CL ${val(d.cl)}</dd></div>`:""}
+        </dl>
+      </div>
+    </header>`;
+  const foot=`<footer><span>Localization Centre</span><span>${esc(d.name||"")} &middot; ${R.today}</span><span>Private</span></footer>`;
+
+  const delta=c.delta&&c.delta.total!==null?c.delta.total:null;
+  const cashDelta=(c.e&&c.e.deltaPct!==null&&c.e.deltaPct!==undefined)?c.e.deltaPct:null;
+
+  const w=window.open("","_blank");
+  if(!w){alert("The browser blocked the print window. Allow pop-ups for this page and try again.");return;}
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${esc(d.name||"Localization")} &mdash; ${pack===1?"Management Output":"Economic Analysis"}</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  @page{size:A4 portrait;margin:18mm 16mm 16mm}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:"IBM Plex Sans",Arial,sans-serif;color:#16191d;font-size:9.5pt;line-height:1.45;
+       font-variant-numeric:tabular-nums}
+  .sheet{page-break-after:always}
+  .sheet:last-child{page-break-after:auto}
+
+  header{margin-bottom:20pt}
+  .eyebrow{display:flex;justify-content:space-between;font-family:"IBM Plex Mono",monospace;
+    font-size:6.8pt;letter-spacing:.16em;text-transform:uppercase;color:#8b959e;
+    padding-bottom:5pt;border-bottom:.5pt solid #c6cfd6}
+  h1{font-family:"IBM Plex Sans Condensed",Arial,sans-serif;font-size:19pt;font-weight:700;
+     letter-spacing:-.005em;margin:11pt 0 0;line-height:1.1}
+  .subject{display:flex;justify-content:space-between;align-items:flex-end;gap:24pt;
+    margin-top:12pt;padding-top:9pt;border-top:2pt solid #1e4d6b}
+  .nm{font-size:13pt;font-weight:600;letter-spacing:-.005em}
+  .rt{font-family:"IBM Plex Mono",monospace;font-size:9pt;color:#4d565f;margin-top:2pt}
+  .arw{color:#1e4d6b}
+  .meta{min-width:150pt}
+
+  h2{font-family:"IBM Plex Mono",monospace;font-size:7.2pt;letter-spacing:.17em;text-transform:uppercase;
+     color:#1e4d6b;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:.5pt solid #c6cfd6}
+  h2:first-of-type{margin-top:0}
+  h3{font-family:"IBM Plex Mono",monospace;font-size:6.8pt;letter-spacing:.15em;text-transform:uppercase;
+     color:#8b959e;margin:13pt 0 5pt}
+
+  dl{margin:0}
+  .kv{display:flex;justify-content:space-between;gap:14pt;padding:3.2pt 0;border-bottom:.4pt solid #e8e4de;
+      break-inside:avoid}
+  .kv:last-child{border-bottom:none}
+  dt{color:#4d565f;flex:0 1 auto}
+  dd{text-align:right;font-weight:500;flex:1 1 auto}
+
+  .lede{display:flex;gap:0;margin:0 0 16pt;border-top:.5pt solid #c6cfd6;border-bottom:.5pt solid #c6cfd6}
+  .lede>div{flex:1;padding:10pt 12pt 10pt 0;border-right:.4pt solid #e8e4de}
+  .lede>div:last-child{border-right:none}
+  .lede-n{font-family:"IBM Plex Sans Condensed",Arial,sans-serif;font-size:17pt;font-weight:700;line-height:1}
+  .lede-l{font-family:"IBM Plex Mono",monospace;font-size:6.6pt;letter-spacing:.14em;text-transform:uppercase;
+    color:#8b959e;margin-top:5pt}
+  .lede-s{font-size:8pt;color:#4d565f;margin-top:1pt}
+
+  table.fig{width:100%;border-collapse:collapse;margin-bottom:4pt}
+  table.fig th{font-family:"IBM Plex Sans",Arial,sans-serif;font-size:8pt;font-weight:600;text-align:right;
+    padding:0 0 4pt 10pt;vertical-align:bottom;border-bottom:.8pt solid #16191d;line-height:1.25}
+  table.fig th .h1{display:block}
+  table.fig th .h2{display:block;font-weight:400;color:#8b959e;font-size:7.2pt}
+  table.fig th.rowhead{text-align:left;width:34%}
+  tr.unit td{font-family:"IBM Plex Mono",monospace;font-size:6.4pt;letter-spacing:.12em;text-transform:uppercase;
+    color:#8b959e;text-align:right;padding:3pt 0 5pt 10pt;border-bottom:.4pt solid #e8e4de}
+  table.fig td{text-align:right;padding:4pt 0 4pt 10pt;border-bottom:.4pt solid #eef1f3}
+  table.fig td.rowhead{text-align:left;color:#4d565f}
+  tr.total td{border-top:.8pt solid #16191d;border-bottom:none;font-weight:600;padding-top:5pt}
+  tr.total td.rowhead{color:#16191d}
+  .neg{color:#b02a2a}
+  .tnote{font-size:8pt;color:#4d565f;line-height:1.5;margin:7pt 0 0;padding-left:9pt;border-left:1.5pt solid #b08d57}
+  .tnote b{font-weight:600;color:#16191d}
+
+  .prose{font-size:8.6pt;line-height:1.6;color:#2c3238;margin-top:3pt}
+  .callout{background:#f7f9fa;border-left:2pt solid #1e4d6b;padding:8pt 11pt;margin-top:10pt;font-size:8.4pt;line-height:1.55}
+
+  .kvb{padding:5pt 0 9pt;border-bottom:.4pt solid #e8e4de;break-inside:avoid}
+  .kvb dt{color:#4d565f;font-size:8.4pt;margin-bottom:4pt}
+  .kvb dd{font-weight:400;line-height:1.55;white-space:pre-wrap;text-align:left}
+  .kv.pending dd,.kvb.pending dd{color:#b08d57}
+  .kv.pending dd::after,.kvb.pending dd::after{content:" (pending)";font-size:7.4pt;color:#b08d57;font-weight:400}
+
+  footer{position:running(f);display:flex;justify-content:space-between;
+    font-family:"IBM Plex Mono",monospace;font-size:6.4pt;letter-spacing:.1em;text-transform:uppercase;
+    color:#9aa4ad;margin-top:22pt;padding-top:6pt;border-top:.4pt solid #c6cfd6}
+  @media print{ .sheet{page-break-after:always} }
+</style></head><body>
+
+${(pack==="emp")?`<div class="sheet">
+  ${head("Localization details &mdash; employee communication")}
+  ${lede([
+    [money(c.e&&c.e.l.cash!==null?Math.round(c.e.l.cash):null),"Cash to you","once localized"],
+    [c.tp&&c.tp.applies?money(Math.round(c.tp.y1)):"None","Transition payment","first year"],
+    [val(d.nhc),"New home country",val(d.locType)]
+  ])}
+  <h2>What changes</h2>
+  ${grid(["As expatriate today|in "+(d.nhc||"the host country"),"Once localized|in "+(d.nhc||"the new home country")],
+    [["Base salary",R.emp[0][1],R.emp[0][3]],
+     ["Alternate forms of pay",R.emp[1][1],R.emp[1][3]],
+     ["Estimated income tax",R.emp[2][1],R.emp[2][3]],
+     ["Expatriate benefits",R.emp[4][1],R.emp[4][3]],
+     ["*Cash to you",R.emp[5][1],R.emp[5][3]]],cc)}
+  ${c.tp&&c.tp.applies?`
+    <h2>Transition payments</h2>
+    ${grid(["Annual value","Monthly value"],R.tp,cc,
+      `Paid across the first two years to ease the change in cash. Year one restores the full difference
+       in twelve instalments; year two restores half.`)}`:""}
+  <h2>Your pension</h2>
+  <p class="prose">${d.pensionNote?esc(String(d.pensionNote)):
+    "Pension treatment on localization will be confirmed by Global Compensation &amp; Benefits Design."}</p>
+  <div class="callout">These figures are estimates prepared for this proposal. A tax consultation and,
+  where applicable, a pension session will be arranged before you are asked to decide.</div>
+  ${foot}
+</div>`:""}
+
+${(pack==="nova")?`<div class="sheet">
+  ${head("Nova report")}
+  <dl>${R.nova.map(r=>{
+    const long=r.label==="Original Home Country DB Benefit";
+    const cls=(long?"kvb":"kv")+(r.pending?" pending":"");
+    const v=r.value===null||r.value===undefined||r.value===""?"&mdash;":esc(String(r.value)).replace(/\n/g,"<br>");
+    return `<div class="${cls}"><dt>${esc(r.label)}</dt><dd>${v}</dd></div>`;
+  }).join("")}</dl>
+  ${R.nova.some(r=>r.pending)?`<div class="callout"><b>Pending before sending to Nova.</b>
+    ${R.nova.filter(r=>r.pending).map(r=>esc(r.label)).join(" &middot; ")}</div>`:""}
+  ${foot}
+</div>`:""}
+
+${(pack==="emp"||pack==="nova")?"":`<div class="sheet">
+  ${head("Employee profile")}
+  ${kv(R.profile.slice(3))}
+  ${foot}
+</div>`}
+
+${(pack===2||pack==="emp"||pack==="nova")?"":`<div class="sheet">
+  ${head("Localization analysis &mdash; management output")}
+  ${lede([
+    [money(c.e&&c.e.l.cash!==null?Math.round(c.e.l.cash):null),"Cash to employee","once localized"],
+    [c.tp&&c.tp.applies?money(Math.round(c.tp.total)):"None","Transition payments",
+      c.tp&&c.tp.applies?"across two years":"not applicable"],
+    [(delta!==null?(delta<0?"&minus;":"+")+Math.abs(Math.round(delta)).toLocaleString("en-US"):"&mdash;"),
+      "Change in annual cost","to the company, per year"]
+  ])}
+  <h2>Employee perspective</h2>
+  ${grid(R.empCols.map(h=>h.replace(" in "," in|")),R.emp,cc)}
+  ${c.tp&&c.tp.applies?`
+    <h2>Transition payments</h2>
+    ${grid(["Annual value","Monthly value"],R.tp,cc,
+      `<b>Why they apply.</b> Cash to the employee falls from ${money(c.e.x.cash)} as an expatriate to
+       ${money(c.e.l.cash)} once localized. Year one restores the full gap across twelve instalments;
+       year two restores half.`)}`
+   :`<h2>Transition payments</h2><p class="prose">Not applicable to this case.</p>`}
+  <h2>Company perspective</h2>
+  ${grid(R.cols.map(h=>h.replace(" + "," +|")),R.cost,cc)}
+  ${d.pensionNote?`<h2>Pension and DB plan integration</h2><p class="prose">${esc(String(d.pensionNote))}</p>`:""}
+  ${foot}
+</div>`}
+
+${(pack===1||pack==="emp"||pack==="nova")?"":`<div class="sheet">
+  ${head("Localization analysis &mdash; economic analysis")}
+  ${lede([
+    [money(c.c&&c.c.total!==null?Math.round(c.c.total):null),"Annual cost","once localized"],
+    [money(c.scen&&c.scen[60]&&c.scen[60].total!==null?Math.round(c.scen[60].total):null),
+      "Lifetime cost","retirement at 60"],
+    [(d.cutoff!==null&&d.age!==null?(d.age<=d.cutoff?"Within":"Past"):"&mdash;"),
+      "Cut-off",(d.cutoff!==null&&d.age!==null?`age ${d.age.toFixed(1)} against ${d.cutoff}`:"")]
+  ])}
+  <h2>Assumptions</h2>
+  ${kv(R.assum)}
+  <h2>Cost to company</h2>
+  ${grid(R.cols.map(h=>h.replace(" + "," +|")),R.cost,cc)}
+  <h2>Retirement scenarios</h2>
+  ${grid(SCEN.map(a=>"Age "+a),R.scen,cc,
+    `<b>How the total is built.</b> Cost over the period, plus transition payments, plus the incremental pension,
+     plus medical costs. The incremental pension is already the NHC pension net of the OHC offset, and the cost
+     over the period already contains the annual cost, so neither is counted a second time.`)}
+  ${d.offsetBasis?`<div class="callout"><b>Offset basis supplied by GC&amp;BD.</b> ${esc(String(d.offsetBasis))}</div>`:""}
+  ${foot}
+</div>`}
+
+</body></html>`);
+  w.document.close();
+  setTimeout(()=>{w.focus();w.print();},650);
+}
+
+/* ═══ EXCEL ═══ */
+function exportXlsx(pack){
+  if(!D){alert("Load the case files first.");return;}
+  if(typeof XLSX==="undefined"){alert("The spreadsheet library did not load. Check the connection and reload the page.");return;}
+  const R=reports(), d=R.d;
+  const wb=XLSX.utils.book_new();
+  const put=(name,aoa,widths)=>{
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"]=widths.map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb,ws,name);
+  };
+
+  if(pack==="nova"){
+    const rows=R.nova;
+    const aoa=[["NOVA REPORT",""],...rows.map(r=>[r.label,r.xls===undefined?r.value:r.xls])];
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"]=[{wch:58},{wch:52}];
+    ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:1}}];
+    ws["!rows"]=aoa.map((r,i)=>i===0?{hpt:22}:undefined);
+    /* number formats so pay reads as currency and service as four decimals */
+    rows.forEach((r,i)=>{
+      if(r.xls===null||typeof r.xls!=="number")return;
+      const cell=ws["B"+(i+2)]; if(!cell)return;
+      cell.z=/Pay upon localization/.test(r.label)?"#,##0.00":"0.0000";
+    });
+    XLSX.utils.book_append_sheet(wb,ws,"Nova Report");
+    const pend=rows.filter(r=>r.pending);
+    if(pend.length){
+      const ws2=XLSX.utils.aoa_to_sheet([["FIELDS PENDING BEFORE SENDING TO NOVA"],...pend.map(r=>[r.label])]);
+      ws2["!cols"]=[{wch:70}];
+      XLSX.utils.book_append_sheet(wb,ws2,"Pending");
+    }
+    const nm2=(d.name||"Localization").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"");
+    XLSX.writeFile(wb,`${nm2}_Nova_${new Date().toISOString().slice(0,10)}.xlsx`);
+    return;
+  }
+
+  put("Employee Profile",[
+    ["EMPLOYEE PROFILE REPORT"],["Report Date",R.today],[],
+    ...R.profile.slice(3).map(([k,v])=>k===null?[]:
+      String(k).startsWith("§")?[k.slice(1).toUpperCase()]:[k,v===undefined?null:v])
+  ],[46,62]);
+
+  if(pack!==2&&pack!=="emp")put("Management Output",[
+    ["LOCALIZATION ANALYSIS — TO GLOBAL CB&PD MANAGER"],["Date Produced",R.today],
+    ["Employee Name",d.name],["Type of Localization",d.locType],
+    ["Original Home Country (OHC)",d.ohc],["New Home Country (NHC)",d.nhc],[],
+    ["ASSUMPTIONS"],...R.assum,[],
+    ["EMPLOYEE PERSPECTIVE ("+R.cc+")"],
+    ["",...R.empCols],
+    ...R.emp.map(r=>[String(r[0]).replace(/^\*/,""),...r.slice(1)]),[],
+    ["COMPANY PERSPECTIVE ("+R.cc+")"],
+    ["",...R.cols],
+    ...R.cost.map(r=>[String(r[0]).replace(/^\*/,""),...r.slice(1)]),[],
+    ...(R.tp?[["TRANSITION PAYMENTS ("+R.cc+")"],["","Annual","Monthly"],
+      ...R.tp.map(r=>[String(r[0]).replace(/^\*/,""),...r.slice(1)]),[]]:[["Transition payments do not apply."],[]]),
+    ...(d.pensionNote?[["COMMENTS ON PENSION / DB PLAN INTEGRATION"],[String(d.pensionNote)]]:[])
+  ],[42,22,22,22]);
+
+  if(pack!==1&&pack!=="emp")put("Economic Analysis",[
+    ["LOCALIZATION ANALYSIS — TO CB&P MANAGER"],["Report Date",R.today],
+    ["Employee Name",d.name],["Type of Localization",d.locType],
+    ["Original Home Country (OHC)",d.ohc],["New Home Country (NHC)",d.nhc],
+    ["Current Age",d.age!==null?+d.age.toFixed(2):null],
+    ["Years of Service",d.yos!==null&&d.yos!==undefined?+(+d.yos).toFixed(2):null],[],
+    ["ASSUMPTIONS"],...R.assum,[],
+    ["COST TO COMPANY — ANNUAL ("+R.cc+")"],
+    ["",...R.cols],
+    ...R.cost.map(r=>[String(r[0]).replace(/^\*/,""),...r.slice(1)]),[],
+    ["RETIREMENT SCENARIOS ("+R.cc+")"],
+    ["",...SCEN.map(a=>"Age "+a)],
+    ...R.scen.map(r=>[String(r[0]).replace(/^\*/,""),...r.slice(1)]),[],
+    ["Total = cost over the period + transition payments + incremental pension + medical costs."],
+    ["The incremental pension is already net of the OHC offset and the cost over the period already contains the annual cost,"],
+    ["so neither is counted twice."]
+  ],[42,22,22,22]);
+
+  const nm=(d.name||"Localization").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"");
+  const tag=pack===1?"Approver1":pack===2?"Approver2":"Full";
+  XLSX.writeFile(wb,`${nm}_${tag}_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+
+/* ═══ DATABASE ═══ */
+const DB_COLS=["Date Created","Original Home Country PERNR","New Home Country PERNR","Full Name","Comments",
+ "Action Required?","Type of Case","Subtype of Case","Original Home Country","New Home Country","Stage","Status",
+ "Approved by GC&BD?","Implementation date","Business Line","Career Steward","CL","YOS","YEE","AGE",
+ "PERFORMANCE","POTENTIAL"];
+/* Added by the Localization Centre. Without these the dashboard can count cases
+   but can say nothing about what the programme costs. */
+const DB_FIN=["Currency","FX Rate","Annual Cost OHC","Annual Cost NHC","Annual Delta",
+ "Transition Payments","Lifetime Cost at 60","Cut-off Status","Analysis Date"];
+let dbHandle=null, DB=[], dbName="";
+let FL={type:"",yr:"",status:"",dest:"",bl:""};
+function setFl(k,v){FL[k]=v;renderAnalytics();}
+function clearFl(){FL={type:"",yr:"",status:"",dest:"",bl:""};renderAnalytics();}
+
+const statusOf=r=>{
+  const t=String(r["Status"]||"");
+  if(/complet|closed/i.test(t))return "Completed";
+  if(/cancel/i.test(t))return "Cancelled";
+  if(/progress|hold/i.test(t))return "Active";
+  return "Other";
+};
+function applyFl(rows){
+  return rows.filter(r=>{
+    if(FL.type&&String(r["Type of Case"]||"").trim()!==FL.type)return false;
+    if(FL.yr&&String(yearOf(r["Date Created"])||"")!==FL.yr)return false;
+    if(FL.status&&statusOf(r)!==FL.status)return false;
+    if(FL.dest==="us"&&!/united states/i.test(String(r["New Home Country"]||"")))return false;
+    if(FL.dest==="non"&&/united states/i.test(String(r["New Home Country"]||"")))return false;
+    if(FL.bl&&String(r["Business Line"]||"").trim()!==FL.bl)return false;
+    return true;
+  });
+}
+/* days between creation and implementation, guarding against transposed dates */
+function cycleDays(rows){
+  const out=[];
+  rows.forEach(r=>{
+    const a=r["Date Created"], b=r["Implementation date"];
+    const da=(a instanceof Date)?a:(typeof a==="number"&&a>20000?new Date(Date.UTC(1899,11,30+Math.floor(a))):null);
+    const db=(b instanceof Date)?b:(typeof b==="number"&&b>20000?new Date(Date.UTC(1899,11,30+Math.floor(b))):null);
+    if(!da||!db)return;
+    const d=Math.round((db-da)/864e5);
+    if(d>-30&&d<2000)out.push(d);
+  });
+  return out.sort((x,y)=>x-y);
+}
+const quant=(a,q)=>a.length?a[Math.min(a.length-1,Math.floor(a.length*q))]:null;
+
+function dbRowFromCase(){
+  const d=D;
+  const g={};
+  DB_COLS.forEach(k=>g[k]=null);
+  g["Date Created"]=new Date().toISOString().slice(0,10);
+  g["Original Home Country PERNR"]=d.ohcPernr??null;
+  g["New Home Country PERNR"]=d.nhcPernr??null;
+  g["Full Name"]=d.name??null;
+  g["Comments"]=d.justif?String(d.justif).slice(0,300):null;
+  g["Action Required?"]="No";
+  g["Type of Case"]=d.locType??null;
+  g["Subtype of Case"]="N/A";
+  g["Original Home Country"]=d.ohc??null;
+  g["New Home Country"]=d.nhc??null;
+  g["Stage"]=null;
+  g["Status"]="In Progress";
+  g["Approved by GC&BD?"]=null;
+  g["Implementation date"]="TBD";
+  g["Business Line"]=d.reqBizLine||d.bizLine||null;
+  g["Career Steward"]=d.reviewedBy??null;
+  g["CL"]=d.cl??null;
+  g["YOS"]=(d.yos!==null&&d.yos!==undefined)?+(+d.yos).toFixed(2):null;
+  g["YEE"]=d.yee??null;
+  g["AGE"]=d.age!==null?+(+d.age).toFixed(1):null;
+  g["PERFORMANCE"]=d.perfText??null;
+  g["POTENTIAL"]=d.pot??null;
+
+  const c=calc(d);
+  const r1=v=>(v===null||v===undefined||!isFinite(v))?null:Math.round(v);
+  DB_FIN.forEach(k=>g[k]=null);
+  g["Currency"]=d.nhcCcy??null;
+  g["FX Rate"]=d.fx!==null&&d.fx!==undefined?+d.fx.toFixed(6):null;
+  g["Annual Cost OHC"]=r1(c.b.total);
+  g["Annual Cost NHC"]=r1(c.c.total);
+  g["Annual Delta"]=r1(c.delta.total);
+  g["Transition Payments"]=c.tp&&c.tp.applies?r1(c.tp.total):0;
+  g["Lifetime Cost at 60"]=r1(c.scen&&c.scen[60]?c.scen[60].total:null);
+  g["Cut-off Status"]=(d.age!==null&&d.cutoff!==null&&d.cutoff!=="N/A")
+      ?(d.age<=d.cutoff?"Within":"Past"):null;
+  g["Analysis Date"]=new Date().toISOString().slice(0,10);
+  return g;
+}
+
+async function pickDb(){
+  try{
+    if(!window.showOpenFilePicker){
+      alert("Linking a database needs Chrome or Edge. The rest of the app works in any browser.");return;
+    }
+    const [h]=await window.showOpenFilePicker({types:[{description:"Excel",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"]}}]});
+    dbHandle=h; dbName=h.name;
+    await readDb();
+    setView("analytics");
+  }catch(e){ if(e.name!=="AbortError")alert("Could not open that file.\n\n"+e.message); }
+}
+
+async function refreshDb(){
+  if(!dbHandle){pickDb();return;}
+  try{
+    const perm=await dbHandle.queryPermission({mode:"readwrite"});
+    if(perm!=="granted"){
+      const r=await dbHandle.requestPermission({mode:"readwrite"});
+      if(r!=="granted"){alert("Permission to read the database was not granted.");return;}
+    }
+    await readDb(); renderAnalytics(); toast("Reloaded from "+dbName);
+  }catch(e){ alert("Could not reload the database.\n\n"+e.message); }
+}
+
+async function readDb(){
+  if(!dbHandle)return;
+  const f=await dbHandle.getFile();
+  const wb=XLSX.read(new Uint8Array(await f.arrayBuffer()),{type:"array",cellDates:true});
+  const sh=wb.SheetNames.find(n=>/track/i.test(n))||wb.SheetNames[0];
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,raw:true,defval:null});
+  let hi=-1;
+  rows.forEach((r,i)=>{ if(hi<0&&r&&r.some(c=>typeof c==="string"&&norm(c)==="full name"))hi=i; });
+  if(hi<0)hi=0;
+  const hdr=rows[hi]||[];
+  const idx={}; hdr.forEach((h,i)=>{ if(typeof h==="string")idx[norm(h)]=i; });
+  DB=[];
+  for(let i=hi+1;i<rows.length;i++){
+    const r=rows[i]; if(!r)continue;
+    const o={};
+    [...DB_COLS,...DB_FIN].forEach(k=>{ const j=idx[norm(k)]; o[k]=(j===undefined)?null:(r[j]??null); });
+    if(!o["Full Name"])continue;
+    DB.push(o);
+  }
+  DB._sheet=sh; DB._hdrRow=hi; DB._hdr=hdr;
+  document.getElementById("btn-db").textContent=dbName.length>18?dbName.slice(0,16)+"…":dbName;
+  document.getElementById("btn-db").classList.add("on");
+}
+
+async function logCase(){
+  if(!D){alert("Load the case files first.");return;}
+  if(!dbHandle){alert("Link the database file first, using the button beside this one.");return;}
+  const row=dbRowFromCase();
+  if(!row["Full Name"]){alert("The case has no employee name yet.");return;}
+  const dup=DB.find(r=>norm(r["Full Name"])===norm(row["Full Name"]));
+  if(dup&&!confirm(`${row["Full Name"]} is already in the database.\n\nAdd another row anyway?`))return;
+  try{
+    const f=await dbHandle.getFile();
+    const wb=XLSX.read(new Uint8Array(await f.arrayBuffer()),{type:"array",cellDates:true});
+    const sh=DB._sheet||wb.SheetNames[0];
+    const ws=wb.Sheets[sh];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null});
+    const hdrRow=DB._hdrRow??0;
+    let hdr=(rows[hdrRow]&&rows[hdrRow].length)?rows[hdrRow].slice():DB_COLS.slice();
+    const idx={}; hdr.forEach((h,i)=>{ if(typeof h==="string")idx[norm(h)]=i; });
+    /* the financial columns are new — add them to the sheet the first time */
+    const added=[];
+    DB_FIN.forEach(k=>{
+      if(idx[norm(k)]===undefined){ hdr.push(k); idx[norm(k)]=hdr.length-1; added.push(k); }
+    });
+    if(added.length)rows[hdrRow]=hdr;
+    const line=new Array(hdr.length).fill(null);
+    [...DB_COLS,...DB_FIN].forEach(k=>{ const j=idx[norm(k)]; if(j!==undefined)line[j]=row[k]; });
+    rows.push(line);
+    const ws2=XLSX.utils.aoa_to_sheet(rows);
+    if(ws["!cols"])ws2["!cols"]=ws["!cols"];
+    wb.Sheets[sh]=ws2;
+    const out=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    const wr=await dbHandle.createWritable();
+    await wr.write(out); await wr.close();
+    await readDb();
+    renderAnalytics();
+    toast(`${row["Full Name"]} added to ${dbName}`+(added.length?` · ${added.length} new columns created`:""));
+  }catch(e){
+    alert("Could not write to the database.\n\n"+e.message+
+      "\n\nIf the file is open in Excel, close it and try again.");
+  }
+}
+
+function toast(msg){
+  let t=document.getElementById("toast");
+  if(!t){t=document.createElement("div");t.id="toast";document.body.appendChild(t);
+    t.style.cssText="position:fixed;bottom:22px;right:22px;background:#16191d;color:#fff;padding:11px 17px;border-radius:4px;font-size:12.5px;z-index:99;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .25s";}
+  t.textContent=msg; t.style.opacity="1";
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.style.opacity="0",3200);
+}
+
+/* ═══ ANALYTICS ═══ */
+let VIEW="case";
+function setView(v){
+  VIEW=v;
+  document.getElementById("nav-start").classList.toggle("on",v==="start");
+  document.getElementById("nav-case").classList.toggle("on",v==="case");
+  document.getElementById("nav-an").classList.toggle("on",v==="analytics");
+  if(v==="analytics")renderAnalytics();
+  else if(v==="start")document.getElementById("body").innerHTML=startCaseHTML();
+  else render();
+}
+
+const tally=(rows,fn)=>{
+  const m=new Map();
+  rows.forEach(r=>{ const k=fn(r); if(k===null||k===undefined||k==="")return;
+    m.set(k,(m.get(k)||0)+1); });
+  return [...m.entries()].sort((a,b)=>b[1]-a[1]);
+};
+const yearOf=v=>{
+  if(v instanceof Date)return v.getFullYear();
+  if(typeof v==="number"&&v>20000&&v<60000)return new Date(Date.UTC(1899,11,30+Math.floor(v))).getFullYear();
+  const m=/(\d{4})/.exec(String(v||"")); return m?+m[1]:null;
+};
+
+function barsHTML(data,total,alt){
+  if(!data.length)return '<div style="color:var(--ink-3);font-size:12px;padding:14px 0">No data</div>';
+  const max=data[0][1];
+  return `<div class="bars">${data.map(([k,v])=>`<div class="bar-r">
+    <div class="bar-lab" title="${esc(k)}">${esc(k)}</div>
+    <div class="bar-track"><div class="bar-fill ${alt?"alt":""}" style="width:${Math.max(2,v/max*100)}%"></div></div>
+    <div class="bar-v">${v}${total?` · ${Math.round(v/total*100)}%`:""}</div></div>`).join("")}</div>`;
+}
+function colsHTML(pairs){
+  if(!pairs.length)return '<div style="color:var(--ink-3);font-size:12px;padding:14px 0">No data</div>';
+  const max=Math.max(...pairs.map(p=>p[1]),1);
+  return `<div class="cols">${pairs.map(([k,v])=>`<div class="col-w">
+    <div class="col-v">${v}</div>
+    <div class="col-b" style="height:${Math.max(2,v/max*112)}px"></div>
+    <div class="col-l" title="${esc(k)}">${esc(k)}</div></div>`).join("")}</div>`;
+}
+
+function renderAnalytics(){
+  const body=document.getElementById("body");
+  if(!dbHandle){
+    body.innerHTML=`<div class="empty"><div class="empty-fig">&#9638;</div>
+      <div class="empty-h">No database linked</div>
+      <div class="empty-p">Choose the tracker workbook once. The app remembers it, adds a row for every case you log,
+      and builds the dashboard from the whole history.</div>
+      <div style="margin-top:20px"><button class="btn btn-p" onclick="pickDb()">Link database</button></div></div>`;
+    return;
+  }
+
+  const ALL=DB, R=applyFl(ALL);
+  const opts=(cur,list,key,blank)=>`<select onchange="setFl('${key}',this.value)">
+    <option value="">${blank}</option>${list.map(([v,lab])=>
+      `<option value="${esc(v)}" ${cur===v?"selected":""}>${esc(lab)}</option>`).join("")}</select>`;
+
+  const types=tally(ALL,r=>String(r["Type of Case"]||"").trim()).map(([k,v])=>[k,`${k} (${v})`]);
+  const yrs=tally(ALL,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
+            .sort((a,b)=>b[0]-a[0]).map(([y,v])=>[String(y),`${y} (${v})`]);
+  const bls=tally(ALL,r=>String(r["Business Line"]||"").trim()).slice(0,14).map(([k,v])=>[k,`${k} (${v})`]);
+  const active=R.filter(r=>statusOf(r)==="Active");
+  const closed=R.filter(r=>statusOf(r)==="Completed");
+  const cancelled=R.filter(r=>statusOf(r)==="Cancelled");
+  const intoUS=R.filter(r=>/united states/i.test(String(r["New Home Country"]||"")));
+  const anyFl=Object.values(FL).some(v=>v);
+
+  /* corridors */
+  const corr=tally(R,r=>{
+    const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
+    return (a&&b)?a+" \u2192 "+b:null;
+  });
+  const corrTop=corr.slice(0,10), corrMax=corrTop.length?corrTop[0][1]:1;
+  const corrHTML=corrTop.length?`<div class="corr">${corrTop.map(([k,v])=>{
+    const [a,b]=k.split(" \u2192 ");
+    return `<div class="corr-r">
+      <div class="corr-l"><span class="corr-a">${esc(a)}</span><span class="corr-x">&#8594;</span><span class="corr-b">${esc(b)}</span></div>
+      <div class="corr-track"><div class="corr-fill" style="width:${Math.max(2,v/corrMax*100)}%"></div></div>
+      <div class="corr-v">${v} · ${Math.round(v/Math.max(R.length,1)*100)}%</div></div>`;
+  }).join("")}</div>`:'<div class="mini-empty">No data</div>';
+
+  /* cycle time */
+  const cd=cycleDays(R);
+  const med=quant(cd,.5), p90=quant(cd,.9);
+  const mean=cd.length?Math.round(cd.reduce((a,b)=>a+b,0)/cd.length):null;
+  const cycHTML=cd.length?`<div class="cyc">
+      <div class="cyc-b"><div class="cyc-n">${med}</div><div class="cyc-l">Median</div><div class="cyc-s">days to implement</div></div>
+      <div class="cyc-b"><div class="cyc-n">${mean}</div><div class="cyc-l">Mean</div><div class="cyc-s">pulled up by the tail</div></div>
+      <div class="cyc-b"><div class="cyc-n">${p90}</div><div class="cyc-l">90th percentile</div><div class="cyc-s">one case in ten exceeds this</div></div>
+    </div>
+    <div class="basis">Measured from date created to implementation date on ${cd.length} of ${R.length} cases.
+    ${p90&&med&&p90>med*2?`The gap between the median and the tail is where the process loses time.`:""}</div>`
+    :'<div class="mini-empty">No case in this selection carries both a creation and an implementation date.</div>';
+
+  /* cancellation rate by corridor */
+  const byCorr=new Map();
+  R.forEach(r=>{
+    const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
+    if(!a||!b)return; const k=a+" \u2192 "+b;
+    const o=byCorr.get(k)||{n:0,c:0}; o.n++; if(statusOf(r)==="Cancelled")o.c++; byCorr.set(k,o);
+  });
+  const rates=[...byCorr.entries()].filter(([,o])=>o.n>=8)
+    .map(([k,o])=>[k,o.c/o.n,o.c,o.n]).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const rateHTML=rates.length?`<div class="rate">${rates.map(([k,p,c,n])=>`
+    <div class="rate-r"><div class="rate-l" title="${esc(k)}">${esc(k)}</div>
+      <div class="rate-track">
+        <div class="rate-seg" style="width:${p*100}%;background:var(--neg)"></div>
+        <div class="rate-seg" style="width:${(1-p)*100}%;background:var(--pos);opacity:.3"></div>
+      </div>
+      <div class="rate-v" style="color:${p>.2?"var(--neg)":"var(--ink-2)"}">${Math.round(p*100)}% · ${c}/${n}</div></div>`).join("")}</div>
+    <div class="basis">Corridors with at least eight cases. Red is the share that did not complete.</div>`
+    :'<div class="mini-empty">Not enough volume in this selection to show a meaningful rate.</div>';
+
+  /* partial-base charts */
+  const pots=R.map(r=>num(r["POTENTIAL"])).filter(v=>v!==null&&v>=20&&v<=50);
+  const potBands=(()=>{
+    const b=[["Below 34",0],["34 to 38",0],["Above 38",0]];
+    pots.forEach(v=>{ b[v<34?0:v<=38?1:2][1]++; });
+    return b.filter(x=>x[1]);
+  })();
+  const clv=R.map(r=>num(r["CL"])).filter(v=>v!==null&&v>10&&v<60);
+  const clBands=(()=>{
+    const b=[["Below CL 27",0],["CL 27 to 29",0],["CL 30 and above",0]];
+    clv.forEach(v=>{ b[v<27?0:v<30?1:2][1]++; });
+    return b.filter(x=>x[1]);
+  })();
+
+  const yrsChart=tally(R,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
+    .sort((a,b)=>a[0]-b[0]).slice(-9);
+  const approved=R.filter(r=>/^y/i.test(String(r["Approved by GC&BD?"]||""))).length;
+  const actionReq=R.filter(r=>/^y/i.test(String(r["Action Required?"]||""))).length;
+
+  body.innerHTML=`<div class="canvas">
+    <div class="filters">
+      <label>Type</label>${opts(FL.type,types,"type","All types")}
+      <label>Year</label>${opts(FL.yr,yrs,"yr","All years")}
+      <label>Status</label>${opts(FL.status,[["Active","Active"],["Completed","Completed"],["Cancelled","Cancelled"]],"status","All")}
+      <label>Destination</label>${opts(FL.dest,[["us","Into the US"],["non","Everywhere else"]],"dest","All")}
+      <label>Business line</label>${opts(FL.bl,bls,"bl","All")}
+      ${anyFl?`<button class="btn" style="padding:5px 12px;font-size:11.5px" onclick="clearFl()">Clear</button>`:""}
+      <div class="f-count"><b>${R.length.toLocaleString("en-US")}</b> of ${ALL.length.toLocaleString("en-US")} cases</div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-n">${R.length.toLocaleString("en-US")}</div><div class="kpi-l">Cases in view</div></div>
+      <div class="kpi"><div class="kpi-n">${active.length}</div><div class="kpi-l">Active</div><div class="kpi-s">in progress or on hold</div></div>
+      <div class="kpi"><div class="kpi-n">${closed.length.toLocaleString("en-US")}</div><div class="kpi-l">Completed</div><div class="kpi-s">${R.length?Math.round(closed.length/R.length*100):0}% of the selection</div></div>
+      <div class="kpi"><div class="kpi-n">${R.length?Math.round(cancelled.length/R.length*100):0}%</div><div class="kpi-l">Cancelled</div><div class="kpi-s">${cancelled.length} cases</div></div>
+      <div class="kpi"><div class="kpi-n">${med!==null?med:"—"}</div><div class="kpi-l">Median days</div><div class="kpi-s">to implementation</div></div>
+      <div class="kpi"><div class="kpi-n">${R.length?Math.round(intoUS.length/R.length*100):0}%</div><div class="kpi-l">Into the US</div><div class="kpi-s">${intoUS.length.toLocaleString("en-US")} cases</div></div>
+    </div>
+
+    <div class="charts">
+      <div class="chart wide">
+        <div class="chart-t">Corridors</div>
+        <div class="chart-s">origin to destination · ${corr.length} distinct in this selection · top 10</div>
+        ${corrHTML}
+      </div>
+
+      <div class="chart wide">
+        <div class="chart-t">Time to implementation</div>
+        <div class="chart-s">from the day the case is created</div>
+        ${cycHTML}
+      </div>
+
+      <div class="chart">
+        <div class="chart-t">Cases by year</div>
+        <div class="chart-s">date created</div>
+        ${colsHTML(yrsChart.map(([y,v])=>[String(y),v]))}
+      </div>
+
+      <div class="chart">
+        <div class="chart-t">Where cases are lost</div>
+        <div class="chart-s">cancellation rate by corridor</div>
+        ${rateHTML}
+      </div>
+
+      <div class="chart">
+        <div class="chart-t">Type of case</div>
+        <div class="chart-s">as recorded in the tracker</div>
+        ${barsHTML(tally(R,r=>String(r["Type of Case"]||"").trim()).slice(0,8),R.length)}
+      </div>
+
+      <div class="chart">
+        <div class="chart-t">Business line</div>
+        <div class="chart-s">top 8</div>
+        ${barsHTML(tally(R,r=>String(r["Business Line"]||"").trim()).slice(0,8),R.length,true)}
+      </div>
+
+      <div class="chart">
+        <div class="chart-t">Potential</div>
+        <div class="chart-s">target band is 34 to 38</div>
+        ${barsHTML(potBands,pots.length)}
+        <div class="basis">Recorded on ${pots.length} of ${R.length} cases in this selection.
+        Every case logged from here on carries it.</div>
+      </div>
+
+      <div class="chart">
+        <div class="chart-t">Career level</div>
+        <div class="chart-s">at the time of the request</div>
+        ${barsHTML(clBands,clv.length)}
+        <div class="basis">Recorded on ${clv.length} of ${R.length} cases in this selection.</div>
+      </div>
+
+      <div class="chart wide">
+        <div class="chart-t">Governance</div>
+        <div class="chart-s">endorsement and open items</div>
+        ${barsHTML([["Endorsed by GC&BD",approved],["Flagged as action required",actionReq]],R.length)}
+      </div>
+    </div>
+
+    <div class="dbtag">Reading ${esc(dbName)} · ${ALL.length.toLocaleString("en-US")} rows on file
+      <button class="btn" style="margin-left:10px;padding:4px 12px;font-size:11px" onclick="refreshDb()">Refresh</button>
+      <button class="btn" style="margin-left:6px;padding:4px 12px;font-size:11px" onclick="pickDb()">Change file</button></div>
+  </div>`;
+}
+
+function setOv(k,v){
+  if(k==="yos"||k==="life"||k==="homeTax"||k==="hostTax"||k==="taxNHC"||k==="taxOHC"||k==="ohcSalary"||k==="yeAge"||k.startsWith("medical")||k.startsWith("nhcPension")||k.startsWith("ohcOffset")||k==="fx"||k.startsWith("calc:")){
+    const n=num(v); if(n===null)delete overrides[k]; else overrides[k]=n;
+  }else if(v===""){delete overrides[k];}
+  else overrides[k]=v;
+  render();
+}
+function ackFx(){render();}
+function keepFx(){overrides.fx=D.fxRaw;render();}
+
+/* ═══ SAVE AND RESUME ═══
+   A case runs across weeks. Everything loaded and every override is kept in the
+   browser so the work survives closing the tab. */
+function caseStore(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open("loc-cases",1);
+    r.onupgradeneeded=e=>{const db=e.target.result;
+      if(!db.objectStoreNames.contains("c"))db.createObjectStore("c",{keyPath:"id"});};
+    r.onsuccess=e=>res(e.target.result); r.onerror=rej;
+  });
+}
+async function saveCase(){
+  if(!D||!D.name){alert("Load the case files first.");return;}
+  try{
+    const db=await caseStore();
+    const rec={id:norm(D.name)+"|"+norm(D.ohc||"")+"|"+norm(D.nhc||""),
+      name:D.name, route:(D.ohc||"?")+" \u2192 "+(D.nhc||"?"),
+      savedAt:new Date().toISOString(),
+      files:Object.keys(F).length,
+      F:JSON.parse(JSON.stringify(F)), overrides:JSON.parse(JSON.stringify(overrides))};
+    await new Promise((res,rej)=>{
+      const t=db.transaction("c","readwrite").objectStore("c").put(rec);
+      t.onsuccess=res; t.onerror=rej;
+    });
+    toast("Saved · "+D.name);
+    railHTML();
+  }catch(e){ alert("Could not save the case.\n\n"+e.message); }
+}
+async function listCases(){
+  try{
+    const db=await caseStore();
+    return await new Promise((res,rej)=>{
+      const t=db.transaction("c","readonly").objectStore("c").getAll();
+      t.onsuccess=e=>res((e.target.result||[]).sort((a,b)=>b.savedAt.localeCompare(a.savedAt)));
+      t.onerror=rej;
+    });
+  }catch(e){ return []; }
+}
+async function openCase(id){
+  const all=await listCases();
+  const rec=all.find(r=>r.id===id); if(!rec)return;
+  Object.keys(F).forEach(k=>delete F[k]);
+  Object.keys(rec.F).forEach(k=>{
+    F[k]=rec.F[k];
+    /* dates survive the round trip as ISO strings */
+    if(F[k].grids)Object.keys(F[k].grids).forEach(sh=>{
+      F[k].grids[sh]=(F[k].grids[sh]||[]).map(row=>(row||[]).map(v=>
+        (typeof v==="string"&&/^\d{4}-\d{2}-\d{2}T/.test(v))?new Date(v):v));
+    });
+    FILEMETA[k]={n:"restored"};
+  });
+  overrides=rec.overrides||{};
+  setView("case"); render(); toast("Reopened · "+rec.name);
+}
+async function deleteCase(id,ev){
+  if(ev)ev.stopPropagation();
+  if(!confirm("Remove this saved case? The source files are not affected."))return;
+  const db=await caseStore();
+  await new Promise(res=>{const t=db.transaction("c","readwrite").objectStore("c").delete(id);t.onsuccess=res;t.onerror=res;});
+  renderCaseList();
+}
+async function renderCaseList(){
+  const el=document.getElementById("saved"); if(!el)return;
+  const all=await listCases();
+  if(!all.length){el.innerHTML="";return;}
+  el.innerHTML=`<div class="rail-sec">In progress</div>`+all.slice(0,8).map(r=>`
+    <div class="slot saved" onclick="openCase('${r.id}')" title="Reopen">
+      <div class="slot-mark">&#8635;</div>
+      <div class="slot-txt"><div class="slot-name">${esc(r.name)}</div>
+      <div class="slot-meta">${esc(r.route)} &middot; ${r.savedAt.slice(0,10)}</div></div>
+      <button class="slot-x" onclick="deleteCase('${r.id}',event)" title="Remove">&times;</button>
+    </div>`).join("");
+}
+
+function pickFile(id){
+  const i=document.createElement("input");
+  i.type="file"; i.accept=".xlsx,.xls,.xlsm,.csv";
+  i.onchange=e=>{
+    const f=e.target.files[0]; if(!f)return;
+    const rd=new FileReader();
+    rd.onload=ev=>{
+      try{
+        const wb=XLSX.read(new Uint8Array(ev.target.result),{type:"array",cellDates:true});
+        F[id]=parseWB(wb);
+        FILEMETA[id]={n:f.name};
+        render();
+      }catch(err){alert("That file could not be read as a spreadsheet.\n\n"+err.message);}
+    };
+    rd.readAsArrayBuffer(f);
+  };
+  i.click();
+}
+
+
+railHTML();
+renderCaseList();
+</script>
+</body>
+</html>
