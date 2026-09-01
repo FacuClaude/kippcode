@@ -13,7 +13,8 @@
   --ink:#16191d; --ink-2:#4d565f; --ink-3:#8b959e;
   --paper:#eef1f3; --surface:#fff; --surface-2:#f7f9fa;
   --line:#dde3e7; --line-2:#c6cfd6;
-  --accent:#8a4145; --accent-bg:#faf2f2; --accent-line:#e0c4c5; --accent-dark:#6e3336;
+  --accent:#b3282d; --accent-bg:#fdf2f2; --accent-line:#e9c3c4; --accent-dark:#8f1f24;
+  --accent-rail:#f28b8f;
   --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
   --pos:#1a6b47; --neg:#b02a2a;
   --mono:'IBM Plex Mono',monospace;
@@ -31,34 +32,34 @@ input,select{font:inherit;color:inherit}
 .rail-head{padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
 .rail-title{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:-.005em;
   line-height:1.2;white-space:nowrap}
-.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#c9a2a4;margin-top:7px}
+.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-rail);margin-top:7px}
 .rail-scroll{flex:1;overflow-y:auto;padding:18px 0 24px}
 .rail-sec{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#6b7883;padding:0 22px;margin:20px 0 10px}
 .rail-sec:first-child{margin-top:0}
 
 .slot{display:flex;gap:11px;align-items:flex-start;padding:9px 22px;cursor:pointer;position:relative;transition:background .13s}
 .slot:hover{background:rgba(255,255,255,.05)}
-.slot.on{background:rgba(126,168,196,.1)}
-.slot.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:#c9a2a4}
+.slot.on{background:rgba(242,139,143,.10)}
+.slot.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent-rail)}
 .slot-mark{width:15px;height:15px;border:1.5px solid #4a5560;border-radius:2px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
-.slot.on .slot-mark{background:#c9a2a4;border-color:#c9a2a4;color:var(--ink);font-weight:700}
+.slot.on .slot-mark{background:var(--accent-rail);border-color:var(--accent-rail);color:var(--ink);font-weight:700}
 .slot.req .slot-mark{border-color:#7a6248}
 .slot-txt{flex:1;min-width:0}
 .slot-name{font-size:12.5px;font-weight:450;line-height:1.3}
 .slot.on .slot-name{color:#fff;font-weight:500}
 .slot-meta{font-family:var(--mono);font-size:9.5px;color:#6b7883;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot.on .slot-meta{color:#c9a2a4}
+.slot.on .slot-meta{color:var(--accent-rail)}
 
 .rail-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.1)}
-.btn-save{width:100%;padding:9px;background:rgba(255,255,255,.09);color:#cfe0ec;border-radius:3px;
+.btn-save{width:100%;padding:9px;background:rgba(255,255,255,.09);color:#f6d3d4;border-radius:3px;
   font-size:12px;font-weight:500;margin-bottom:10px;transition:background .14s}
 .btn-save:hover{background:rgba(255,255,255,.16);color:#fff}
-.slot.saved .slot-mark{border-color:#5f6d78;color:#c9a2a4;font-size:11px}
+.slot.saved .slot-mark{border-color:#5f6d78;color:var(--accent-rail);font-size:11px}
 .slot-x{opacity:0;color:#6b7883;font-size:15px;padding:0 4px;line-height:1;transition:opacity .12s}
 .slot.saved:hover .slot-x{opacity:1}
-.slot-x:hover{color:#c98b8b}
+.slot-x:hover{color:var(--accent-rail)}
 .status{font-family:var(--mono);font-size:10px;line-height:1.6;color:#6b7883;letter-spacing:.03em}
-.status b{color:#c9a2a4;font-weight:500}
+.status b{color:var(--accent-rail);font-weight:500}
 .status .ok{color:#8fbf9f}
 
 /* ── MAIN ── */
@@ -392,6 +393,11 @@ const REGISTRY={
   gcbd:{
     title:"GC&BD Information Data Request",
     to:"Compensation & Benefit Design advisor for the original home country",
+    email:"Attached is the GC&BD information data request for {name}, moving from {ohc} to {nhc}.\n\n"+
+      "Part III drives the pension offset in the economic analysis and the Nova pension counselling "+
+      "session, so the pension section matters most. Where a question does not apply, please leave it "+
+      "blank rather than entering zero or No, so the analysis can tell an answer from a gap.\n\n"+
+      "Please complete column B and return the file with the wording in column A unchanged.",
     note:"Pension and benefits position in the original home country. Part III drives the "+
          "pension offset, which is the figure approvers question most.",
     sections:[
@@ -428,6 +434,9 @@ const REGISTRY={
         {label:"Eligibility criteria",type:"text",need:0},
         {label:"Formula / Calculation Description",alt:["Formula — description"],type:"text",need:0},
         {label:"Payment Options",type:"text",need:0},
+        {label:"Original Home Country DB Benefit",type:"text",need:1,
+         help:"Nova asks for this in one block: what the employee is entitled to, when it becomes "+
+              "payable, and how it can be taken. Written out here it goes straight into the Nova report."},
         {label:"Vesting Service with Home Country",alt:["Vesting Service"],type:"number",need:1,
          help:"Years, four decimals. Required by Nova."},
         {label:"Comments on Pension / DB Plan Integration",alt:["Comments on Pension"],type:"text",need:0}
@@ -487,6 +496,9 @@ const REGISTRY={
   tmo:{
     title:"TMO Data Request",
     to:"Cartus",
+    email:"Attached is the TMO data request for {name}, moving from {ohc} to {nhc}.\n\n"+
+      "Please state the direction of the exchange rate along with the figure. Tax equalization is taken "+
+      "from the cost matrix on our side, so please leave those two rows blank rather than returning zero.",
     note:"Exchange rate, hypothetical tax and the expatriate benefit build-up.",
     sections:[
       {name:"Currency",fields:[
@@ -518,12 +530,22 @@ const REGISTRY={
   comp:{
     title:"Compensation Data Request",
     to:"Compensation advisor for the new home country",
+    email:"Attached is the compensation data request for {name}, localizing to {nhc}.\n\n"+
+      "We are looking for the reference pay in {nhc} for this level, developed independently of the "+
+      "{ohc} salary structure.",
     note:"Reference pay in the new home country, developed independently of the origin country structure.",
     sections:[
       {name:"New home country pay",fields:[
         {label:"NHC - Annual Base Salary",alt:["NHC — Annual Base Salary","New Home Country Annual Base Salary"],type:"money",need:1},
         {label:"NHC - Pay Scale Group (CL)",alt:["New Home Country CL (Promotion)"],type:"number",need:0,
-         help:"Classification level on localizing, if it differs from today."}
+         help:"Classification level on localizing, if it differs from today."},
+        {label:"NHC - Pay Scale Type",type:"text",need:0},
+        {label:"NHC - Pay Scale Area",type:"text",need:0},
+        {label:"NHC - Employee Subgroup",type:"text",need:0},
+        {label:"NHC - Salary Reference Percentage",type:"text",need:0,
+         help:"95% for MPT, 100% for executives."},
+        {label:"OHC - Salary Reference Percentage",type:"text",need:0},
+        {label:"NHC - Advancement Guide",type:"text",need:0}
       ]}
     ]
   },
@@ -531,6 +553,8 @@ const REGISTRY={
   exec:{
     title:"Exec Compensation Data Request",
     to:"Executive compensation advisor",
+    email:"Attached is the executive compensation data request for {name} (CL {cl}), "+
+      "moving from {ohc} to {nhc}.",
     note:"CL 30 and above only.",
     when:"execCase",
     sections:[
@@ -544,6 +568,9 @@ const REGISTRY={
   tax:{
     title:"Deloitte Income Tax Estimate Request",
     to:"Deloitte",
+    email:"Attached is the income tax estimate request for {name}, moving from {ohc} to {nhc}.\n\n"+
+      "Income taxes only, excluding social taxes, on the same basis for both countries. The file lists "+
+      "only the side or sides we need for this case.",
     note:"Income taxes only, excluding social taxes, on the same basis for both countries. "+
          "Only the sides this case actually needs are listed below.",
     when:"needsDeloitte",
@@ -642,14 +669,14 @@ const STYLES_XML=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Aptos Narrow"/></font>
 <font><i/><sz val="9.5"/><color rgb="FF7A8288"/><name val="Aptos Narrow"/></font>
 <font><sz val="9.5"/><color rgb="FF5B6469"/><name val="Aptos Narrow"/></font>
-<font><b/><sz val="10.5"/><color rgb="FF8A4145"/><name val="Aptos Narrow"/></font>
-<font><i/><sz val="9.5"/><color rgb="FF8A4145"/><name val="Aptos Narrow"/></font>
+<font><b/><sz val="10.5"/><color rgb="FFB3282D"/><name val="Aptos Narrow"/></font>
+<font><i/><sz val="9.5"/><color rgb="FFB3282D"/><name val="Aptos Narrow"/></font>
 </fonts>
 <fills count="6">
 <fill><patternFill patternType="none"/></fill>
 <fill><patternFill patternType="gray125"/></fill>
-<fill><patternFill patternType="solid"><fgColor rgb="FF8A4145"/><bgColor indexed="64"/></patternFill></fill>
-<fill><patternFill patternType="solid"><fgColor rgb="FFA1686B"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFB3282D"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFC85E62"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFFDF8EC"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFF4F6F7"/><bgColor indexed="64"/></patternFill></fill>
 </fills>
@@ -809,8 +836,43 @@ function buildTemplate(slot,seed){
 function genTemplate(slot,seed){
   seed=seed||effectiveSeed();
   const {rows,merges,def,cols,freeze}=buildTemplate(slot,seed);
+  writeStyledXlsx(def.title,rows,cols,merges,freeze,templateFilename(slot,seed));
+}
+
+/* Opens a draft in the mail client with the recipient, subject and covering note
+   filled in. A web page cannot attach a file to a mail draft — no browser allows
+   it — so the file is generated first and the draft says to attach it. */
+function emailTemplate(slot){
+  const seed=readSeed();
+  if(!seed.name||!seed.ohc||!seed.nhc){
+    alert("Employee name and both countries are needed before a draft can be prepared.");
+    return;
+  }
+  const def=REGISTRY[slot];
+  const fill=t=>String(t||"")
+    .replace(/\{name\}/g,seed.name).replace(/\{ohc\}/g,seed.ohc)
+    .replace(/\{nhc\}/g,seed.nhc).replace(/\{cl\}/g,seed.cl||"");
+  const file=templateFilename(slot,seed);
+
+  genTemplate(slot,seed);                       /* download it first */
+
+  const subject=`${def.title} — ${seed.name} (${seed.ohc} to ${seed.nhc})`;
+  const body=fill(def.email||`Attached is the ${def.title.toLowerCase()} for {name}.`)
+    +`\n\nAttachment: ${file}\n\nThank you,\nGlobal Mobility`;
+  const mail=`mailto:${encodeURIComponent(vendorEmail[slot]||"")}`
+    +`?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  lastMailto=mail;
+  setTimeout(()=>{window.location.href=mail;},600);
+  toast("Draft opened — attach "+file);
+}
+
+let lastMailto=null;
+const vendorEmail={};
+function setVendorEmail(slot,v){ vendorEmail[slot]=v.trim(); }
+
+function templateFilename(slot,seed){
   const who=(seed.name||"Localization").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"");
-  writeStyledXlsx(def.title,rows,cols,merges,freeze,`${who} - ${def.title}.xlsx`);
+  return `${who} - ${REGISTRY[slot].title}.xlsx`;
 }
 
 function genAllTemplates(){
@@ -879,7 +941,11 @@ function startCaseHTML(){
     return `<tr class="${skipped?"miss":""}">
       <td><strong>${esc(def.title)}</strong><div class="ds">${esc(def.to)}</div></td>
       <td class="dv">${skipped?"not needed for this case":`${fields.length} fields · ${req} required`}</td>
-      <td style="text-align:right">${skipped?"":`<button class="mini-btn" onclick="genTemplate('${slot}',readSeed())">Generate</button>`}</td>
+      <td>${skipped?"":`<input placeholder="recipient email" value="${esc(vendorEmail[slot]||"")}"
+        style="width:100%;min-width:150px" onchange="setVendorEmail('${slot}',this.value)">`}</td>
+      <td style="text-align:right;white-space:nowrap">${skipped?"":`
+        <button class="mini-btn" onclick="genTemplate('${slot}',readSeed())">Generate</button>
+        <button class="mini-btn" onclick="emailTemplate('${slot}')">Email</button>`}</td>
     </tr>`;
   }).join("");
 
@@ -907,6 +973,9 @@ function startCaseHTML(){
       here. Column A wording is what the parser matches on, so ask vendors to complete column B and leave
       the labels alone. Fields that only apply to some cases &mdash; EMPP affiliate service for U.S. moves,
       executive compensation at CL 30 and above &mdash; appear only when the case above calls for them.</div>
+    <div class="note"><strong>Email</strong> generates the file and opens a draft with the covering note
+      already written. Browsers cannot attach a file to a mail draft, so attach the file that lands in your
+      downloads folder &mdash; the draft names it for you.</div>
     <div class="panel-b"><button class="mini-btn solid" onclick="genAllTemplates()">Generate all templates</button></div>
   </div>`;
 }
@@ -1348,7 +1417,8 @@ function resolve(){
     pensionPlanName:gS("Original Home Country Pension Plan Name","Original Home Country Pension Plan name"),
     isDBPlan:gS("Is Original Home Country Pension Plan a DB Plan","Is original home country pension plan a DB plan"),
     discFactors:gS("Discount Factors (if applicable)","Discount Factors"),
-    vestingSvc:gN("Vesting Service with Home Country","Vesting Service")
+    vestingSvc:gN("Vesting Service with Home Country","Vesting Service"),
+    dbBenefit:gS("Original Home Country DB Benefit")
   };
   /* allowance detail for display, not just the totals */
   d.afpRows=[];
@@ -1393,6 +1463,15 @@ function resolve(){
   const cmpN=(...k)=>num(pickStrict("comp",...k)??pick("comp",...k)??pickStrict("exec",...k)??pick("exec",...k));
   d.nhcSalary = cmpN("NHC - Annual Base Salary","NHC — Annual Base Salary","New Home Country Annual Base Salary");
   d.clNew     = cmpN("New Home Country CL (Promotion)","NHC - Pay Scale Group (CL)");
+  const cmpS=(...k)=>pickStrict("comp",...k)??pick("comp",...k);
+  /* Pay-scale detail Compensation confirms alongside the salary. Not used in the
+     arithmetic, but approvers ask where the reference pay came from. */
+  d.payScaleType = cmpS("NHC - Pay Scale Type");
+  d.payScaleArea = cmpS("NHC - Pay Scale Area");
+  d.empSubgroup  = cmpS("NHC - Employee Subgroup");
+  d.nhcSalRef    = cmpS("NHC - Salary Reference Percentage");
+  d.ohcSalRef    = cmpS("OHC - Salary Reference Percentage");
+  d.advGuide     = cmpS("NHC - Advancement Guide");
   d.ohcBBU    = pickN("exec","Original Home Country BBU Guide","OHC - BBU Guide");
   d.nhcBBU    = pickN("exec","NHC - BBU Guide")??pickN("comp","NHC - BBU Guide");
 
@@ -1597,7 +1676,8 @@ function resolve(){
     exec:        nOv("exec",d.cl!==null?(d.cl>=30?"Executive":"Non-Executive"):null),
     planName:    nOv("planName",d.gc.pensionPlanName),
     isDBPlan:    nOv("isDBPlan",d.gc.isDBPlan),
-    dbBenefit:   nOv("dbBenefit",[d.gc.elig,d.gc.payOpts,d.gc.dcDesc].filter(v=>v&&String(v).trim()).join("\n\n")||null),
+    dbBenefit:   nOv("dbBenefit", d.gc.dbBenefit ||
+                   ([d.gc.elig,d.gc.payOpts,d.gc.dcDesc].filter(v=>v&&String(v).trim()).join("\n\n")||null)),
     affPension:  nOv("affPension",null),
     affBenefit:  nOv("affBenefit",null),
     affVesting:  nOv("affVesting",null),
@@ -1897,9 +1977,16 @@ function fieldsHTML(d){
   const f=(l,v,src)=>`<div class="f"><div class="f-l">${l}${src?`<span class="f-src">${src}</span>`:""}</div><div class="f-v">${v??"—"}</div></div>`;
   /* The hint sits under the field rather than inside it: a placeholder longer
      than the box just gets clipped and cannot be read. */
-  const ed=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
-    <input class="${val===null||val===""?"blank":""}" value="${val??""}"
-      onchange="setOv('${key}',this.value)">${ph?`<div class="f-hint">${ph}</div>`:""}</div>`;
+  /* The tag says where the value standing in the box actually came from. A field
+     that is overridable but currently holding a figure read from a file should
+     not be labelled "manual" — that reads as though it had to be typed. */
+  const ed=(l,key,val,ph="",src)=>{
+    const typed=overrides[key]!==undefined&&overrides[key]!==null&&overrides[key]!=="";
+    const tag=typed?"entered by hand":(val!==null&&val!==""&&src?src:"manual");
+    return `<div class="f"><div class="f-l">${l}<span class="f-src">${esc(tag)}</span></div>
+      <input class="${val===null||val===""?"blank":""}" value="${val??""}"
+        onchange="setOv('${key}',this.value)">${ph?`<div class="f-hint">${ph}</div>`:""}</div>`;
+  };
   const sel=(l,key,val)=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
     <select class="${val?"":"blank"}" onchange="setOv('${key}',this.value)">
       <option value=""${val?"":" selected"}>—</option>
@@ -1930,6 +2017,12 @@ function fieldsHTML(d){
         ?`${d.cutoff} — through the day before turning ${d.cutoff+1}`:null,"rules")}
       ${f("Prior service recognised",esc(d.offset),"GC&BD")}
       ${f("New home country CL",d.clNew?"CL "+d.clNew:null,"form")}
+      ${f("Pay scale type",esc(d.payScaleType),"Compensation")}
+      ${f("Pay scale area",esc(d.payScaleArea),"Compensation")}
+      ${f("Employee subgroup",esc(d.empSubgroup),"Compensation")}
+      ${f("Salary reference — NHC",esc(d.nhcSalRef),"Compensation")}
+      ${f("Salary reference — OHC",esc(d.ohcSalRef),"Compensation")}
+      ${f("Advancement guide",esc(d.advGuide),"Compensation")}
     </div></div>
     <div class="legend">
       <div class="lg"><div class="sw sw-c"></div>Calculated — hover any figure to see its formula</div>
@@ -1978,16 +2071,17 @@ function fieldsHTML(d){
   <div class="panel">
     <div class="panel-h"><div class="panel-t">Request form not loaded</div><div class="panel-n">fill by hand meanwhile</div></div>
     <div class="panel-b"><div class="fgrid">
-      ${ed("Years of service","yos",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(2):null,"e.g. 16.40")}
+      ${ed("Years of service","yos",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(2):null,"","")}
     </div></div>
   </div>`}
 
   <div class="panel">
     <div class="panel-h"><div class="panel-t">Assumptions you can override</div><div class="panel-n">everything else is locked</div></div>
     <div class="panel-b"><div class="fgrid">
-      ${ed("Employment date","hireDate",dstr(d.hireDate),"YYYY-MM-DD — drives years of service")}
+      ${ed("Employment date","hireDate",dstr(d.hireDate),"drives years of service",
+        d.hireCol&&d.hireCol!=="a named column"?"SuccessFactors · "+d.hireCol:"SuccessFactors")}
       ${ed("OHC annual salary","ohcSalary",overrides.ohcSalary??(d.ohcSalarySF??""),
-        "overrides SuccessFactors")}
+        d.ohcCcy?"in "+d.ohcCcy:"","SuccessFactors")}
       <div class="f"><div class="f-l">Currency that salary is stated in<span class="f-src">manual</span></div>
         <select onchange="setOv('ohcSalaryCcy',this.value)">
           <option value=""${!overrides.ohcSalaryCcy?" selected":""}>${esc(d.ohcCcy||"origin currency")} — as held</option>
@@ -2475,6 +2569,12 @@ function reports(){
     ["§Sensitive Employee Data",null],
     ["Classification Level (CL)",d.cl?"CL "+d.cl:null],
     ["New Home Country CL",d.clNew?"CL "+d.clNew:null],
+    ["NHC Pay Scale Type",d.payScaleType],
+    ["NHC Pay Scale Area",d.payScaleArea],
+    ["NHC Employee Subgroup",d.empSubgroup],
+    ["NHC Salary Reference Percentage",d.nhcSalRef],
+    ["OHC Salary Reference Percentage",d.ohcSalRef],
+    ["NHC Advancement Guide",d.advGuide],
     ["Performance — Last Three Years",d.perfText],
     ["Potential",d.pot],
     ["§Current & Future Position",null],
@@ -2660,14 +2760,14 @@ function exportPdf(pack){
   h1{font-family:"IBM Plex Sans Condensed",Arial,sans-serif;font-size:19pt;font-weight:700;
      letter-spacing:-.005em;margin:11pt 0 0;line-height:1.1}
   .subject{display:flex;justify-content:space-between;align-items:flex-end;gap:24pt;
-    margin-top:12pt;padding-top:9pt;border-top:2pt solid #8a4145}
+    margin-top:12pt;padding-top:9pt;border-top:2pt solid #b3282d}
   .nm{font-size:13pt;font-weight:600;letter-spacing:-.005em}
   .rt{font-family:"IBM Plex Mono",monospace;font-size:9pt;color:#4d565f;margin-top:2pt}
-  .arw{color:#8a4145}
+  .arw{color:#b3282d}
   .meta{min-width:150pt}
 
   h2{font-family:"IBM Plex Mono",monospace;font-size:7.2pt;letter-spacing:.17em;text-transform:uppercase;
-     color:#8a4145;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:.5pt solid #c6cfd6}
+     color:#b3282d;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:.5pt solid #c6cfd6}
   h2:first-of-type{margin-top:0}
   h3{font-family:"IBM Plex Mono",monospace;font-size:6.8pt;letter-spacing:.15em;text-transform:uppercase;
      color:#8b959e;margin:13pt 0 5pt}
@@ -2704,7 +2804,7 @@ function exportPdf(pack){
   .tnote b{font-weight:600;color:#16191d}
 
   .prose{font-size:8.6pt;line-height:1.6;color:#2c3238;margin-top:3pt}
-  .callout{background:#f7f9fa;border-left:2pt solid #8a4145;padding:8pt 11pt;margin-top:10pt;font-size:8.4pt;line-height:1.55}
+  .callout{background:#f7f9fa;border-left:2pt solid #b3282d;padding:8pt 11pt;margin-top:10pt;font-size:8.4pt;line-height:1.55}
 
   .kvb{padding:5pt 0 9pt;border-bottom:.4pt solid #e8e4de;break-inside:avoid}
   .kvb dt{color:#4d565f;font-size:8.4pt;margin-bottom:4pt}
