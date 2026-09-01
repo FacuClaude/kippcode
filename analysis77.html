@@ -13,7 +13,7 @@
   --ink:#16191d; --ink-2:#4d565f; --ink-3:#8b959e;
   --paper:#eef1f3; --surface:#fff; --surface-2:#f7f9fa;
   --line:#dde3e7; --line-2:#c6cfd6;
-  --petrol:#1e4d6b; --petrol-bg:#eef4f8; --petrol-line:#b9d2e2;
+  --accent:#8a4145; --accent-bg:#faf2f2; --accent-line:#e0c4c5; --accent-dark:#6e3336;
   --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
   --pos:#1a6b47; --neg:#b02a2a;
   --mono:'IBM Plex Mono',monospace;
@@ -29,8 +29,9 @@ input,select{font:inherit;color:inherit}
 /* ── RAIL ── */
 .rail{width:296px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;overflow:hidden}
 .rail-head{padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
-.rail-title{font-family:var(--cond);font-size:19px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
-.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#7fa8c4;margin-top:7px}
+.rail-title{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:-.005em;
+  line-height:1.2;white-space:nowrap}
+.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#c9a2a4;margin-top:7px}
 .rail-scroll{flex:1;overflow-y:auto;padding:18px 0 24px}
 .rail-sec{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#6b7883;padding:0 22px;margin:20px 0 10px}
 .rail-sec:first-child{margin-top:0}
@@ -38,40 +39,74 @@ input,select{font:inherit;color:inherit}
 .slot{display:flex;gap:11px;align-items:flex-start;padding:9px 22px;cursor:pointer;position:relative;transition:background .13s}
 .slot:hover{background:rgba(255,255,255,.05)}
 .slot.on{background:rgba(126,168,196,.1)}
-.slot.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:#7fa8c4}
+.slot.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:#c9a2a4}
 .slot-mark{width:15px;height:15px;border:1.5px solid #4a5560;border-radius:2px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
-.slot.on .slot-mark{background:#7fa8c4;border-color:#7fa8c4;color:var(--ink);font-weight:700}
+.slot.on .slot-mark{background:#c9a2a4;border-color:#c9a2a4;color:var(--ink);font-weight:700}
 .slot.req .slot-mark{border-color:#7a6248}
 .slot-txt{flex:1;min-width:0}
 .slot-name{font-size:12.5px;font-weight:450;line-height:1.3}
 .slot.on .slot-name{color:#fff;font-weight:500}
 .slot-meta{font-family:var(--mono);font-size:9.5px;color:#6b7883;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot.on .slot-meta{color:#7fa8c4}
+.slot.on .slot-meta{color:#c9a2a4}
 
 .rail-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.1)}
 .btn-save{width:100%;padding:9px;background:rgba(255,255,255,.09);color:#cfe0ec;border-radius:3px;
   font-size:12px;font-weight:500;margin-bottom:10px;transition:background .14s}
 .btn-save:hover{background:rgba(255,255,255,.16);color:#fff}
-.slot.saved .slot-mark{border-color:#5f6d78;color:#7fa8c4;font-size:11px}
+.slot.saved .slot-mark{border-color:#5f6d78;color:#c9a2a4;font-size:11px}
 .slot-x{opacity:0;color:#6b7883;font-size:15px;padding:0 4px;line-height:1;transition:opacity .12s}
 .slot.saved:hover .slot-x{opacity:1}
 .slot-x:hover{color:#c98b8b}
 .status{font-family:var(--mono);font-size:10px;line-height:1.6;color:#6b7883;letter-spacing:.03em}
-.status b{color:#7fa8c4;font-weight:500}
+.status b{color:#c9a2a4;font-weight:500}
 .status .ok{color:#8fbf9f}
 
 /* ── MAIN ── */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-.topbar{background:var(--surface);border-bottom:1px solid var(--line);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.topbar{background:rgba(255,255,255,.92);backdrop-filter:saturate(1.6) blur(8px);
+  border-bottom:1px solid var(--line);padding:13px 32px;display:flex;align-items:center;
+  justify-content:space-between;gap:24px;position:sticky;top:0;z-index:20}
 .crumb{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
 .subject{font-family:var(--cond);font-size:21px;font-weight:700;margin-top:2px;line-height:1.1}
 .route{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-top:3px}
-.topbar-act{display:flex;gap:8px}
-.btn{padding:8px 15px;border-radius:3px;font-size:12.5px;font-weight:500;transition:all .14s;border:1px solid var(--line-2);background:var(--surface)}
+.topbar-act{display:flex;align-items:center;gap:14px}
+
+/* Views sit in a segmented control because they are one choice, not three
+   separate actions; the file and export commands stay outside it. */
+.navseg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:9px;padding:3px;gap:2px}
+.navseg .btn{border:none;background:none;border-radius:6px;padding:7px 14px;color:var(--ink-2);font-weight:500}
+.navseg .btn:hover{background:rgba(255,255,255,.75);color:var(--ink)}
+.navseg .btn.on{background:var(--surface);color:var(--accent);font-weight:600;
+  box-shadow:0 1px 2px rgba(22,25,29,.10),0 0 0 1px rgba(22,25,29,.04)}
+
+.btn{padding:8px 15px;border-radius:7px;font-size:12.5px;font-weight:500;
+  transition:background .14s,border-color .14s,color .14s;border:1px solid var(--line-2);background:var(--surface)}
 .btn:hover{background:var(--surface-2);border-color:var(--ink-3)}
-.btn-p{background:var(--petrol);color:#fff;border-color:var(--petrol)}
-.btn-p:hover{background:#16394f;border-color:#16394f}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* quieter treatment for the two file commands, so Export reads as the primary */
+.btn-q{border-color:transparent;background:none;color:var(--ink-2)}
+.btn-q:hover{background:var(--surface-2);border-color:var(--line);color:var(--ink)}
+.btn-p{background:var(--accent);color:#fff;border-color:var(--accent);
+  box-shadow:0 1px 2px rgba(138,65,69,.28)}
+.btn-p:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.topbar-sep{width:1px;height:22px;background:var(--line);flex:none}
+/* the case title can run long, so it yields space and the controls never wrap
+   into the heading */
+.topbar>div:first-child{min-width:0;flex:1 1 auto}
+.topbar-act{flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end}
+.subject{overflow-wrap:anywhere}
+@media (max-width:1280px){
+  .topbar{padding:11px 20px;gap:16px}
+  .btn{padding:7px 11px;font-size:12px}
+  .navseg .btn{padding:6px 11px}
+}
+@media (max-width:1040px){
+  .subject{font-size:18px}
+  .topbar-sep{display:none}
+}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
 
 .canvas{padding:28px 32px 80px;max-width:1180px;width:100%}
 
@@ -86,7 +121,7 @@ input,select{font:inherit;color:inherit}
 .alert{display:flex;gap:12px;padding:13px 15px;border-radius:4px;font-size:13px;line-height:1.55;border:1px solid;align-items:flex-start}
 .alert-w{background:var(--ochre-bg);border-color:var(--ochre-line);color:#6b3d00}
 .alert-e{background:#fdf0ef;border-color:#eec5c2;color:#7d1e1e}
-.alert-i{background:var(--petrol-bg);border-color:var(--petrol-line);color:#15384f}
+.alert-i{background:var(--accent-bg);border-color:var(--accent-line);color:#15384f}
 .alert-tag{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;padding:2.5px 6px;border-radius:2px;background:rgba(0,0,0,.07);flex-shrink:0;margin-top:1px;font-weight:600}
 .alert-b{flex:1}
 .alert-b strong{font-weight:600}
@@ -104,12 +139,13 @@ input,select{font:inherit;color:inherit}
 .panel-b{padding:6px 20px 16px}
 
 /* ── FIELD GRID ── */
+.f-hint{font-size:11px;color:var(--ink-3);line-height:1.45;margin-top:4px}
 .note code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);
   padding:2px 6px;border-radius:3px;display:inline-block;margin:4px 0;line-height:1.7}
 .mini-btn{font:inherit;font-size:11.5px;padding:5px 12px;border:1px solid var(--line);
   background:#fff;border-radius:3px;cursor:pointer;color:var(--ink-1);white-space:nowrap}
-.mini-btn:hover{border-color:var(--petrol);color:var(--petrol)}
-.mini-btn.solid{background:var(--petrol);color:#fff;border-color:var(--petrol);padding:8px 18px;font-size:12px}
+.mini-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mini-btn.solid{background:var(--accent);color:#fff;border-color:var(--accent);padding:8px 18px;font-size:12px}
 .mini-btn.solid:hover{opacity:.9;color:#fff}
 .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:0 26px}
 .f{padding:11px 0;border-bottom:1px solid var(--line)}
@@ -125,11 +161,11 @@ input,select{font:inherit;color:inherit}
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
 .tbl th{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:9px 12px;text-align:right;border-bottom:1px solid var(--line-2);vertical-align:bottom;line-height:1.4}
 .tbl th:first-child{text-align:left;width:38%}
-.tbl th.grp{text-align:center;color:var(--petrol);font-weight:600;border-bottom:1px solid var(--petrol-line);padding-bottom:6px}
+.tbl th.grp{text-align:center;color:var(--accent);font-weight:600;border-bottom:1px solid var(--accent-line);padding-bottom:6px}
 .tbl td{padding:8px 12px;text-align:right;font-family:var(--mono);font-size:13px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .tbl td:first-child{text-align:left;font-family:var(--sans);font-size:13px;color:var(--ink-2)}
 .tbl tr:hover td{background:var(--surface-2)}
-.tbl tr.sub td{font-weight:600;color:var(--ink);background:var(--petrol-bg)}
+.tbl tr.sub td{font-weight:600;color:var(--ink);background:var(--accent-bg)}
 .tbl tr.sub:hover td{background:#e4eef5}
 .tbl tr.sub td:first-child{color:var(--ink)}
 .tbl tr.tot td{font-weight:600;font-size:14px;background:var(--ink);color:#fff;border-bottom:none}
@@ -141,7 +177,7 @@ input,select{font:inherit;color:inherit}
 .dim{color:var(--ink-3)}
 
 /* formula reveal */
-.calc{position:relative;cursor:help;border-bottom:1px dotted var(--petrol-line)}
+.calc{position:relative;cursor:help;border-bottom:1px dotted var(--accent-line)}
 .calc:hover::after{content:attr(data-f);position:absolute;bottom:calc(100% + 7px);right:0;background:var(--ink);color:#c9dae6;font-family:var(--mono);font-size:10.5px;padding:7px 10px;border-radius:3px;white-space:nowrap;z-index:60;box-shadow:0 4px 14px rgba(0,0,0,.22);font-weight:400;letter-spacing:.01em}
 
 .note{font-size:12px;color:var(--ink-2);line-height:1.6;padding:11px 20px 3px;border-top:1px solid var(--line);background:var(--surface-2)}
@@ -150,7 +186,7 @@ input,select{font:inherit;color:inherit}
 .legend{display:flex;gap:18px;padding:11px 20px;background:var(--surface-2);border-top:1px solid var(--line);font-size:11.5px;color:var(--ink-2);flex-wrap:wrap}
 .lg{display:flex;align-items:center;gap:6px}
 .sw{width:11px;height:11px;border-radius:2px;flex-shrink:0}
-.sw-c{background:var(--petrol-bg);border:1px solid var(--petrol-line);border-left:2.5px solid var(--petrol)}
+.sw-c{background:var(--accent-bg);border:1px solid var(--accent-line);border-left:2.5px solid var(--accent)}
 .sw-e{background:var(--ochre-bg);border:1px solid var(--ochre-line);border-left:2.5px solid var(--ochre)}
 
 .menu-wrap{position:relative;display:inline-block}
@@ -161,10 +197,10 @@ input,select{font:inherit;color:inherit}
 .menu-h{font-family:var(--mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;
   color:var(--ink-3);padding:9px 10px 4px}
 .menu button{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:3px;font-size:12.5px;color:var(--ink)}
-.menu button:hover{background:var(--petrol-bg);color:var(--petrol)}
-.btn.on{background:var(--petrol);color:#fff;border-color:var(--petrol)}
+.menu button:hover{background:var(--accent-bg);color:var(--accent)}
+.btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:22px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:16px 18px;border-top:2.5px solid var(--petrol)}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:16px 18px;border-top:2.5px solid var(--accent)}
 .kpi-n{font-family:var(--cond);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 .kpi-l{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-top:7px}
 .kpi-s{font-size:11px;color:var(--ink-2);margin-top:3px}
@@ -177,12 +213,12 @@ input,select{font:inherit;color:inherit}
 .bar-r{display:flex;align-items:center;gap:11px;font-size:12px}
 .bar-lab{width:130px;flex-shrink:0;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-track{flex:1;height:15px;background:var(--surface-2);border-radius:2px;overflow:hidden}
-.bar-fill{height:100%;background:var(--petrol);border-radius:2px;transition:width .5s}
+.bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s}
 .bar-fill.alt{background:var(--ochre)}
 .bar-v{width:52px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex-shrink:0}
 .cols{display:flex;align-items:flex-end;gap:5px;height:150px;padding-top:8px}
 .col-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
-.col-b{width:100%;background:var(--petrol);border-radius:2px 2px 0 0;min-height:2px;transition:height .5s}
+.col-b{width:100%;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;transition:height .5s}
 .col-v{font-family:var(--mono);font-size:9.5px;color:var(--ink-2)}
 .col-l{font-family:var(--mono);font-size:8.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .tbl.diag td{padding:6px 14px;font-size:12px}
@@ -190,7 +226,7 @@ input,select{font:inherit;color:inherit}
 .tbl.diag td.ds{text-align:right;width:170px;font-family:var(--mono);font-size:9.5px;color:var(--ink-3)}
 .tbl.diag tr.miss td{color:var(--neg)}
 .tbl.diag tr.miss td.dv{color:var(--neg);font-style:italic}
-.sub-h{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--petrol);
+.sub-h{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);
   padding:12px 20px 2px;border-top:1px solid var(--line);background:var(--surface-2)}
 .panel-b.two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .mini-t{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:8px 0 5px}
@@ -206,9 +242,9 @@ input,select{font:inherit;color:inherit}
   display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .filters label{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-right:-4px}
 .filters select{background:var(--surface-2);border:1px solid var(--border2);border-radius:3px;font-size:12px;padding:5px 8px;outline:none;color:var(--ink)}
-.filters select:focus{border-color:var(--petrol)}
+.filters select:focus{border-color:var(--accent)}
 .f-count{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
-.f-count b{color:var(--petrol)}
+.f-count b{color:var(--accent)}
 .corr{display:flex;flex-direction:column;gap:6px}
 .corr-r{display:flex;align-items:center;gap:10px;font-size:12px}
 .corr-l{width:200px;flex-shrink:0;display:flex;align-items:center;gap:6px;overflow:hidden}
@@ -216,7 +252,7 @@ input,select{font:inherit;color:inherit}
 .corr-b{color:var(--ink);font-weight:500}
 .corr-x{color:var(--ink-3);flex-shrink:0}
 .corr-track{flex:1;height:14px;background:var(--surface-2);border-radius:2px;overflow:hidden}
-.corr-fill{height:100%;background:var(--petrol);border-radius:2px}
+.corr-fill{height:100%;background:var(--accent);border-radius:2px}
 .corr-v{width:64px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex-shrink:0}
 .cyc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
 .cyc-b{text-align:center;padding:14px 8px;background:var(--surface-2);border-radius:4px}
@@ -243,7 +279,7 @@ input[type=file]{display:none}
 
 <aside class="rail">
   <div class="rail-head">
-    <div class="rail-title">Localization<br>Centre</div>
+    <div class="rail-title">Localization Centre</div>
     <div class="rail-sub">Management &amp; Analytics</div>
   </div>
   <div class="rail-scroll">
@@ -267,12 +303,14 @@ input[type=file]{display:none}
       <div class="route" id="route"></div>
     </div>
     <div class="topbar-act">
-      <button class="btn" id="nav-start" onclick="setView('start')">Start case</button>
-      <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
-      <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
-      <span style="width:10px"></span>
-      <button class="btn" id="btn-db" onclick="pickDb()">Link database</button>
-      <button class="btn" id="btn-log" disabled onclick="logCase()">Add to database</button>
+      <nav class="navseg" aria-label="Views">
+        <button class="btn" id="nav-start" onclick="setView('start')">Start case</button>
+        <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
+        <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
+      </nav>
+      <span class="topbar-sep"></span>
+      <button class="btn btn-q" id="btn-db" onclick="pickDb()">Link database</button>
+      <button class="btn btn-q" id="btn-log" disabled onclick="logCase()">Add to database</button>
       <div class="menu-wrap">
         <button class="btn btn-p" id="btn-exp" disabled onclick="toggleExp(event)">Export &#9662;</button>
         <div class="menu" id="exp-menu">
@@ -604,14 +642,14 @@ const STYLES_XML=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Aptos Narrow"/></font>
 <font><i/><sz val="9.5"/><color rgb="FF7A8288"/><name val="Aptos Narrow"/></font>
 <font><sz val="9.5"/><color rgb="FF5B6469"/><name val="Aptos Narrow"/></font>
-<font><b/><sz val="10.5"/><color rgb="FF1E4D6B"/><name val="Aptos Narrow"/></font>
-<font><i/><sz val="9.5"/><color rgb="FF1E4D6B"/><name val="Aptos Narrow"/></font>
+<font><b/><sz val="10.5"/><color rgb="FF8A4145"/><name val="Aptos Narrow"/></font>
+<font><i/><sz val="9.5"/><color rgb="FF8A4145"/><name val="Aptos Narrow"/></font>
 </fonts>
 <fills count="6">
 <fill><patternFill patternType="none"/></fill>
 <fill><patternFill patternType="gray125"/></fill>
-<fill><patternFill patternType="solid"><fgColor rgb="FF1E4D6B"/><bgColor indexed="64"/></patternFill></fill>
-<fill><patternFill patternType="solid"><fgColor rgb="FF4A7C8C"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FF8A4145"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="solid"><fgColor rgb="FFA1686B"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFFDF8EC"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFF4F6F7"/><bgColor indexed="64"/></patternFill></fill>
 </fills>
@@ -659,8 +697,8 @@ function sheetXml(rows,cols,merges,freeze){
   const pane=freeze?`<pane ySplit="${freeze}" topLeftCell="A${freeze+1}" activePane="bottomLeft" state="frozen"/>`:"";
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<sheetViews><sheetView showGridLines="0" workbookViewId="0">${pane}</sheetView></sheetViews>
 <sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>
+<sheetViews><sheetView showGridLines="0" workbookViewId="0">${pane}</sheetView></sheetViews>
 <sheetFormatPr defaultRowHeight="15"/>
 <cols>${colXml}</cols>
 <sheetData>${body}</sheetData>${mg}
@@ -1109,7 +1147,20 @@ function sfRow(){
     if(idx["person id"]===undefined&&idx["last name"]===undefined)continue;
     const data=rows.slice(1).filter(r=>r&&r.some(c=>c!==null&&c!==""));
     if(!data.length)continue;
-    return {idx,rows:data,get(r,...ks){for(const k of ks){const i=this.idx[norm(k)];if(i!==undefined&&r[i]!==null&&r[i]!=="")return r[i];}return null;}};
+    return {idx,rows:data,
+      get(r,...ks){for(const k of ks){const i=this.idx[norm(k)];if(i!==undefined&&r[i]!==null&&r[i]!=="")return r[i];}return null;},
+      /* Exports word their headers differently between reports, so when none of
+         the expected names match, fall back to any header the pattern fits and
+         report which column was used. */
+      find(r,re){
+        for(const h of Object.keys(this.idx)){
+          if(!re.test(h))continue;
+          const i=this.idx[h], v=r[i];
+          if(v!==null&&v!==undefined&&v!=="")return {v,header:h};
+        }
+        return null;
+      },
+      headers(){return Object.keys(this.idx);}};
   }
   return null;
 }
@@ -1136,6 +1187,14 @@ function resolve(){
     d.hireSF=xlDate(sf.get(r,"Employment Date / Original Date of Hire","Employment Date","Original Date of Hire",
       "Original Hire Date","Hire Date","Date of Hire","Company Service Date","Service Date","Seniority Date",
       "Continuous Service Date","Original Start Date","Start Date"));
+    d.hireCol=d.hireSF?"a named column":null;
+    if(!d.hireSF){
+      const hit=sf.find(r,/(hire|employment|seniority|continuous service|company service)/);
+      if(hit){ const dt=xlDate(hit.v); if(dt){ d.hireSF=dt; d.hireCol=hit.header; } }
+    }
+    /* if it still cannot be found, list what date-like columns exist so the
+       right one can be named rather than guessed at */
+    if(!d.hireSF)d.sfDateCols=sf.headers().filter(h=>/date|hire|service/.test(h));
     d.posTitle=sf.get(r,"Position Title");
     d.company=sf.get(r,"Company Name");
     d.bizLine=sf.get(r,"Business Line");
@@ -1367,6 +1426,9 @@ function resolve(){
   d.reqNat     = pickReq("Nationality");
   d.visaType   = pickReq("Type of visa / immigration comments","Type of visa");
   d.visaExp    = pickReq("Visa expiration date");
+  /* BAL's immigration assessment, worded by them and pasted in here. It travels
+     with both approver reports, so approvers see the strategy alongside the visa. */
+  d.immStrategy = overrides.immStrategy || null;
   d.education  = pickReq("Educational background");
   d.justif     = pickReq("Request justification / business case","Request justification");
   d.reviewedBy = pickReq("Reviewed by (B/L HR Manager name)","Reviewed by");
@@ -1742,6 +1804,17 @@ function gate(d,c){
     b:`Medical cost is built from the U.S. PPO B company rates, which are reissued each year.
        The figures in use are ${MEDICAL_US.year}. If a newer schedule exists, the rates want updating,
        or key the medical figures in directly on the scenario table.`});
+  if(F.sf&&!d.hireDate)A.push({t:"n",tag:"SERVICE",
+    h:`No employment date found in the SuccessFactors export.`,
+    b:`Years of service is falling back to the request form. ${
+      d.sfDateCols&&d.sfDateCols.length
+      ? `The date-like columns in the file are: <strong>${d.sfDateCols.map(esc).join(", ")}</strong>.
+         If one of these is the original hire date, key the date in below and it will be used.`
+      : `The export carries no column that looks like a hire date.`}`});
+  if(d.hireDate&&d.hireCol&&d.hireCol!=="a named column")A.push({t:"n",tag:"SERVICE",
+    h:`Employment date matched on a column name the system did not expect.`,
+    b:`It was read from <strong>${esc(d.hireCol)}</strong>, giving
+       ${dstr(d.hireDate)}. Worth a glance to confirm that is the original hire date and not a later one.`});
   if(d.locTypeClash)A.push({t:"w",tag:"TYPE",
     h:`The request form and GC&BD state different localization types.`,
     b:`The form says <strong>${esc(d.locTypeClash.form)}</strong>, GC&amp;BD says
@@ -1822,9 +1895,11 @@ function railHTML(){
 const PERF_CATS=["OPwD","OP","EP","VG","GP","NI","NSI"];
 function fieldsHTML(d){
   const f=(l,v,src)=>`<div class="f"><div class="f-l">${l}${src?`<span class="f-src">${src}</span>`:""}</div><div class="f-v">${v??"—"}</div></div>`;
+  /* The hint sits under the field rather than inside it: a placeholder longer
+     than the box just gets clipped and cannot be read. */
   const ed=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
-    <input class="${val===null||val===""?"blank":""}" value="${val??""}" placeholder="${ph}"
-      onchange="setOv('${key}',this.value)"></div>`;
+    <input class="${val===null||val===""?"blank":""}" value="${val??""}"
+      onchange="setOv('${key}',this.value)">${ph?`<div class="f-hint">${ph}</div>`:""}</div>`;
   const sel=(l,key,val)=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
     <select class="${val?"":"blank"}" onchange="setOv('${key}',this.value)">
       <option value=""${val?"":" selected"}>—</option>
@@ -1883,6 +1958,11 @@ function fieldsHTML(d){
       ${f("Business line / function",esc(d.reqBizLine))}
       ${f("Visa type",esc(d.visaType))}
       ${f("Visa expiry",esc(d.visaExp))}
+      <div class="f" style="grid-column:1/-1"><div class="f-l">Immigration strategy<span class="f-src">manual</span></div>
+        <textarea rows="4" style="width:100%;font:inherit;font-size:13px;padding:7px 9px;
+          border:1px solid var(--line);border-radius:3px;resize:vertical"
+          onchange="setOv('immStrategy',this.value)">${esc(d.immStrategy||"")}</textarea>
+        <div class="f-hint">Paste BAL's assessment in their own wording. It appears on both approver reports.</div></div>
       ${f("Direct &amp; indirect reports — now",esc(d.reportsNow))}
       ${f("Direct &amp; indirect reports — future",esc(d.reportsFut))}
       ${f("Peers of comparison",esc(d.peers))}
@@ -2015,6 +2095,7 @@ function gcbdHTML(d){
   };
   const anyPar=Object.values(p).some(v=>v!==null&&v!==undefined&&v!=="");
   const fromD=new Set(d.parFromDefaults||[]);
+  const tiered=String(p.method||"").toLowerCase().startsWith("tier");
   const fp=(l,key,v)=>`<div class="f"><div class="f-l">${l}${
     fromD.has(key)?`<span class="f-src">country default</span>`:(v===null||v===undefined||v===""?"":`<span class="f-src">GC&amp;BD</span>`)
   }</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
@@ -2051,16 +2132,25 @@ function gcbdHTML(d){
     ${anyPar?`<div class="sub-h">Part III-A — Origin country pension formula</div>
     <div class="panel-b"><div class="fgrid">
       ${fp("Formula shape","method",p.method)}
-      ${fp("Pension multiplier","mult",p.mult!==null&&p.mult!==undefined?pct(p.mult):null)}
-      ${fp("Accrual rate — tier 1","rate1",p.rate1!==null&&p.rate1!==undefined?pct(p.rate1):null)}
-      ${fp("Accrual rate — tier 2","rate2",p.rate2!==null&&p.rate2!==undefined?pct(p.rate2):null)}
-      ${fp("Salary cap — tier 1","thresh",p.thresh!==null&&p.thresh!==undefined?fmt(p.thresh):null)}
-      ${fp("Salary cap — tier 2","thresh2",p.thresh2!==null&&p.thresh2!==undefined?fmt(p.thresh2):null)}
-      ${fp("Salary basis","basis",p.basis)}
-      ${fp("Service denominator","denom",p.denom)}
-      ${fp("Discount per year","discPerYr",p.discPerYr!==null&&p.discPerYr!==undefined?pct(p.discPerYr):null)}
-      ${fp("Factor at 55","f55",p.f55)} ${fp("Factor at 58","f58",p.f58)} ${fp("Factor at 60","f60",p.f60)}
+      ${tiered?"":fp("Pension multiplier","mult",p.mult!==null&&p.mult!==undefined?pct(p.mult):null)}
+      ${tiered?fp("Accrual rate — tier 1","rate1",p.rate1!==null&&p.rate1!==undefined?pct(p.rate1):null):""}
+      ${tiered?fp("Accrual rate — tier 2","rate2",p.rate2!==null&&p.rate2!==undefined?pct(p.rate2):null):""}
+      ${tiered?fp("Salary cap — tier 1","thresh",p.thresh!==null&&p.thresh!==undefined?fmt(p.thresh):null):""}
+      ${tiered?fp("Salary cap — tier 2","thresh2",p.thresh2!==null&&p.thresh2!==undefined?fmt(p.thresh2):null):""}
+      ${tiered?"":fp("Discount factor at 55","f55",p.f55)}
+      ${tiered?"":fp("Discount factor at 58","f58",p.f58)}
+      ${tiered?"":fp("Discount factor at 60","f60",p.f60)}
     </div></div>
+    ${[["Salary basis",p.basis],["Service denominator",p.denom],
+       ["Discount per year",p.discPerYr!==null&&p.discPerYr!==undefined?pct(p.discPerYr):null]]
+       .some(([,v])=>v!==null&&v!==undefined&&v!=="")
+      ? `<div class="panel-b"><div class="fgrid">
+          ${fp("Salary basis","basis",p.basis)}
+          ${fp("Service denominator","denom",p.denom)}
+          ${fp("Discount per year","discPerYr",p.discPerYr!==null&&p.discPerYr!==undefined?pct(p.discPerYr):null)}
+         </div></div>
+         <div class="note">Extra detail GC&amp;BD supplied. Not used by the calculation.</div>`
+      : ""}
     <div class="note">${String(p.method||"").toLowerCase().startsWith("tier")
       ? `<strong>Tiered accrual</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
          <code>(rate&nbsp;1 &times; salary up to the cap &nbsp;+&nbsp; rate&nbsp;2 &times; salary above it) &times; years of service</code><br>
@@ -2093,7 +2183,8 @@ function gcbdHTML(d){
          a zero here would overstate the incremental pension the company takes on.`}</div>
     <div class="panel-b"><div class="fgrid">
       ${SCEN.map(a=>`<div class="f"><div class="f-l">At age ${a}${d.ohcCcy?" · "+d.ohcCcy:""}<span class="f-src">manual</span></div>
-        <input style="width:100%" value="${d.ohcOffset[a]??""}" placeholder="from GC&BD, or key in the old template's figure"
+        <input style="width:100%" value="${d.ohcOffset[a]??""}" placeholder="${esc(d.ohcCcy||"amount")}"
+          title="Amount GC&BD reported for retirement at age ${a}, in ${esc(d.ohcCcy||"the origin country currency")}. Leave empty to use the formula above."
           onchange="setOv('ohcOffset${a}',this.value)"></div>`).join("")}
     </div></div>
     ${d.offsetBasis?`<div class="note"><strong>Basis.</strong> ${esc(String(d.offsetBasis))}</div>`:""}
@@ -2115,8 +2206,8 @@ function novaHTML(d){
   const pendingN=rows.filter(r=>r.pending).length;
   const f=(l,v)=>`<div class="f"><div class="f-l">${l}</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
   const ed=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
-    <input class="${val===null||val===""?"blank":""}" value="${esc(val??"")}" placeholder="${ph}"
-      onchange="setOv('nova:${key}',this.value)"></div>`;
+    <input class="${val===null||val===""?"blank":""}" value="${esc(val??"")}"
+      onchange="setOv('nova:${key}',this.value)">${ph?`<div class="f-hint">${ph}</div>`:""}</div>`;
   const ta=(l,key,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
     <textarea rows="5" style="width:100%;font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);
       border-radius:3px;resize:vertical" placeholder="${ph}"
@@ -2368,6 +2459,7 @@ function reports(){
     ["Reviewed By",d.reviewedBy],
     ["Future Assignments After Localization",d.futureAssign],
     ["§Immigration Strategy",null],
+    ["Strategy",d.immStrategy],
     ["Type of Visa",d.visaType],
     ["Visa Expiration Date",dOnly(d.visaExp)],
     ["Current Direct & Indirect Reports",d.reportsNow],
@@ -2497,7 +2589,12 @@ function exportPdf(pack){
         out+=`<h3>${esc(k.slice(1))}</h3>`; return;
       }
       if(!open){out+="<dl>";open=true;}
-      out+=`<div class="kv"><dt>${esc(k)}</dt><dd>${val(v)}</dd></div>`;
+      /* Long prose — an immigration assessment, a justification — reads badly
+         squeezed opposite its label, so it runs full width underneath instead. */
+      const long=typeof v==="string"&&v.length>110;
+      out+=long
+        ? `<div class="kvb"><dt>${esc(k)}</dt><dd>${esc(v).replace(/\n/g,"<br>")}</dd></div>`
+        : `<div class="kv"><dt>${esc(k)}</dt><dd>${val(v)}</dd></div>`;
     });
     return out+(open?"</dl>":"");
   };
@@ -2563,14 +2660,14 @@ function exportPdf(pack){
   h1{font-family:"IBM Plex Sans Condensed",Arial,sans-serif;font-size:19pt;font-weight:700;
      letter-spacing:-.005em;margin:11pt 0 0;line-height:1.1}
   .subject{display:flex;justify-content:space-between;align-items:flex-end;gap:24pt;
-    margin-top:12pt;padding-top:9pt;border-top:2pt solid #1e4d6b}
+    margin-top:12pt;padding-top:9pt;border-top:2pt solid #8a4145}
   .nm{font-size:13pt;font-weight:600;letter-spacing:-.005em}
   .rt{font-family:"IBM Plex Mono",monospace;font-size:9pt;color:#4d565f;margin-top:2pt}
-  .arw{color:#1e4d6b}
+  .arw{color:#8a4145}
   .meta{min-width:150pt}
 
   h2{font-family:"IBM Plex Mono",monospace;font-size:7.2pt;letter-spacing:.17em;text-transform:uppercase;
-     color:#1e4d6b;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:.5pt solid #c6cfd6}
+     color:#8a4145;margin:20pt 0 8pt;padding-bottom:4pt;border-bottom:.5pt solid #c6cfd6}
   h2:first-of-type{margin-top:0}
   h3{font-family:"IBM Plex Mono",monospace;font-size:6.8pt;letter-spacing:.15em;text-transform:uppercase;
      color:#8b959e;margin:13pt 0 5pt}
@@ -2607,7 +2704,7 @@ function exportPdf(pack){
   .tnote b{font-weight:600;color:#16191d}
 
   .prose{font-size:8.6pt;line-height:1.6;color:#2c3238;margin-top:3pt}
-  .callout{background:#f7f9fa;border-left:2pt solid #1e4d6b;padding:8pt 11pt;margin-top:10pt;font-size:8.4pt;line-height:1.55}
+  .callout{background:#f7f9fa;border-left:2pt solid #8a4145;padding:8pt 11pt;margin-top:10pt;font-size:8.4pt;line-height:1.55}
 
   .kvb{padding:5pt 0 9pt;border-bottom:.4pt solid #e8e4de;break-inside:avoid}
   .kvb dt{color:#4d565f;font-size:8.4pt;margin-bottom:4pt}
