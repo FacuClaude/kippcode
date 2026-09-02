@@ -15,7 +15,7 @@
   --line:#dde3e7; --line-2:#c6cfd6;
   --accent:#b3282d; --accent-bg:#fdf2f2; --accent-line:#e9c3c4; --accent-dark:#8f1f24;
   --accent-rail:#f28b8f;
-  --rail-bg:#4a1f22; --rail-dim:rgba(255,255,255,.52);
+  --rail-bg:#b3282d; --rail-dim:rgba(255,255,255,.62);
   --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
   --pos:#1a6b47; --neg:#b02a2a;
   --mono:'IBM Plex Mono',monospace;
@@ -50,9 +50,9 @@ input,select{font:inherit;color:inherit}
 .slot{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;cursor:pointer;position:relative;
   border-radius:9px;border:1px solid transparent;margin-bottom:3px;
   transition:background .14s,border-color .14s}
-.slot:hover{background:rgba(255,255,255,.07)}
-.slot.on{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.14)}
-.slot-mark{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.32);border-radius:5px;flex-shrink:0;
+.slot:hover{background:rgba(255,255,255,.10)}
+.slot.on{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.26)}
+.slot-mark{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.45);border-radius:5px;flex-shrink:0;
   margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
 .slot.on .slot-mark{background:#fff;border-color:#fff;color:var(--rail-bg);font-weight:700}
 .slot.req .slot-mark{border-color:rgba(255,255,255,.5);border-style:dashed}
@@ -75,7 +75,7 @@ input,select{font:inherit;color:inherit}
 .slot-x:hover{color:#fff}
 .status{font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--rail-dim);letter-spacing:.03em}
 .status b{color:#fff;font-weight:500}
-.status .ok{color:#9fd4ae}
+.status .ok{color:#d6f0dd}
 
 /* ── MAIN ── */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -156,6 +156,7 @@ input,select{font:inherit;color:inherit}
 
 /* ── FIELD GRID ── */
 .f-hint{font-size:11px;color:var(--ink-3);line-height:1.45;margin-top:4px}
+.prose-block{white-space:normal;line-height:1.65;max-height:none;overflow:visible}
 .note code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);
   padding:2px 6px;border-radius:3px;display:inline-block;margin:4px 0;line-height:1.7}
 .mini-btn{font:inherit;font-size:11.5px;padding:5px 12px;border:1px solid var(--line);
@@ -381,10 +382,13 @@ function canonCountry(v){
 }
 
 const NHC_RULES={
-  "United States":{retAge:60,cutoff:45,ls:{55:14.5,58:13.8,60:13.3},mult:.016,erf:{55:.75,58:.90,60:1.00}},
-  "Belgium":{retAge:67,cutoff:52},"Netherlands":{retAge:68,cutoff:53},
-  "France":{retAge:67,cutoff:52},"Singapore":{retAge:60,cutoff:45},
-  "Canada":{retAge:65,cutoff:50},"United Kingdom":{retAge:65,cutoff:50}
+  /* retAge is the reference age at which the country's plan pays an undiscounted
+     benefit. The cut-off is always that age less fifteen years, so it is derived
+     rather than stored twice and cannot fall out of step. */
+  "United States":{retAge:60,ls:{55:14.5,58:13.8,60:13.3},mult:.016,erf:{55:.75,58:.90,60:1.00}},
+  "Belgium":{retAge:67},"Netherlands":{retAge:68},
+  "France":{retAge:67},"Singapore":{retAge:60},
+  "Canada":{retAge:65},"United Kingdom":{retAge:65}
 };
 const SCEN=[55,58,60];
 
@@ -1059,6 +1063,18 @@ const xlDate=v=>{
 };
 const dstr=d=>d?d.toISOString().slice(0,10):"";
 /* Vendors send dates as Date objects, serials or free text. Reports show the day only. */
+/* Compensation state this either as a share (0.95) or embedded in a code
+   ("%SR-:95"). Both mean the same thing and both should read as a percentage. */
+function salRef(v){
+  if(v===null||v===undefined||v==="")return null;
+  if(typeof v==="number")return (v<=1?v*100:v).toFixed(0)+"%";
+  const t=String(v).trim();
+  const m=/(\d+(?:\.\d+)?)\s*%?\s*$/.exec(t);
+  if(!m)return t;
+  const n=parseFloat(m[1]);
+  return (n<=1?n*100:n).toFixed(0)+"%";
+}
+
 const dOnly=v=>{
   if(v===null||v===undefined||v==="")return null;
   if(v instanceof Date)return v.toISOString().slice(0,10);
@@ -1507,8 +1523,21 @@ function resolve(){
   /* -- NHC plan rules -- */
   const R=NHC_RULES[d.nhc]||{};
   d.rule=R;
-  d.retAge = d.retAgeG ?? R.retAge ?? null;
-  d.cutoff = R.cutoff ?? (d.retAge?d.retAge-15:null);
+  /* Two different retirement ages, and they must not be confused.
+       OHC — what GC&BD report for the plan the employee is leaving
+       NHC — the reference age in the country being localized to, from which
+             the cut-off is derived
+     The cut-off asks whether the employee can still accrue fifteen years in
+     the NEW plan, so it can only come from the new home country. Reading the
+     origin country's age here gave a Belgian employee moving to the U.S. a
+     cut-off built on Belgium's plan. */
+  d.retAgeOHC = d.retAgeG ?? null;
+  d.retAgeNHC = (overrides.retAgeNHC!==undefined&&overrides.retAgeNHC!=="")
+    ? num(overrides.retAgeNHC) : (R.retAge ?? null);
+  d.retAge    = d.retAgeNHC;                       /* scenarios run on the NHC plan */
+  d.cutoff    = d.retAgeNHC!==null ? d.retAgeNHC-15 : null;
+  d.cutoffSrc = d.retAgeNHC===null ? null
+    : `${d.nhc||"NHC"} reference retirement age ${d.retAgeNHC} less the 15-year runtime rule`;
   d.intoUS = d.nhc==="United States";
 
   /* -- D&S request form: authoritative for profile data -- */
@@ -1798,7 +1827,9 @@ function calc(d){
   c.c.ben    = ov("c.ben",(c.c.salary!==null&&d.nhcSBR!==null)?c.c.salary*d.nhcSBR-(c.c.afp??0):null);
   c.b.expat = ov("b.expat",d.expatTotal);
   c.c.expat  = 0;
-  c.b.taxeq = ov("b.taxeq",sum([d.homeTax,d.hostTax]));
+  /* Only an expatriate is tax equalized. On a direct localization the line is a
+     true zero, and a value left over from an earlier edit must not resurrect it. */
+  c.b.taxeq = d.locType==="Full Localization" ? ov("b.taxeq",sum([d.homeTax,d.hostTax])) : 0;
   c.c.taxeq  = 0;
   /* A column with no salary has nothing to total. Summing the zeros around it
      would report a real figure where there is none, and the delta would look
@@ -1957,7 +1988,7 @@ function gate(d,c){
     A.push({t:ok?"i":"w",tag:"Cut-off",
       h:ok?`Age ${d.age.toFixed(1)} is within the ${d.nhc} cut-off of ${d.cutoff}.`
           :`Age ${d.age.toFixed(1)} is past the ${d.nhc} cut-off of ${d.cutoff}.`,
-      b:ok?`Plan retirement age ${d.retAge} less the 15-year runtime rule.`
+      b:ok?`${esc(d.cutoffSrc||"")}.`
           :`Late-in-career principle applies. This case needs an explicit exception before it goes forward.`});
   }
 
@@ -2040,7 +2071,8 @@ function fieldsHTML(d){
           ${["","Full Localization","Direct from Home Country","Direct from 3rd Country"].map(o=>
             `<option value="${esc(o)}"${d.locType===o||(!d.locType&&!o)?" selected":""}>${esc(o||"—")}</option>`).join("")}
         </select></div>
-      ${f("Plan retirement age",d.retAge,d.retAgeG?"GC&BD":"rules")}
+      ${f("Retirement age — "+(d.nhc||"NHC"),d.retAgeNHC,"country rules")}
+      ${f("Retirement age — "+(d.ohc||"OHC"),d.retAgeOHC,"GC&BD")}
       ${f("Cut-off age",d.cutoff!==null&&d.cutoff!==undefined
         ?`${d.cutoff} — through the day before turning ${d.cutoff+1}`:null,"rules")}
       ${f("Prior service recognised",esc(d.offset),"GC&BD")}
@@ -2048,8 +2080,8 @@ function fieldsHTML(d){
       ${f("Pay scale type",esc(d.payScaleType),"Compensation")}
       ${f("Pay scale area",esc(d.payScaleArea),"Compensation")}
       ${f("Employee subgroup",esc(d.empSubgroup),"Compensation")}
-      ${f("Salary reference — NHC",esc(d.nhcSalRef),"Compensation")}
-      ${f("Salary reference — OHC",esc(d.ohcSalRef),"Compensation")}
+      ${f("Salary reference — NHC",esc(salRef(d.nhcSalRef)),"Compensation")}
+      ${f("Salary reference — OHC",esc(salRef(d.ohcSalRef)),"Compensation")}
       ${f("Advancement guide",esc(d.advGuide),"Compensation")}
     </div></div>
     <div class="legend">
@@ -2093,7 +2125,7 @@ function fieldsHTML(d){
       ${f("Future position",esc(d.futPos))}
       ${f("Future affiliate",esc(d.futAffil))}
     </div></div>
-    ${d.justif?`<div class="note"><strong>Business case.</strong> ${esc(String(d.justif).slice(0,600))}</div>`:""}
+    ${d.justif?`<div class="note prose-block"><strong>Business case.</strong> ${esc(String(d.justif)).replace(/\n/g,"<br>")}</div>`:""}
     ${career?`<div class="note"><strong>Career history.</strong> ${career.map(r=>`${esc(r.country)} ${esc(r.dates)} — ${esc(r.position)}`).join(" · ")}</div>`:""}
   </div>`:`
   <div class="panel">
@@ -2180,7 +2212,8 @@ function diagHTML(d,c){
         :(d.ohcOffset&&d.ohcOffset[55]!==null&&d.ohcOffset[55]!==undefined?fmt(d.ohcOffset[55]):null),
       (d.ohcOffset&&d.ohcOffset[55]!==null&&d.ohcOffset[55]!==undefined)?"GC&BD"
         :(d.par&&d.par.method?"calculated from the origin country formula":"GC&BD")],
-    ["Retirement age NHC",d.retAge,"GC&BD / country rules"],
+    ["Retirement age NHC",d.retAgeNHC,"country rules"],
+    ["Retirement age OHC",d.retAgeOHC,"GC&BD"],
     ["Years of service",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(4):null,d.yosSrc||"request form"],
     ["Year end age",d.ageYE,"SuccessFactors"],
     ["Classification level",d.cl?"CL "+d.cl:null,d.reqCL!==null?"request form":"SuccessFactors"],
@@ -2600,8 +2633,8 @@ function reports(){
     ["NHC Pay Scale Type",d.payScaleType],
     ["NHC Pay Scale Area",d.payScaleArea],
     ["NHC Employee Subgroup",d.empSubgroup],
-    ["NHC Salary Reference Percentage",d.nhcSalRef],
-    ["OHC Salary Reference Percentage",d.ohcSalRef],
+    ["NHC Salary Reference Percentage",salRef(d.nhcSalRef)],
+    ["OHC Salary Reference Percentage",salRef(d.ohcSalRef)],
     ["NHC Advancement Guide",d.advGuide],
     ["Performance — Last Three Years",d.perfText],
     ["Potential",d.pot],
