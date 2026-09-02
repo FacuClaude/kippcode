@@ -15,6 +15,7 @@
   --line:#dde3e7; --line-2:#c6cfd6;
   --accent:#b3282d; --accent-bg:#fdf2f2; --accent-line:#e9c3c4; --accent-dark:#8f1f24;
   --accent-rail:#f28b8f;
+  --rail-bg:#4a1f22; --rail-dim:rgba(255,255,255,.52);
   --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
   --pos:#1a6b47; --neg:#b02a2a;
   --mono:'IBM Plex Mono',monospace;
@@ -27,40 +28,54 @@ body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:
 button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,select{font:inherit;color:inherit}
 
-/* ── RAIL ── */
-.rail{width:296px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;overflow:hidden}
-.rail-head{padding:22px 22px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+/* ── RAIL ──
+   A deep, desaturated version of the export red rather than near-black, so the
+   two reds in the interface read as one family. Rows are cards with room to
+   breathe instead of a dense checklist. */
+.rail{width:296px;flex-shrink:0;background:var(--rail-bg);color:#fff;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:inset -1px 0 0 rgba(255,255,255,.06)}
+.rail-head{padding:24px 22px 20px;border-bottom:1px solid rgba(255,255,255,.09)}
 .rail-title{font-family:var(--cond);font-size:17px;font-weight:700;letter-spacing:-.005em;
   line-height:1.2;white-space:nowrap}
-.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-rail);margin-top:7px}
-.rail-scroll{flex:1;overflow-y:auto;padding:18px 0 24px}
-.rail-sec{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#6b7883;padding:0 22px;margin:20px 0 10px}
+.rail-sub{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--rail-dim);margin-top:7px}
+.rail-scroll{flex:1;overflow-y:auto;padding:16px 12px 24px}
+.rail-scroll::-webkit-scrollbar{width:8px}
+.rail-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:4px}
+.rail-sec{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--rail-dim);padding:0 10px;margin:18px 0 8px}
 .rail-sec:first-child{margin-top:0}
 
-.slot{display:flex;gap:11px;align-items:flex-start;padding:9px 22px;cursor:pointer;position:relative;transition:background .13s}
-.slot:hover{background:rgba(255,255,255,.05)}
-.slot.on{background:rgba(242,139,143,.10)}
-.slot.on::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent-rail)}
-.slot-mark{width:15px;height:15px;border:1.5px solid #4a5560;border-radius:2px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
-.slot.on .slot-mark{background:var(--accent-rail);border-color:var(--accent-rail);color:var(--ink);font-weight:700}
-.slot.req .slot-mark{border-color:#7a6248}
+.slot{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;cursor:pointer;position:relative;
+  border-radius:9px;border:1px solid transparent;margin-bottom:3px;
+  transition:background .14s,border-color .14s}
+.slot:hover{background:rgba(255,255,255,.07)}
+.slot.on{background:rgba(255,255,255,.10);border-color:rgba(255,255,255,.14)}
+.slot-mark{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.32);border-radius:5px;flex-shrink:0;
+  margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
+.slot.on .slot-mark{background:#fff;border-color:#fff;color:var(--rail-bg);font-weight:700}
+.slot.req .slot-mark{border-color:rgba(255,255,255,.5);border-style:dashed}
 .slot-txt{flex:1;min-width:0}
-.slot-name{font-size:12.5px;font-weight:450;line-height:1.3}
+.slot-name{font-size:12.5px;font-weight:450;line-height:1.35;color:rgba(255,255,255,.86)}
 .slot.on .slot-name{color:#fff;font-weight:500}
-.slot-meta{font-family:var(--mono);font-size:9.5px;color:#6b7883;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot.on .slot-meta{color:var(--accent-rail)}
+.slot-meta{font-family:var(--mono);font-size:9.5px;color:var(--rail-dim);margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.on .slot-meta{color:rgba(255,255,255,.66)}
 
-.rail-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.1)}
-.btn-save{width:100%;padding:9px;background:rgba(255,255,255,.09);color:#f6d3d4;border-radius:3px;
-  font-size:12px;font-weight:500;margin-bottom:10px;transition:background .14s}
-.btn-save:hover{background:rgba(255,255,255,.16);color:#fff}
-.slot.saved .slot-mark{border-color:#5f6d78;color:var(--accent-rail);font-size:11px}
-.slot-x{opacity:0;color:#6b7883;font-size:15px;padding:0 4px;line-height:1;transition:opacity .12s}
+.rail-foot{padding:16px 22px;border-top:1px solid rgba(255,255,255,.09)}
+.btn-save{width:100%;padding:10px;background:rgba(255,255,255,.12);color:#fff;border-radius:8px;
+  font-size:12px;font-weight:500;margin-bottom:11px;border:1px solid rgba(255,255,255,.14);
+  transition:background .14s}
+.btn-save:hover{background:rgba(255,255,255,.2)}
+.btn-save:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.slot.saved .slot-mark{border-color:rgba(255,255,255,.4);color:#fff;font-size:11px}
+.slot-x{opacity:0;color:var(--rail-dim);font-size:15px;padding:0 4px;line-height:1;transition:opacity .12s}
 .slot.saved:hover .slot-x{opacity:1}
-.slot-x:hover{color:var(--accent-rail)}
-.status{font-family:var(--mono);font-size:10px;line-height:1.6;color:#6b7883;letter-spacing:.03em}
-.status b{color:var(--accent-rail);font-weight:500}
-.status .ok{color:#8fbf9f}
+.slot-x:hover{color:#fff}
+.status{font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--rail-dim);letter-spacing:.03em}
+.status b{color:#fff;font-weight:500}
+.status .ok{color:#9fd4ae}
 
 /* ── MAIN ── */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
@@ -1143,10 +1158,18 @@ function careerRows(){
     });
     if(hdr<0)continue;
     const out=[];
+    /* The block ends where the form moves on to its prose questions. Career
+       entries are short — a country, a date range, a title — so a long cell or
+       a known heading means the table is over, not that the row is unusual. */
+    const STOP=/^(request justification|business case|reviewed by|future assignments|current position|relevant skillset|comments|notes|business line)/i;
     for(let i=hdr+1;i<Math.min(rows.length,hdr+14);i++){
       const r=rows[i]; if(!r)continue;
       const a=r[1],b=r[2],c=r[3];
       if(typeof a==="string"&&/^\d\./.test(a.trim()))break;
+      if([a,b,c].some(v=>typeof v==="string"&&v.trim().length>90))break;
+      if(typeof a==="string"&&STOP.test(a.trim()))break;
+      /* prose that spilled past the table columns */
+      if((a===null||a===undefined||a==="")&&r.slice(4).some(v=>typeof v==="string"&&v.length>60))break;
       if([a,b,c].every(v=>v===null||v===undefined||v===""))continue;
       out.push({country:a??"",dates:b??"",position:c??""});
     }
@@ -1593,6 +1616,11 @@ function resolve(){
 
   d.ohcSalarySF = d.ohcSalary;
   const fullLoc = d.locType==="Full Localization";
+  /* Tax equalization exists because the employee is an expatriate being kept
+     whole. A direct localization has no assignment and no equalization, so the
+     figures do not belong in the comparison at all. */
+  if(!fullLoc){ d.homeTax=null; d.hostTax=null; }
+  d.taxeqFromMatrix = fullLoc;
   d.taxOHCSrc = fullLoc?"TMO hypothetical tax":"Deloitte";
   d.taxOHC    = fullLoc ? d.hypoTax : d.taxOHCDel;
   d.taxNHCSrc = d.intoUS?"paycheck calculator, by hand":"Deloitte";
@@ -2050,7 +2078,7 @@ function fieldsHTML(d){
       ${f("Nationality",esc(d.reqNat))}
       ${f("Business line / function",esc(d.reqBizLine))}
       ${f("Visa type",esc(d.visaType))}
-      ${f("Visa expiry",esc(d.visaExp))}
+      ${f("Visa expiry",esc(dOnly(d.visaExp)))}
       <div class="f" style="grid-column:1/-1"><div class="f-l">Immigration strategy<span class="f-src">manual</span></div>
         <textarea rows="4" style="width:100%;font:inherit;font-size:13px;padding:7px 9px;
           border:1px solid var(--line);border-radius:3px;resize:vertical"
