@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#f2f0eb;--bg2:#eae7e0;--bg3:#e0ddd5;--white:#faf9f7;--ink:#1a1916;--ink2:#6b6760;--ink3:#aba8a2;--border:#d4d0c8;--orange:#f05a00;--ora-bg:#fff3ec}
+:root{--bg:#f2f0eb;--bg2:#f4f2ee;--bg3:#eae7e0;--white:#ffffff;--ink:#1a1916;--ink2:#6b6760;--ink3:#aba8a2;--border:#e2ded7;--orange:#f05a00;--ora-bg:#fff3ec}
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
@@ -37,9 +37,9 @@ nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 /* SHARED */
-.s-eyebrow{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem}
-.s-eyebrow-line{width:28px;height:2.5px;background:var(--orange);border-radius:2px;flex-shrink:0}
-.s-eyebrow-text{font-size:0.72rem;font-weight:700;color:var(--orange);letter-spacing:0.08em;text-transform:uppercase}
+.s-eyebrow{display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem}
+.s-eyebrow-line{width:36px;height:3px;background:var(--orange);border-radius:2px;flex-shrink:0}
+.s-eyebrow-text{font-size:0.9rem;font-weight:700;color:var(--orange);letter-spacing:0.1em;text-transform:uppercase}
 .s-eyebrow.inv .s-eyebrow-line{background:rgba(255,255,255,.4)}
 .s-eyebrow.inv .s-eyebrow-text{color:rgba(255,255,255,.55)}
 .s-h{font-size:clamp(1.4rem,2.3vw,2rem);font-weight:700;line-height:1.15;letter-spacing:-0.035em;color:var(--ink);margin-bottom:1rem}
@@ -108,8 +108,8 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .kc-ind-wrap{max-width:1040px;margin:0 auto}
 .kc-ind-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
 .kc-ind-bar{width:24px;height:2px;background:var(--orange);display:inline-block}
-.kc-ind-eyebrow{font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange)}
-.kc-ind-title{font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,44px);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin:0 0 14px;max-width:720px;color:var(--bg)}
+.kc-ind-eyebrow{font-family:'Fira Code',monospace;font-size:14px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange)}
+.kc-ind-title{font-family:'Syne',sans-serif;font-size:clamp(32px,5.5vw,50px);font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin:0 0 14px;max-width:760px;color:var(--bg)}
 .kc-ind-lead{font-size:16px;line-height:1.6;color:rgba(242,240,235,0.6);max-width:600px;margin:0 0 30px}
 .kc-ind-tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px}
 .kc-ind-tab{display:flex;align-items:center;gap:8px;white-space:nowrap;cursor:pointer;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:rgba(242,240,235,0.55);background:transparent;border:1px solid rgba(242,240,235,0.14);border-radius:99px;padding:9px 18px;transition:all .18s ease}
@@ -120,8 +120,8 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .kc-ind-panel.active{display:block}
 @keyframes kcfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .kc-ind-body{display:grid;grid-template-columns:0.9fr 1.1fr;gap:26px;align-items:start}
-.kc-ind-eyebrow2{font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
-.kc-ind-eyebrow3{font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:rgba(242,240,235,0.4);margin-bottom:12px}
+.kc-ind-eyebrow2{font-family:'Fira Code',monospace;font-size:13px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);margin-bottom:10px}
+.kc-ind-eyebrow3{font-family:'Fira Code',monospace;font-size:13px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:rgba(242,240,235,0.4);margin-bottom:12px}
 .kc-ind-h3{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;line-height:1.15;margin:0 0 14px;color:var(--bg)}
 .kc-ind-pain{font-size:15px;line-height:1.6;color:rgba(242,240,235,0.68);margin:0 0 20px}
 .kc-ind-btn{display:inline-block;background:var(--orange);color:#fff;font-family:'Inter',sans-serif;font-weight:600;font-size:14.5px;padding:12px 22px;border-radius:8px;border:none;cursor:pointer;transition:transform .15s ease}
@@ -135,20 +135,20 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .kc-ind-prod-desc{font-size:13px;line-height:1.55;color:rgba(242,240,235,0.85)}
 @media(max-width:760px){.kc-ind-body{grid-template-columns:1fr}.kc-ind-solgrid{grid-template-columns:1fr}.kc-ind-tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:6px}}
 /* ── TARS ── */
-#page-tars{--tars-steel:#2a3f5f;--tars-steel-light:#3d5578}
+#page-tars{--tars-steel:#2a3f5f;--tars-steel-light:#3d5578;--tars-terra:#c15a3a;--tars-terra-light:#d47450}
 .tars-hero{background:linear-gradient(160deg,#1a2438 0%,#141b2b 100%);color:#f2f0eb;padding:clamp(3.5rem,8vw,6.5rem) 7vw clamp(3rem,6vw,5rem)}
 .tars-hero-inner{max-width:1000px;margin:0 auto}
 .tars-brand-row{display:flex;align-items:center;gap:8px;margin-bottom:1.8rem}
 .tars-kip{font-family:'Syne',sans-serif;font-weight:800;font-size:0.85rem;color:rgba(242,240,235,0.7);letter-spacing:-0.02em}
 .tars-div{color:rgba(242,240,235,0.3)}
 .tars-unit{font-family:'Fira Code',monospace;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(242,240,235,0.4)}
-.tars-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3rem,9vw,5.5rem);letter-spacing:0.08em;line-height:1;background:linear-gradient(90deg,#f05a00 0%,#ff7a2e 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.6rem}
+.tars-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3rem,9vw,5.5rem);letter-spacing:0.08em;line-height:1;background:linear-gradient(90deg,var(--tars-terra) 0%,var(--tars-terra-light) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.6rem}
 .tars-expand{font-family:'Fira Code',monospace;font-size:0.8rem;letter-spacing:0.1em;color:rgba(242,240,235,0.55);margin-bottom:2.2rem}
 .tars-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,3rem);line-height:1.08;letter-spacing:-0.03em;color:#f2f0eb;margin-bottom:1.4rem}
 .tars-lead{font-size:1.02rem;line-height:1.7;color:rgba(242,240,235,0.62);max-width:680px;margin-bottom:2.4rem}
 .tars-hero-btns{display:flex;gap:0.8rem;flex-wrap:wrap}
-.tars-btn-primary{background:#f05a00;color:#fff;border:none;border-radius:9px;padding:0.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
-.tars-btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(240,90,0,0.3)}
+.tars-btn-primary{background:var(--tars-terra);color:#fff;border:none;border-radius:9px;padding:0.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.tars-btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(193,90,58,0.3)}
 .tars-btn-lg{padding:1rem 2.2rem;font-size:1rem}
 .tars-btn-ghost{background:transparent;color:#f2f0eb;border:1.5px solid rgba(242,240,235,0.25);border-radius:9px;padding:0.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:border-color .2s}
 .tars-btn-ghost:hover{border-color:rgba(242,240,235,0.55)}
@@ -156,8 +156,8 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .tars-dual-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
 .tars-dual-card{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:2.5rem 2.2rem}
 .tars-dual-card-alt{background:var(--tars-steel);border-color:var(--tars-steel)}
-.tars-dual-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--orange);margin-bottom:0.8rem}
-.tars-dual-card-alt .tars-dual-num{color:#ff7a2e}
+.tars-dual-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--tars-terra);margin-bottom:0.8rem}
+.tars-dual-card-alt .tars-dual-num{color:var(--tars-terra-light)}
 .tars-dual-tag{font-family:'Fira Code',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem}
 .tars-dual-card-alt .tars-dual-tag{color:rgba(242,240,235,0.5)}
 .tars-dual-h{font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem;line-height:1.2;letter-spacing:-0.02em;color:var(--ink);margin-bottom:1rem}
@@ -166,16 +166,16 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .tars-dual-card-alt .tars-dual-p{color:rgba(242,240,235,0.7)}
 .tars-dual-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.7rem}
 .tars-dual-list li{position:relative;padding-left:1.3rem;font-size:0.86rem;color:var(--ink2);line-height:1.4}
-.tars-dual-list li::before{content:"→";position:absolute;left:0;color:var(--orange);font-weight:700}
+.tars-dual-list li::before{content:"→";position:absolute;left:0;color:var(--tars-terra);font-weight:700}
 .tars-dual-card-alt .tars-dual-list li{color:rgba(242,240,235,0.75)}
-.tars-dual-card-alt .tars-dual-list li::before{color:#ff7a2e}
-.tars-areas{background:var(--bg2);padding:clamp(3rem,6vw,5rem) 7vw;border-top:1px solid var(--border)}
+.tars-dual-card-alt .tars-dual-list li::before{color:var(--tars-terra-light)}
+.tars-areas{background:var(--white);padding:clamp(3rem,6vw,5rem) 7vw;border-top:1px solid var(--border)}
 .tars-areas-inner{max-width:1100px;margin:0 auto}
 .tars-section-head{margin-bottom:2.5rem}
-.tars-eyebrow{display:inline-block;font-family:'Fira Code',monospace;font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:0.9rem}
-.tars-section-h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2.3rem);line-height:1.12;letter-spacing:-0.03em;color:var(--ink)}
+.tars-eyebrow{display:inline-block;font-family:'Fira Code',monospace;font-size:0.9rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--tars-terra);margin-bottom:1.1rem;font-weight:500}
+.tars-section-h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.9rem,3.6vw,2.9rem);line-height:1.1;letter-spacing:-0.03em;color:var(--ink)}
 .tars-areas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
-.tars-area{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1.8rem 1.7rem;transition:transform .2s ease,box-shadow .2s ease}
+.tars-area{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:1.8rem 1.7rem;transition:transform .2s ease,box-shadow .2s ease}
 .tars-area:hover{transform:translateY(-3px);box-shadow:0 12px 34px rgba(26,25,22,0.09)}
 .tars-area-ico{font-size:1.7rem;margin-bottom:0.9rem}
 .tars-area-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-0.02em;color:var(--ink);margin-bottom:0.5rem}
@@ -585,9 +585,9 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
     <div style="max-width:940px;margin:0 auto;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
         <span style="width:8px;height:8px;border-radius:2px;background:var(--orange);display:inline-block;"></span>
-        <span style="font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);">Calculadora de tiempo recuperado</span>
+        <span style="font-family:'Fira Code',monospace;font-size:14px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--orange);">Calculadora de tiempo recuperado</span>
       </div>
-      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;line-height:1.03;letter-spacing:-0.03em;margin:0 0 12px;color:var(--ink);">
+      <h2 style="font-family:'Syne',sans-serif;font-size:clamp(32px,5.5vw,52px);font-weight:800;line-height:1.03;letter-spacing:-0.03em;margin:0 0 12px;color:var(--ink);">
         ¿Cuánto tiempo te devuelve<br>ordenar tu operación?
       </h2>
       <p style="font-size:16px;line-height:1.6;color:var(--ink2);max-width:560px;margin:0 0 30px;">
@@ -880,7 +880,7 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
         <div class="tars-area">
           <div class="tars-area-ico">⚙️</div>
           <div class="tars-area-name">Procesos &amp; Operaciones</div>
-          <div class="tars-area-desc">Automatización de tareas administrativas repetitivas y rediseño de flujos para que el equipo foco en lo importante.</div>
+          <div class="tars-area-desc">Automatización de tareas administrativas repetitivas y rediseño de flujos para que el equipo se enfoque en lo importante.</div>
         </div>
       </div>
     </div>
@@ -1061,8 +1061,8 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 </div><!-- /#app -->
 
 <script>
-var pages = ['home','soluciones','proceso','productos','nosotros','contacto'];
-var navLabels = {soluciones:'soluciones',proceso:'proceso',productos:'productos',nosotros:'nosotros',contacto:'contacto'};
+var pages = ['home','soluciones','proceso','productos','tars','nosotros','contacto'];
+var navLabels = {soluciones:'soluciones',proceso:'proceso',productos:'productos',tars:'tars',nosotros:'nosotros',contacto:'contacto'};
 function openMenu(){
   document.getElementById('mobile-menu').classList.add('open');
 }
