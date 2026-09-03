@@ -15,7 +15,7 @@
   --line:#dde3e7; --line-2:#c6cfd6;
   --accent:#b3282d; --accent-bg:#fdf2f2; --accent-line:#e9c3c4; --accent-dark:#8f1f24;
   --accent-rail:#f28b8f;
-  --rail-bg:#b3282d; --rail-dim:rgba(255,255,255,.62);
+  --rail-bg:#8c3236; --rail-dim:rgba(255,255,255,.58);
   --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
   --pos:#1a6b47; --neg:#b02a2a;
   --mono:'IBM Plex Mono',monospace;
@@ -32,7 +32,7 @@ input,select{font:inherit;color:inherit}
    A deep, desaturated version of the export red rather than near-black, so the
    two reds in the interface read as one family. Rows are cards with room to
    breathe instead of a dense checklist. */
-.rail{width:296px;flex-shrink:0;background:var(--rail-bg);color:#fff;
+.rail{width:296px;flex-shrink:0;background:var(--rail-bg);color:var(--rail-ink,#fff);
   display:flex;flex-direction:column;overflow:hidden;
   box-shadow:inset -1px 0 0 rgba(255,255,255,.06)}
 .rail-head{padding:24px 22px 20px;border-bottom:1px solid rgba(255,255,255,.09)}
@@ -54,11 +54,11 @@ input,select{font:inherit;color:inherit}
 .slot.on{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.26)}
 .slot-mark{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.45);border-radius:5px;flex-shrink:0;
   margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .15s}
-.slot.on .slot-mark{background:#fff;border-color:#fff;color:var(--rail-bg);font-weight:700}
+.slot.on .slot-mark{background:var(--rail-ink,#fff);border-color:var(--rail-ink,#fff);color:var(--rail-bg);font-weight:700}
 .slot.req .slot-mark{border-color:rgba(255,255,255,.5);border-style:dashed}
 .slot-txt{flex:1;min-width:0}
-.slot-name{font-size:12.5px;font-weight:450;line-height:1.35;color:rgba(255,255,255,.86)}
-.slot.on .slot-name{color:#fff;font-weight:500}
+.slot-name{font-size:12.5px;font-weight:450;line-height:1.35;color:var(--rail-ink,#fff);opacity:.86}
+.slot.on .slot-name{opacity:1;font-weight:500}
 .slot-meta{font-family:var(--mono);font-size:9.5px;color:var(--rail-dim);margin-top:3px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slot.on .slot-meta{color:rgba(255,255,255,.66)}
@@ -68,13 +68,18 @@ input,select{font:inherit;color:inherit}
   font-size:12px;font-weight:500;margin-bottom:11px;border:1px solid rgba(255,255,255,.14);
   transition:background .14s}
 .btn-save:hover{background:rgba(255,255,255,.2)}
+.btn-clear{background:none;border-color:rgba(255,255,255,.18);opacity:.8}
+.btn-clear:hover{background:rgba(255,255,255,.12);opacity:1}
 .btn-save:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .slot.saved .slot-mark{border-color:rgba(255,255,255,.4);color:#fff;font-size:11px}
+.slot-act{background:none;border:0;color:var(--rail-ink,#fff);opacity:.55;font-size:15px;
+  padding:0 4px;line-height:1;cursor:pointer}
+.slot-act:hover{opacity:1}
 .slot-x{opacity:0;color:var(--rail-dim);font-size:15px;padding:0 4px;line-height:1;transition:opacity .12s}
 .slot.saved:hover .slot-x{opacity:1}
 .slot-x:hover{color:#fff}
 .status{font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--rail-dim);letter-spacing:.03em}
-.status b{color:#fff;font-weight:500}
+.status b{color:var(--rail-ink,#fff);font-weight:500}
 .status .ok{color:#d6f0dd}
 
 /* ── MAIN ── */
@@ -157,14 +162,58 @@ input,select{font:inherit;color:inherit}
 /* ── FIELD GRID ── */
 .f-hint{font-size:11px;color:var(--ink-3);line-height:1.45;margin-top:4px}
 .prose-block{white-space:normal;line-height:1.65;max-height:none;overflow:visible}
+.note-warn{border-left:3px solid var(--accent);background:var(--accent-bg)}
 .note code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);
   padding:2px 6px;border-radius:3px;display:inline-block;margin:4px 0;line-height:1.7}
+.ins{display:flex;flex-direction:column;gap:0}
+.ins-r{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+.ins-r:last-child{border-bottom:0}
+.ins-tag{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-line);
+  padding:3px 7px;border-radius:4px;flex-shrink:0;min-width:92px;text-align:center}
+.ins-t{font-size:13px;line-height:1.55;color:var(--ink-1)}
+.ticker{display:flex;align-items:center;gap:12px;background:var(--accent-bg);
+  border:1px solid var(--accent-line);border-radius:9px;padding:11px 16px;margin-bottom:16px}
+.ticker.done{background:var(--surface-2);border-color:var(--line)}
+.tick-tag{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  background:var(--accent);color:#fff;padding:3px 8px;border-radius:4px;flex-shrink:0;transition:opacity .2s}
+.ticker.done .tick-tag{background:var(--ink-3)}
+.tick-t{flex:1;font-size:13px;line-height:1.45;transition:opacity .2s;min-width:0}
+.tick-n{font-family:var(--mono);font-size:10px;color:var(--ink-3);flex-shrink:0}
+.tick-dots{display:flex;gap:3px;flex-shrink:0}
+.tick-dots i{width:5px;height:5px;border-radius:50%;background:var(--accent-line);transition:background .2s}
+.tick-dots i.on{background:var(--accent)}
+.tl{display:flex;gap:0;padding:20px 22px 8px;overflow-x:auto}
+.tl-s{flex:1;min-width:96px;position:relative;text-align:center;padding:0 4px}
+.tl-s::before{content:"";position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--line-2)}
+.tl-s:first-child::before{display:none}
+.tl-s.done::before{background:var(--accent)}
+.tl-dot{width:27px;height:27px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:600;position:relative;z-index:1;
+  background:var(--surface);border:2px solid var(--line-2);color:var(--ink-3)}
+.tl-s.done .tl-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.tl-s.doing .tl-dot{border-color:var(--accent);color:var(--accent);
+  box-shadow:0 0 0 4px var(--accent-bg)}
+.tl-s.na .tl-dot{opacity:.4}
+.tl-lab{font-size:11px;line-height:1.35;color:var(--ink-2)}
+.tl-s.done .tl-lab,.tl-s.doing .tl-lab{color:var(--ink);font-weight:500}
+.tl-s.na .tl-lab{opacity:.45}
+.tl-note{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:3px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rail-theme{margin-top:12px;width:100%;background:rgba(255,255,255,.12);color:var(--rail-ink,#fff);
+  border:1px solid rgba(255,255,255,.2);border-radius:7px;font-size:11px;padding:5px 8px;
+  font-family:var(--mono);letter-spacing:.06em}
+.rail-theme option{color:#16191d}
 .mini-btn{font:inherit;font-size:11.5px;padding:5px 12px;border:1px solid var(--line);
   background:#fff;border-radius:3px;cursor:pointer;color:var(--ink-1);white-space:nowrap}
 .mini-btn:hover{border-color:var(--accent);color:var(--accent)}
 .mini-btn.solid{background:var(--accent);color:#fff;border-color:var(--accent);padding:8px 18px;font-size:12px}
 .mini-btn.solid:hover{opacity:.9;color:#fff}
-.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:0 26px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:0 26px;align-items:start}
+/* labels can run to two lines; the inputs still sit on one baseline */
+.fgrid .f{display:flex;flex-direction:column}
+.fgrid .f-l{min-height:26px;align-items:flex-start}
+.fgrid .f input,.fgrid .f select{margin-top:auto}
 .f{padding:11px 0;border-bottom:1px solid var(--line)}
 .f-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px;display:flex;align-items:center;gap:5px}
 .f-src{font-size:8px;padding:1px 4px;border-radius:2px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-3);letter-spacing:.05em}
@@ -258,7 +307,11 @@ input,select{font:inherit;color:inherit}
 .filters{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:13px 16px;margin-bottom:20px;
   display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .filters label{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-right:-4px}
-.filters select{background:var(--surface-2);border:1px solid var(--border2);border-radius:3px;font-size:12px;padding:5px 8px;outline:none;color:var(--ink)}
+.filters select{background:var(--surface-2);border:1px solid var(--border2);border-radius:5px;font-size:12px;
+  padding:5px 8px;outline:none;color:var(--ink)}
+.filters select[multiple]{padding:3px;min-width:150px;max-width:210px;border-radius:6px}
+.filters select[multiple] option{padding:3px 6px;border-radius:3px}
+.filters select[multiple] option:checked{background:var(--accent-bg);color:var(--accent);font-weight:600}
 .filters select:focus{border-color:var(--accent)}
 .f-count{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
 .f-count b{color:var(--accent)}
@@ -270,7 +323,11 @@ input,select{font:inherit;color:inherit}
 .corr-x{color:var(--ink-3);flex-shrink:0}
 .corr-track{flex:1;height:14px;background:var(--surface-2);border-radius:2px;overflow:hidden}
 .corr-fill{height:100%;background:var(--accent);border-radius:2px}
-.corr-v{width:64px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex-shrink:0}
+.corr-v,.rate-v{display:flex;justify-content:flex-end;gap:10px;font-family:var(--mono);
+  font-size:11px;color:var(--ink-2);flex-shrink:0;font-variant-numeric:tabular-nums}
+.corr-v{width:78px}
+.corr-n{min-width:34px;text-align:right}
+.corr-p{min-width:34px;text-align:right;color:var(--ink-3)}
 .cyc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
 .cyc-b{text-align:center;padding:14px 8px;background:var(--surface-2);border-radius:4px}
 .cyc-n{font-family:var(--cond);font-size:26px;font-weight:700;line-height:1}
@@ -281,7 +338,10 @@ input,select{font:inherit;color:inherit}
 .rate-l{width:150px;flex-shrink:0;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rate-track{flex:1;height:14px;background:var(--surface-2);border-radius:2px;overflow:hidden;display:flex}
 .rate-seg{height:100%}
-.rate-v{width:88px;text-align:right;font-family:var(--mono);font-size:10.5px;flex-shrink:0}
+.rate-v{width:96px;font-size:10.5px}
+.rate-key{display:flex;gap:16px;margin-top:10px;font-size:10.5px;color:var(--ink-3);flex-wrap:wrap}
+.rate-key span{display:flex;align-items:center;gap:5px}
+.rate-key i{width:9px;height:9px;border-radius:2px;display:inline-block}
 .basis{font-family:var(--mono);font-size:9px;color:var(--ink-3);margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
 .dbtag{font-family:var(--mono);font-size:10px;color:var(--ink-3);padding:5px 20px 14px}
 ::-webkit-scrollbar{width:9px;height:9px}
@@ -298,6 +358,11 @@ input[type=file]{display:none}
   <div class="rail-head">
     <div class="rail-title">Localization Centre</div>
     <div class="rail-sub">Management &amp; Analytics</div>
+      <select class="rail-theme" onchange="setTheme(this.value)" title="Panel colour">
+        <option value="brick">Brick</option><option value="skin">Skin</option>
+        <option value="slate">Slate</option><option value="charcoal">Charcoal</option>
+        <option value="forest">Forest</option><option value="navy">Navy</option>
+      </select>
   </div>
   <div class="rail-scroll">
     <div class="rail-sec">Required</div>
@@ -308,6 +373,7 @@ input[type=file]{display:none}
   <div id="saved"></div>
   <div class="rail-foot">
     <button class="btn-save" id="btn-save" onclick="saveCase()">Save case</button>
+    <button class="btn-save btn-clear" onclick="clearCase()">Clear case</button>
     <div id="status" class="status">No files loaded</div>
   </div>
 </aside>
@@ -483,14 +549,34 @@ const REGISTRY={
         {label:"Early retirement discount per year",type:"percent",need:0},
         {label:"Basis and assumptions used",type:"text",need:0}
       ]},
-      {name:"Part III-B — Estimated OHC offset",
+      {name:"Part III-B — Vesting and EMPP recognition",
+       note:"Whether prior service is recognized in the new home country plan turns on what happens to "+
+            "the origin country benefit. Answer each question separately rather than giving an overall "+
+            "verdict; the system works the verdict out and shows its reasoning.",
+       fields:[
+        {label:"Is the employee vested in the OHC pension plan?",type:"yesno",need:1},
+        {label:"Vesting criteria applied",type:"text",need:1,
+         help:"What the plan requires for vesting — years of service, age, plan entry date — and where "+
+              "this employee stands against it."},
+        {label:"Does the plan require distribution on leaving the affiliate?",type:"yesno",need:1,
+         help:"A Yes rules out recognition in the US EMPP."},
+        {label:"Has the employee elected to take distribution?",type:"yesno",need:1,
+         help:"A Yes rules out recognition in the US EMPP."},
+        {label:"Will the benefit be transferred out of the OHC plan before or at localization?",type:"yesno",need:1,
+         help:"A Yes rules out recognition in the US EMPP."},
+        {label:"Does the OHC plan retain the benefit?",type:"yesno",need:1,
+         help:"Not distributed and not transferred. Needed for recognition to be possible."},
+        {label:"Will the employee receive a future vested benefit from the OHC plan?",type:"yesno",need:0,
+         help:"If they will, the US EMPP generally credits the service and applies an offset for it."}
+      ]},
+      {name:"Part III-C — Estimated OHC offset",
        note:"Only if Part III-A is not supplied. Amounts in the original home country currency.",
        fields:[
         {label:"Estimated OHC offset — retirement at age 55",alt:["OHC Offset Amount @ Age 55"],type:"money",need:0},
         {label:"Estimated OHC offset — retirement at age 58",alt:["OHC Offset Amount @ Age 58"],type:"money",need:0},
         {label:"Estimated OHC offset — retirement at age 60",alt:["OHC Offset Amount @ Age 60"],type:"money",need:0}
       ]},
-      {name:"Part III-C — EMPP affiliate service",
+      {name:"Part III-D — EMPP affiliate service",
        note:"Required by Nova for the pension counselling session.",
        fields:[
         {label:"Affiliate Pension Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"},
@@ -790,7 +876,14 @@ function writeStyledXlsx(sheetName,rows,cols,merges,freeze,filename){
    exactly what the system reads back. Case identity is pre-filled and locked
    in wording, leaving the vendor only their own fields to complete. */
 
-const caseSeed={name:"",ohc:"",nhc:"",type:"Full Localization",cl:"",pernrOHC:"",pernrNHC:""};
+const caseSeed={name:"",ohc:"",nhc:"",type:"",cl:"",pernrOHC:"",pernrNHC:""};
+let seedFor=null;
+/* Values typed for one employee must not carry into the next; the moment the
+   loaded case changes, anything typed is dropped and the files speak again. */
+function seedGuard(d){
+  const who=d?(String(d.pid||"")+"|"+String(d.name||"")):null;
+  if(who&&seedFor!==who){ seedFor=who; Object.keys(caseSeed).forEach(k=>caseSeed[k]=""); }
+}
 
 const TYPE_HINT={number:"number",percent:"percent, e.g. 1.5%",money:"amount",
   date:"date",yesno:"Yes / No",text:"text",choice:""};
@@ -914,6 +1007,7 @@ function genAllTemplates(){
    again — the fields below are only for what is still blank. */
 function seedAuto(){
   const d=(F.req||F.sf)?(D=resolve()):null;
+  seedGuard(d);
   if(!d)return {};
   return {
     name:d.name||"", ohc:d.ohc||"", nhc:d.nhc||"", type:d.locType||"",
@@ -1007,7 +1101,8 @@ const SLOTS=[
   {id:"gcbd",name:"GC&BD information data request",  req:1, hint:"SBR, pension, offset, DC plans"},
   {id:"comp",name:"Compensation data request",       req:1, hint:"NHC salary and pay scale"},
   {id:"exec",name:"Exec compensation data request",  req:1, hint:"CL 30 and above only"},
-  {id:"tax", name:"Deloitte income tax estimate",    req:0, hint:"OHC and NHC estimated income tax"}
+  {id:"tax", name:"Deloitte income tax estimate",    req:0, hint:"OHC and NHC estimated income tax"},
+  {id:"db",  name:"Case tracker / database",          req:0, hint:"Full Tracker.xlsx — progress and analytics", db:1}
 ];
 
 const F={};       // raw parsed pairs per slot
@@ -1419,8 +1514,7 @@ function resolve(){
   /* GC&BD templates ship with "Select Yes/No" in the cell; an unreturned answer
      is not a No, so it is treated as unanswered and the offset stays blank. */
   if(/^select\s*yes\s*\/?\s*no$/i.test(d.offset)||/^(n\/?a|tbc|tbd|-)$/i.test(d.offset))d.offset="";
-  if(overrides.offset)d.offset=overrides.offset;
-  d.offsetSrc = overrides.offset?"entered by hand":(d.offset?"GC&BD":null);
+  d.offsetStated=d.offset;
   d.retAgeG= gAge("Normal retirement age","Normal Retirement Age");
   d.earlyRet = gAge("Early retirement age");
   d.planStatus = gS("Plan status");
@@ -1440,6 +1534,39 @@ function resolve(){
     f60:gN("Discount factor at age 60")
   };
   d.offsetBasis = gS("Basis and assumptions used");
+
+  /* ── Vesting and EMPP recognition ──────────────────────────────────────
+     Whether the U.S. plan credits prior home country service is not one
+     question but several, and the answers point in a definite direction:
+     a benefit that is paid out or moved cannot be credited, and one the plan
+     keeps can be. GC&BD answer each question; the verdict is worked out here
+     so the reasoning is visible rather than buried in someone's judgement. */
+  const yn=v=>{const t=String(v??"").trim();
+    if(!t||/^select|^n\/?a$|^tbc$|^tbd$/i.test(t))return null;
+    return /^y/i.test(t)?true:/^n/i.test(t)?false:null;};
+  d.vest={
+    vested:      yn(gS("Is the employee vested in the OHC pension plan?")),
+    criteria:    gS("Vesting criteria applied"),
+    mustDistrib: yn(gS("Does the plan require distribution on leaving the affiliate?")),
+    electDistrib:yn(gS("Has the employee elected to take distribution?")),
+    transfersOut:yn(gS("Will the benefit be transferred out of the OHC plan before or at localization?")),
+    retains:     yn(gS("Does the OHC plan retain the benefit?")),
+    futureBenefit:yn(gS("Will the employee receive a future vested benefit from the OHC plan?"))
+  };
+  d.empp=emppVerdict(d.vest);
+
+  /* The recognition answer: GC&BD's own if they gave one, otherwise worked out
+     from the questions above, and always overridable. */
+  if(!d.offsetStated&&d.empp.state!=="unknown")d.offset=d.empp.state==="yes"?"Yes":"No";
+  d.offsetDerived=!d.offsetStated&&!!d.offset;
+  if(overrides.offset)d.offset=overrides.offset;
+  d.offsetSrc = overrides.offset?"entered by hand"
+    :(d.offsetDerived?"worked out from Part III-B"
+    :(d.offset?"GC&BD":null));
+  /* a stated answer that disagrees with the detail behind it is worth saying */
+  d.offsetClash=(d.offsetStated&&!overrides.offset&&d.empp.state!=="unknown"&&
+    (/^y/i.test(d.offsetStated)?"yes":"no")!==d.empp.state)
+    ?{stated:d.offsetStated,derived:d.empp.state}:null;
   d.gc={
     planStatus:gS("Plan status"),
     entry:gS("Plan entry date"),
@@ -1518,6 +1645,28 @@ function resolve(){
   const tS=(...k)=>pickStrict("tax",...k)??pick("tax",...k);
   d.taxOHCDel = num(tS("Estimated annual income tax — original home country","Original Home Country","Estimated Income Tax OHC"));
   d.taxNHCDel = num(tS("Estimated annual income tax — new home country","New Home Country","Estimated Income Tax NHC"));
+  /* Deloitte lay their sheet out by country rather than by our wording: an
+     "Income tax" heading with a row per country beneath it. Read that shape too,
+     matching on the country names this case actually uses. */
+  if(d.taxOHCDel===null||d.taxNHCDel===null){
+    const g=F.tax&&F.tax.grids;
+    if(g)for(const sh of Object.keys(g)){
+      const rows=g[sh]; if(!rows)continue;
+      let inTax=false;
+      for(const r of rows){
+        if(!r)continue;
+        const lab=String(r.find(c=>typeof c==="string")??"").trim();
+        if(/^income\s*tax/i.test(lab)){ inTax=true; continue; }
+        if(!inTax)continue;
+        if(/^(compensation|employee information|province|state)/i.test(lab))break;
+        const val=num(r.slice(1).find(c=>c!==null&&c!==""&&num(c)!==null));
+        if(val===null)continue;
+        const L=canonCountry(lab);
+        if(d.taxOHCDel===null&&L&&d.ohc&&norm(L)===norm(d.ohc))d.taxOHCDel=val;
+        if(d.taxNHCDel===null&&L&&d.nhc&&norm(L)===norm(d.nhc))d.taxNHCDel=val;
+      }
+    }
+  }
   d.taxAssump = tS("Assumptions applied");
 
   /* -- NHC plan rules -- */
@@ -1652,8 +1801,14 @@ function resolve(){
   d.taxeqFromMatrix = fullLoc;
   d.taxOHCSrc = fullLoc?"TMO hypothetical tax":"Deloitte";
   d.taxOHC    = fullLoc ? d.hypoTax : d.taxOHCDel;
-  d.taxNHCSrc = d.intoUS?"paycheck calculator, by hand":"Deloitte";
-  d.taxNHC    = d.intoUS ? null : d.taxNHCDel;
+  /* Into the U.S. the figure comes from the paycheck calculator. If Deloitte
+     happened to supply one anyway, it is used rather than left blank, and the
+     source says so. */
+  d.taxNHC    = d.intoUS ? (d.taxNHCDel ?? null) : d.taxNHCDel;
+  d.taxNHCSrc = d.intoUS
+    ? (d.taxNHCDel!==null&&d.taxNHCDel!==undefined ? "Deloitte — replace with the calculator figure"
+                                                   : "paycheck calculator, by hand")
+    : "Deloitte";
 
   /* -- manual -- */
   d.hireDate=d.hireSF??null; d.life=80;
@@ -1783,6 +1938,26 @@ function planDefaults(country){
 
    Returns null when the parameters are not there, so the figure reads blank
    rather than as a confident zero. */
+/* Reads the answers and returns a verdict with the reason attached. */
+function emppVerdict(v){
+  if(!v)return {state:"unknown",why:"not asked"};
+  const blockers=[
+    [v.mustDistrib,"the plan requires distribution when the employee leaves the affiliate"],
+    [v.electDistrib,"the employee has elected to take distribution"],
+    [v.transfersOut,"the benefit is being transferred out before or at localization"]
+  ].filter(([x])=>x===true).map(([,w])=>w);
+  if(blockers.length)
+    return {state:"no",why:"Prior service cannot be recognized because "+blockers.join(", and ")+"."};
+  const answered=[v.mustDistrib,v.electDistrib,v.transfersOut,v.retains].every(x=>x!==null);
+  if(!answered)
+    return {state:"unknown",why:"GC&BD have not answered every question in Part III-B yet."};
+  if(v.retains===false)
+    return {state:"no",why:"The origin plan does not retain the benefit, so there is nothing for the U.S. plan to credit."};
+  return {state:"yes",
+    why:"The origin plan retains the benefit and nothing has been distributed or transferred, "+
+        "so the U.S. plan can credit the prior service and an offset applies."};
+}
+
 function ohcOffsetFormula(d,age,yearsToRet){
   const f=d.par||{}, sal=d.ohcSalary;
   if(sal===null||sal===undefined||d.yos===null||d.yos===undefined)return null;
@@ -2015,11 +2190,14 @@ function gate(d,c){
 /* ═══ RENDER ═══ */
 function railHTML(){
   const html=g=>SLOTS.filter(s=>s.req===g).map(s=>{
-    const on=!!F[s.id], m=FILEMETA[s.id];
+    const on=s.db?!!dbHandle:!!F[s.id];
+    const m=s.db?{n:dbHandle?dbName:(pendingDb?"click to reconnect "+pendingDb.name:"")}:FILEMETA[s.id];
     return `<div class="slot ${on?"on":""} ${s.req&&!on?"req":""}" onclick="pickFile('${s.id}')">
       <div class="slot-mark">${on?"✓":""}</div>
       <div class="slot-txt"><div class="slot-name">${s.name}</div>
-      <div class="slot-meta">${on?esc(m.n):s.hint}</div></div></div>`;
+      <div class="slot-meta">${on?esc(m.n):s.hint}</div></div>
+      ${s.db&&on?`<button class="slot-act" title="Reload from the file"
+        onclick="event.stopPropagation();refreshDb()">&#8635;</button>`:""}</div>`;
   }).join("");
   document.getElementById("slots-req").innerHTML=html(1);
   document.getElementById("slots-opt").innerHTML=html(0);
@@ -2032,6 +2210,259 @@ function railHTML(){
 }
 
 const PERF_CATS=["OPwD","OP","EP","VG","GP","NI","NSI"];
+
+
+
+/* ═══ INSIGHTS ═════════════════════════════════════════════════════════════
+   Observations the tracker supports, each stated with the count behind it so
+   the reader can judge the weight. Anything resting on too few cases is either
+   left out or says so; a portfolio of thirty does not carry a confident trend,
+   and dressing one up would be worse than saying nothing. */
+function insights(R,ALL){
+  const out=[], n=R.length;
+  if(!n)return out;
+  const pct=(a,b)=>Math.round(a/b*100);
+  const count=(f)=>R.filter(f).length;
+
+  /* concentration of the portfolio */
+  const pairs=tally(R,r=>{
+    const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
+    return a&&b?a+" \u2192 "+b:null;}).filter(([k])=>k);
+  if(pairs.length&&n>=8){
+    const [top,tv]=pairs[0];
+    if(tv/n>=.35)out.push({tag:"concentration",
+      t:`${top} accounts for ${pct(tv,n)}% of the selection (${tv} of ${n}). A change to that plan pair moves most of the portfolio.`});
+  }
+
+  /* where cases stop */
+  const stopped=R.filter(r=>["Cancelled","On hold"].includes(statusOf(r)));
+  if(stopped.length&&n>=8){
+    out.push({tag:"attrition",
+      t:`${stopped.length} of ${n} cases (${pct(stopped.length,n)}%) were cancelled or put on hold.`});
+    const sp=tally(stopped,r=>{
+      const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
+      return a&&b?a+" \u2192 "+b:null;}).filter(([k])=>k);
+    if(sp.length&&sp[0][1]>=2)out.push({tag:"attrition",
+      t:`Most of that sits on ${sp[0][0]} — ${sp[0][1]} of the ${stopped.length} stopped cases.`});
+  }
+
+  /* the stage cases reach and stop at */
+  const live=R.filter(r=>statusOf(r)!=="Completed");
+  const stalls=new Map();
+  live.forEach(r=>{
+    const steps=(/resign/i.test(subtypeOf(r))?RR_STEPS:LOC_STEPS);
+    const open=steps.find(([col])=>{const st=stepState(r[col]);return st==="doing"||st==="todo";});
+    if(open)stalls.set(open[1],(stalls.get(open[1])||0)+1);
+  });
+  const st=[...stalls.entries()].sort((a,b)=>b[1]-a[1]);
+  if(st.length&&st[0][1]>=2)out.push({tag:"bottleneck",
+    t:`Of the ${live.length} cases not yet complete, ${st[0][1]} are sitting at ${st[0][0]} — the most common place to be waiting.`});
+
+  /* destination mix */
+  const us=count(r=>/united states|^us$/i.test(String(r["New Home Country"]||"").trim()));
+  if(n>=8)out.push({tag:"destination",
+    t:`${pct(us,n)}% of the selection localizes into the United States (${us} of ${n}), where the age 45 cut-off and the green card路 apply.`
+      .replace("路"," route")});
+
+  /* age against the cut-off */
+  const ages=R.map(r=>num(r["AGE"])).filter(v=>v!==null&&v>18&&v<75);
+  const near=ages.filter(a=>a>=43&&a<=45).length;
+  if(us>0&&near>0)out.push({tag:"cut-off",
+    t:`${near} case${near>1?"s":""} in this selection sit${near>1?"":"s"} at age 43 to 45. For a move into the U.S. these are the last years the employee remains localizable.`});
+
+  /* potential against the stated band */
+  const pots=R.map(r=>num(r["POTENTIAL"])).filter(v=>v!==null&&v>0);
+  if(pots.length>=5){
+    const below=pots.filter(v=>v<34).length;
+    if(below)out.push({tag:"potential",
+      t:`${below} of ${pots.length} cases carrying a potential rating fall below the 34 to 38 band, so they need the exception argued rather than assumed.`});
+  }
+
+  /* how much of the tracker is actually filled in */
+  const withPot=pots.length;
+  if(n>=10&&withPot/n<.5)out.push({tag:"data",
+    t:`Potential is recorded on only ${withPot} of ${n} cases, so any read on candidate quality here is partial.`});
+
+  /* green card, for U.S. moves */
+  const usRows=R.filter(r=>/united states|^us$/i.test(String(r["New Home Country"]||"").trim()));
+  const gc=usRows.filter(r=>stepState(r["U.S. Green Card Initiation"])==="done").length;
+  if(usRows.length>=5)out.push({tag:"immigration",
+    t:`Green card initiation is recorded as done on ${gc} of the ${usRows.length} U.S. moves in this selection.`});
+
+  /* volume shift, only when both years are genuinely present */
+  const byYear=tally(ALL,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
+    .sort((a,b)=>a[0]-b[0]);
+  if(byYear.length>=2){
+    const [py,pv]=byYear[byYear.length-2], [cy,cv]=byYear[byYear.length-1];
+    if(pv>=5)out.push({tag:"volume",
+      t:`${cy} carries ${cv} cases against ${pv} in ${py}${cv<pv?" — the year is not over, so a fall part-way through is expected":""}.`});
+  }
+
+  if(n<8)out.push({tag:"sample",
+    t:`Only ${n} case${n>1?"s":""} in this selection. Too few to read a pattern from; widen the filters.`});
+  return out;
+}
+
+/* ═══ WHAT IS OUTSTANDING ═══════════════════════════════════════════════════
+   Everything the case is still waiting on, gathered from the places it can
+   hide: files not loaded, figures not supplied, questions not answered, and
+   stages the tracker still shows as open. */
+function pendingItems(d,c){
+  const out=[];
+  if(!d)return out;
+
+  SLOTS.filter(s=>s.req&&!F[s.id]&&!s.db).forEach(s=>
+    out.push({tag:"file",t:`${s.name} has not been loaded.`}));
+
+  const miss=[];
+  if(d.nhcSalary===null||d.nhcSalary===undefined)miss.push("new home country salary");
+  if(d.fx===null&&d.ohcCcy!==d.nhcCcy)miss.push("exchange rate");
+  if(d.taxOHC===null||d.taxOHC===undefined)miss.push("income tax in "+(d.ohc||"the origin country"));
+  if(d.taxNHC===null||d.taxNHC===undefined)miss.push("income tax in "+(d.nhc||"the new home country"));
+  if(d.locType==="Full Localization"&&(d.homeTax===null||d.hostTax===null))miss.push("tax equalization from the cost matrix");
+  miss.forEach(m=>out.push({tag:"figure",t:`Waiting on the ${m}.`}));
+
+  if(d.empp&&d.empp.state==="unknown")
+    out.push({tag:"GC&BD",t:"Part III-B is not fully answered, so recognition of prior service is undecided."});
+  if(d.offsetClash)
+    out.push({tag:"GC&BD",t:"GC&BD's answer on prior service disagrees with the detail behind it."});
+  if(d.parFromDefaults&&d.parFromDefaults.length)
+    out.push({tag:"GC&BD",t:`${d.parFromDefaults.length} pension parameter${d.parFromDefaults.length>1?"s are":" is"} still a country default, not confirmed for this case.`});
+  if(!d.immStrategy)
+    out.push({tag:"BAL",t:"The immigration strategy has not been pasted in; it goes to both approvers."});
+
+  const nv=(R_NOVA||[]).filter(r=>r.pending);
+  if(nv.length)out.push({tag:"Nova",t:`${nv.length} field${nv.length>1?"s":""} the Nova report needs ${nv.length>1?"are":"is"} still blank.`});
+
+  const row=trackerRow(d);
+  if(row){
+    const rr=/resign/i.test(subtypeOf(row));
+    const open=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>({label,state:stepState(row[col])}))
+      .filter(x=>x.state==="doing"||x.state==="todo");
+    if(open.length)out.push({tag:"stage",t:`Next stage in the tracker: ${open[0].label}.`});
+    const act=row["Action Required Notes"];
+    if(act&&String(act).trim())out.push({tag:"action",t:String(act).trim().slice(0,160)});
+  }
+  return out;
+}
+
+let R_NOVA=null, tickTimer=null;
+function tickerHTML(d,c){
+  const items=pendingItems(d,c);
+  if(!items.length)return `<div class="ticker done"><span class="tick-tag">clear</span>
+    <span class="tick-t">Nothing outstanding on this case.</span></div>`;
+  return `<div class="ticker">
+    <span class="tick-tag" id="tick-tag">${esc(items[0].tag)}</span>
+    <span class="tick-t" id="tick-t">${esc(items[0].t)}</span>
+    <span class="tick-n">${items.length} outstanding</span>
+    <div class="tick-dots">${items.map((_,i)=>`<i class="${i===0?"on":""}"></i>`).join("")}</div>
+  </div>`;
+}
+/* Cycles the messages after the view is in the DOM. One timer only, replaced
+   on every render, so nothing keeps running against a screen that is gone. */
+function startTicker(d,c){
+  if(tickTimer){clearInterval(tickTimer);tickTimer=null;}
+  const items=pendingItems(d,c);
+  if(items.length<2)return;
+  let i=0;
+  tickTimer=setInterval(()=>{
+    const tag=document.getElementById("tick-tag"), txt=document.getElementById("tick-t");
+    if(!tag||!txt){clearInterval(tickTimer);tickTimer=null;return;}
+    i=(i+1)%items.length;
+    txt.style.opacity=0; tag.style.opacity=0;
+    setTimeout(()=>{
+      tag.textContent=items[i].tag; txt.textContent=items[i].t;
+      txt.style.opacity=1; tag.style.opacity=1;
+      document.querySelectorAll(".tick-dots i").forEach((el,n)=>el.classList.toggle("on",n===i));
+    },220);
+  },4200);
+}
+
+/* ═══ CASE TIMELINE ════════════════════════════════════════════════════════
+   The tracker records each stage of the process in its own column. Matching the
+   loaded case to its tracker row turns those columns into a position: what is
+   done, what is next, what has not started. */
+const LOC_STEPS=[
+  ["U.S. Green Card Initiation","Green card"],
+  ["Business Case","Business case"],
+  ["Immigration strategy","Immigration"],
+  ["Economic Analysis","Economic analysis"],
+  ["Preliminary review","Preliminary review"],
+  ["Employee Offer","Employee offer"],
+  ["Nova / Deloitte authorization","Nova / Deloitte"],
+  ["Final Approval","Final approval"],
+  ["Implementation Note","Implementation note"]
+];
+const RR_STEPS=[
+  ["Business case template","Business case"],
+  ["Template completion","Template completion"],
+  ["GC&BD Review","GC&BD review"],
+  ["Implementation note","Implementation note"]
+];
+
+/* A stage cell reads as done, in flight, not applicable, or untouched. */
+function stepState(v){
+  const t=String(v??"").trim();
+  if(!t)return "todo";
+  if(/^n\/?a$/i.test(t))return "na";
+  if(/^(y|yes|done|complete|completed|sent|approved|x)$/i.test(t))return "done";
+  if(/pending|progress|await|tbd|hold/i.test(t))return "doing";
+  return "done";                               /* a date or a note means it happened */
+}
+
+/* Find this employee in the tracker. Person ID is the reliable key; the name is
+   a fallback, and both are compared loosely because the tracker writes
+   "Surname, Firstname" while SuccessFactors writes them the other way round. */
+function trackerRow(d){
+  if(!DB||!DB.length||!d)return null;
+  const pid=String(d.pid??"").replace(/^0+/,"");
+  if(pid){
+    const byId=DB.find(r=>[r["Central Person ID"],r["Original Home"],r["New Home Country"]]
+      .some(v=>String(v??"").replace(/^0+/,"")===pid));
+    if(byId)return byId;
+  }
+  const parts=norm(d.name||"").split(" ").filter(Boolean);
+  if(parts.length<2)return null;
+  const first=parts[0], last=parts[parts.length-1];
+  return DB.find(r=>{
+    const n=norm(r["Full Name"]||"");
+    return n.includes(last)&&n.includes(first);
+  })||null;
+}
+
+function timelineHTML(d){
+  const row=trackerRow(d);
+  if(!DB||!DB.length)return `<div class="panel"><div class="panel-h"><div class="panel-t">Progress</div>
+    <div class="panel-n">no tracker linked</div></div>
+    <div class="note">Link the tracker on the left to see where this case stands.</div></div>`;
+  if(!row)return `<div class="panel"><div class="panel-h"><div class="panel-t">Progress</div>
+    <div class="panel-n">not found in the tracker</div></div>
+    <div class="note">No row in the tracker matches ${esc(d.name||"this employee")}${d.pid?` (person ID ${esc(d.pid)})`:""}.
+    A case that has not been logged yet will not appear until it is added.</div></div>`;
+
+  const rr=/resign/i.test(subtypeOf(row));
+  const steps=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>({label,raw:row[col],state:stepState(row[col])}));
+  const live=steps.filter(x=>x.state!=="na");
+  const done=live.filter(x=>x.state==="done").length;
+  const nextUp=live.find(x=>x.state!=="done");
+
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Progress</div>
+      <div class="panel-n">${done} of ${live.length} stages &middot; ${esc(statusOf(row))}</div></div>
+    <div class="tl">${steps.map((x,i)=>`
+      <div class="tl-s ${x.state}">
+        <div class="tl-dot">${x.state==="done"?"&#10003;":x.state==="na"?"&ndash;":i+1}</div>
+        <div class="tl-lab">${esc(x.label)}</div>
+        ${x.raw&&!/^(y|yes)$/i.test(String(x.raw).trim())&&!/^n\/?a$/i.test(String(x.raw).trim())
+          ?`<div class="tl-note">${esc(dOnly(x.raw)??String(x.raw)).slice(0,40)}</div>`:""}
+      </div>`).join("")}</div>
+    <div class="note">${nextUp
+      ? `Next: <strong>${esc(nextUp.label)}</strong>.`
+      : `Every stage on this case is recorded as done.`}
+      ${row["Action Required Notes"]?`<br><strong>Action noted in the tracker.</strong> ${esc(String(row["Action Required Notes"]).slice(0,300))}`:""}</div>
+  </div>`;
+}
+
 function fieldsHTML(d){
   const f=(l,v,src)=>`<div class="f"><div class="f-l">${l}${src?`<span class="f-src">${src}</span>`:""}</div><div class="f-v">${v??"—"}</div></div>`;
   /* The hint sits under the field rather than inside it: a placeholder longer
@@ -2189,6 +2620,14 @@ function clearOv(key){ delete overrides["calc:"+key]; render(); }
 
 /* What each file actually yielded. Most "wrong" figures are missing inputs,
    and without this there is no way to tell the two apart. */
+/* An origin-country figure is shown in its own currency and again converted, so
+   a number can be checked against the vendor file without arithmetic. */
+function both(d,v){
+  const a=fmt(v)+(d.ohcCcy?" "+d.ohcCcy:"");
+  if(!d.fx||!d.nhcCcy||d.ohcCcy===d.nhcCcy)return a;
+  return a+"  ·  "+fmt(v*d.fx)+" "+d.nhcCcy;
+}
+
 function diagHTML(d,c){
   const rows=[
     ["Employee name",d.name,"request form / SF"],
@@ -2196,7 +2635,7 @@ function diagHTML(d,c){
     ["New home country",d.nhc,d.nhcSrc==="file"?"vendor file":"SuccessFactors"],
     ["OHC PERNR",d.ohcPernr,"request form / TMO"],
     ["NHC PERNR",d.nhcPernr,"request form / TMO"],
-    ["OHC annual salary",d.ohcSalary!==null?fmt(d.ohcSalary)+" "+(d.ohcCcy||""):null,
+    ["OHC annual salary",d.ohcSalary!==null?both(d,d.ohcSalary):null,
       (d.ohcSalarySrc||"SuccessFactors")+(d.ohcSalaryConv?", converted":"")],
     ["NHC annual salary",d.nhcSalary!==null?fmt(d.nhcSalary)+" "+(d.nhcCcy||""):null,"Compensation"],
     ["Exchange rate",d.fx!==null?d.fx.toFixed(6):null,"TMO"],
@@ -2204,7 +2643,7 @@ function diagHTML(d,c){
     ["NHC benefits rate",d.nhcSBR!==null?pct(d.nhcSBR):null,"GC&BD"],
     ["Expatriate benefits",d.expatTotal!==null?fmt(d.expatTotal):null,"TMO"],
     ["Tax equalization",(d.homeTax!==null||d.hostTax!==null)?fmt((d.homeTax||0)+(d.hostTax||0)):null,"cost matrix, by hand"],
-    ["Income tax OHC",d.taxOHC!==null?fmt(d.taxOHC):null,d.taxOHCSrc||"Deloitte"],
+    ["Income tax OHC",d.taxOHC!==null?both(d,d.taxOHC):null,d.taxOHCSrc||"Deloitte"],
     ["Income tax NHC",d.taxNHC!==null?fmt(d.taxNHC):null,d.taxNHCSrc||"Deloitte"],
     ["Prior service recognised",d.offset||null,"GC&BD"],
     ["OHC offset @55",(c&&c.scen&&c.scen[55]&&c.scen[55].ohcOffset!==null&&c.scen[55].ohcOffset!==undefined)
@@ -2236,7 +2675,7 @@ function diagHTML(d,c){
   </div>`;
 }
 
-function gcbdHTML(d){
+function gcbdHTML(d,c){
   if(!F.gcbd)return "";
   const g=d.gc||{};
   const f=(l,v)=>`<div class="f"><div class="f-l">${l}</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
@@ -2251,6 +2690,9 @@ function gcbdHTML(d){
   const anyPar=Object.values(p).some(v=>v!==null&&v!==undefined&&v!=="");
   const fromD=new Set(d.parFromDefaults||[]);
   const tiered=String(p.method||"").toLowerCase().startsWith("tier");
+  const v=d.vest||{};
+  const fv=(l,b)=>`<div class="f"><div class="f-l">${l}<span class="f-src">GC&amp;BD</span></div>
+    <div class="f-v">${b===null||b===undefined?"—":(b?"Yes":"No")}</div></div>`;
   const fp=(l,key,v)=>`<div class="f"><div class="f-l">${l}${
     fromD.has(key)?`<span class="f-src">country default</span>`:(v===null||v===undefined||v===""?"":`<span class="f-src">GC&amp;BD</span>`)
   }</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
@@ -2309,7 +2751,7 @@ function gcbdHTML(d){
     <div class="note">${String(p.method||"").toLowerCase().startsWith("tier")
       ? `<strong>Tiered accrual</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
          <code>(rate&nbsp;1 &times; salary up to the cap &nbsp;+&nbsp; rate&nbsp;2 &times; salary above it) &times; years of service</code><br>
-         There is no age factor, so all three retirement ages return the same amount.`
+         The amount does not change with the age of retirement, so the three retirement scenarios all show the same figure. Only the age-discount shape varies by age.`
       : `<strong>Accrual with an age discount</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
          <code>multiplier &times; lump-sum factor &times; salary &times; (years of service + years to retirement)
          &times; the discount factor for that age</code><br>
@@ -2323,7 +2765,26 @@ function gcbdHTML(d){
       cases and are a starting point, not confirmation. Plan rules vary by plan, not only by country, so ask
       GC&amp;BD to state them for this case before the figures go into an endorsement.</div>`:""}`:""}
 
-    <div class="sub-h">Part III-B — Estimated OHC offset</div>
+    <div class="sub-h">Part III-B — Vesting and EMPP recognition</div>
+    <div class="panel-b"><div class="fgrid">
+      ${fv("Vested in the OHC plan",v.vested)}
+      ${fv("Plan requires distribution on leaving",v.mustDistrib)}
+      ${fv("Employee elected distribution",v.electDistrib)}
+      ${fv("Benefit transferred out",v.transfersOut)}
+      ${fv("Plan retains the benefit",v.retains)}
+      ${fv("Future vested benefit from the OHC plan",v.futureBenefit)}
+    </div></div>
+    ${v.criteria?`<div class="note"><strong>Vesting criteria.</strong> ${esc(String(v.criteria))}</div>`:""}
+    <div class="note ${d.empp.state==="no"?"note-warn":""}"><strong>${
+      d.empp.state==="yes"?"Prior service can be recognized."
+      :d.empp.state==="no"?"Prior service cannot be recognized."
+      :"Not yet determined."}</strong> ${esc(d.empp.why)}</div>
+    ${d.offsetClash?`<div class="note note-warn"><strong>The stated answer does not match.</strong>
+      GC&amp;BD answered <em>${esc(d.offsetClash.stated)}</em> to whether prior service is recognized, but the
+      questions above point to <em>${d.offsetClash.derived==="yes"?"yes":"no"}</em>. Worth settling before
+      the offset goes into an endorsement.</div>`:""}
+
+    <div class="sub-h">Part III-C — Estimated OHC offset</div>
     <div class="panel-b"><div class="fgrid">
       <div class="f"><div class="f-l">Prior service recognised in the NHC<span class="f-src">${esc(d.offsetSrc||"not answered")}</span></div>
         <select onchange="setOv('offset',this.value)">
@@ -2338,7 +2799,7 @@ function gcbdHTML(d){
          a zero here would overstate the incremental pension the company takes on.`}</div>
     <div class="panel-b"><div class="fgrid">
       ${SCEN.map(a=>`<div class="f"><div class="f-l">At age ${a}${d.ohcCcy?" · "+d.ohcCcy:""}<span class="f-src">manual</span></div>
-        <input style="width:100%" value="${d.ohcOffset[a]??""}" placeholder="${esc(d.ohcCcy||"amount")}"
+        <input style="width:100%" value="${d.ohcOffset[a]??((c&&c.scen&&c.scen[a]&&c.scen[a].ohcOffset!==null&&c.scen[a].ohcOffset!==undefined)?Math.round(c.scen[a].ohcOffset):"")}" placeholder=""
           title="Amount GC&BD reported for retirement at age ${a}, in ${esc(d.ohcCcy||"the origin country currency")}. Leave empty to use the formula above."
           onchange="setOv('ohcOffset${a}',this.value)"></div>`).join("")}
     </div></div>
@@ -2399,15 +2860,19 @@ function novaHTML(d){
 
 function empHTML(d,c){
   const cc=d.nhcCcy||"USD";
+  /* The expatriate column only means something when the employee is one. On a
+     direct localization there is no assignment to compare against, so the table
+     is the two columns the old template showed: staying put, and localizing. */
+  const expat=d.locType==="Full Localization";
   const row=(lab,k,f,cls="")=>`<tr class="${cls}">
-    <td>${lab}</td>${cell("e.x."+k,c.e.x[k],f)}${cell("e.o."+k,c.e.o[k],f)}${cell("e.l."+k,c.e.l[k],f)}</tr>`;
+    <td>${lab}</td>${expat?cell("e.x."+k,c.e.x[k],f):""}${cell("e.o."+k,c.e.o[k],f)}${cell("e.l."+k,c.e.l[k],f)}</tr>`;
   const fxs=d.fx!==null?d.fx.toFixed(6):"fx";
   return `<div class="panel">
     <div class="panel-h"><div class="panel-t">Cash to the employee</div>
       <div class="panel-n">annual · ${cc} · drives the transition payment</div></div>
     <table class="tbl">
       <thead><tr><th></th>
-        <th class="grp">As expatriate<br><span style="font-weight:400;color:var(--ink-3)">in new home country</span></th>
+        ${expat?`<th class="grp">As expatriate<br><span style="font-weight:400;color:var(--ink-3)">in new home country</span></th>`:""}
         <th class="grp">Remain<br><span style="font-weight:400;color:var(--ink-3)">in origin country</span></th>
         <th class="grp">Localized<br><span style="font-weight:400;color:var(--ink-3)">in new home country</span></th></tr></thead>
       <tbody>
@@ -2415,7 +2880,7 @@ function empHTML(d,c){
       ${row("Alternate forms of pay","afp",`sum of OHC allowances × ${fxs}`)}
       ${row("Estimated income tax","tax","from the Deloitte estimate, shown negative")}
       ${row("Subtotal","sub","salary + alternate pay − income tax","sub")}
-      ${row("Expatriate benefits","benSub","premium + IC&S + housing + travel")}
+      ${expat?row("Expatriate benefits","benSub","premium + IC&S + housing + travel"):""}
       ${row("Cash to employee","cash","subtotal + expatriate benefits","tot")}
       </tbody></table>
     ${c.e.deltaPct!==null?`<div class="note"><strong>Change in cash on localizing:</strong>
@@ -2525,21 +2990,25 @@ function render(){
   document.getElementById("btn-log").disabled=!(D&&D.name);
 
   const A=gate(D,c);
+  R_NOVA=novaRows(D);
   document.getElementById("body").innerHTML=`<div class="canvas">
+    ${tickerHTML(D,c)}
     ${A.length?`<div class="alerts">${A.map(a=>`
       <div class="alert alert-${a.t}"><span class="alert-tag">${a.tag}</span>
       <div class="alert-b"><strong>${a.h}</strong><br>${a.b}
       ${a.acts?`<div class="alert-act">${a.acts.map(x=>`<button class="alert-btn ${x.solid?"solid":""}" onclick="${x.f}">${x.l}</button>`).join("")}</div>`:""}
       </div></div>`).join("")}</div>`:""}
+    ${timelineHTML(D)}
     ${fieldsHTML(D)}
     ${diagHTML(D,c)}
-    ${gcbdHTML(D)}
+    ${gcbdHTML(D,c)}
     ${novaHTML(D)}
     ${empHTML(D,c)}
     ${costHTML(D,c)}
     ${scenHTML(D,c)}
   </div>`;
   railHTML();
+  startTicker(D,c);
 }
 
 /* ═══ EVENTS ═══ */
@@ -3069,25 +3538,47 @@ const DB_COLS=["Date Created","Original Home Country PERNR","New Home Country PE
 const DB_FIN=["Currency","FX Rate","Annual Cost OHC","Annual Cost NHC","Annual Delta",
  "Transition Payments","Lifetime Cost at 60","Cut-off Status","Analysis Date"];
 let dbHandle=null, DB=[], dbName="";
-let FL={type:"",yr:"",status:"",dest:"",bl:""};
+let FL={type:[],yr:[],status:[],dest:"",bl:[]};
 function setFl(k,v){FL[k]=v;renderAnalytics();}
-function clearFl(){FL={type:"",yr:"",status:"",dest:"",bl:""};renderAnalytics();}
+/* multi-selects hand back a list of chosen options */
+function setFlMulti(k,sel){
+  FL[k]=[...sel.selectedOptions].map(o=>o.value).filter(v=>v!=="");
+  renderAnalytics();
+}
+function clearFl(){FL={type:[],yr:[],status:[],dest:"",bl:[]};renderAnalytics();}
 
+/* On hold is kept apart from in progress: a case that has stalled is a
+   different problem from one that is moving. */
 const statusOf=r=>{
   const t=String(r["Status"]||"");
   if(/complet|closed/i.test(t))return "Completed";
   if(/cancel/i.test(t))return "Cancelled";
-  if(/progress|hold/i.test(t))return "Active";
+  if(/hold/i.test(t))return "On hold";
+  if(/progress|open|active/i.test(t))return "In progress";
   return "Other";
 };
+const STATUSES=["In progress","On hold","Completed","Cancelled","Other"];
+/* Filters hold a list, so a question like "2025 and 2026" can be asked directly
+   instead of being run twice. An empty list means no restriction. */
+const has=(sel,v)=>!sel||!sel.length||sel.includes(String(v??""));
+/* "Type of Case" is Localization for almost every row; the distinction that
+   matters — full, direct from home, direct from a third country, resign-rehire,
+   PRV — lives in the subtype column. */
+function subtypeOf(r){
+  const sub=String(r["Subtype of Case"]||"").trim();
+  const top=String(r["Type of Case"]||"").trim();
+  if(sub&&!/^n\/?a$/i.test(sub))return sub;
+  return top||"Not recorded";
+}
+
 function applyFl(rows){
   return rows.filter(r=>{
-    if(FL.type&&String(r["Type of Case"]||"").trim()!==FL.type)return false;
-    if(FL.yr&&String(yearOf(r["Date Created"])||"")!==FL.yr)return false;
-    if(FL.status&&statusOf(r)!==FL.status)return false;
+    if(!has(FL.type,subtypeOf(r)))return false;
+    if(!has(FL.yr,yearOf(r["Date Created"])))return false;
+    if(!has(FL.status,statusOf(r)))return false;
     if(FL.dest==="us"&&!/united states/i.test(String(r["New Home Country"]||"")))return false;
     if(FL.dest==="non"&&/united states/i.test(String(r["New Home Country"]||"")))return false;
-    if(FL.bl&&String(r["Business Line"]||"").trim()!==FL.bl)return false;
+    if(!has(FL.bl,String(r["Business Line"]||"").trim()))return false;
     return true;
   });
 }
@@ -3149,6 +3640,38 @@ function dbRowFromCase(){
   return g;
 }
 
+/* A file handle can be stored and reopened later, but the browser will not read
+   the file again without the person confirming — so the path is remembered and
+   only the permission click remains. */
+async function rememberDb(h){
+  try{ const db=await caseStore();
+    db.transaction("h","readwrite").objectStore("h").put(h,"tracker"); }catch(e){}
+}
+async function recallDb(){
+  try{
+    const db=await caseStore();
+    const h=await new Promise(res=>{
+      const t=db.transaction("h","readonly").objectStore("h").get("tracker");
+      t.onsuccess=()=>res(t.result||null); t.onerror=()=>res(null);
+    });
+    if(!h)return false;
+    const perm=await h.queryPermission({mode:"readwrite"});
+    if(perm==="granted"){ dbHandle=h; dbName=h.name; await readDb(); return true; }
+    pendingDb=h;                       /* needs a click before it can be read */
+    return false;
+  }catch(e){ return false; }
+}
+let pendingDb=null;
+async function resumeDb(){
+  if(!pendingDb)return pickDb();
+  try{
+    const r=await pendingDb.requestPermission({mode:"readwrite"});
+    if(r!=="granted"){ toast("Permission not granted"); return; }
+    dbHandle=pendingDb; dbName=pendingDb.name; pendingDb=null;
+    await readDb(); railHTML(); render(); toast("Reloaded "+dbName);
+  }catch(e){ pickDb(); }
+}
+
 async function pickDb(){
   try{
     if(!window.showOpenFilePicker){
@@ -3156,7 +3679,9 @@ async function pickDb(){
     }
     const [h]=await window.showOpenFilePicker({types:[{description:"Excel",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"]}}]});
     dbHandle=h; dbName=h.name;
+    await rememberDb(h);
     await readDb();
+    railHTML();
     setView("analytics");
   }catch(e){ if(e.name!=="AbortError")alert("Could not open that file.\n\n"+e.message); }
 }
@@ -3301,18 +3826,24 @@ function renderAnalytics(){
   const opts=(cur,list,key,blank)=>`<select onchange="setFl('${key}',this.value)">
     <option value="">${blank}</option>${list.map(([v,lab])=>
       `<option value="${esc(v)}" ${cur===v?"selected":""}>${esc(lab)}</option>`).join("")}</select>`;
+  /* more than one value can be chosen; ctrl-click or drag to add */
+  const multi=(cur,list,key,blank)=>`<select multiple size="${Math.min(5,Math.max(2,list.length))}"
+      onchange="setFlMulti('${key}',this)" title="${blank} — choose one or more">
+    ${list.map(([v,lab])=>
+      `<option value="${esc(v)}" ${(cur||[]).includes(String(v))?"selected":""}>${esc(lab)}</option>`).join("")}</select>`;
 
-  const types=tally(ALL,r=>String(r["Type of Case"]||"").trim()).map(([k,v])=>[k,`${k} (${v})`]);
+  const types=tally(ALL,r=>subtypeOf(r)).map(([k,v])=>[k,`${k} (${v})`]);
   const yrs=tally(ALL,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
             .sort((a,b)=>b[0]-a[0]).map(([y,v])=>[String(y),`${y} (${v})`]);
   const bls=tally(ALL,r=>String(r["Business Line"]||"").trim()).slice(0,14).map(([k,v])=>[k,`${k} (${v})`]);
-  const active=R.filter(r=>statusOf(r)==="Active");
+  const active=R.filter(r=>statusOf(r)==="In progress");
+  const onHold=R.filter(r=>statusOf(r)==="On hold");
   const closed=R.filter(r=>statusOf(r)==="Completed");
   const cancelled=R.filter(r=>statusOf(r)==="Cancelled");
   const intoUS=R.filter(r=>/united states/i.test(String(r["New Home Country"]||"")));
-  const anyFl=Object.values(FL).some(v=>v);
+  const anyFl=Object.values(FL).some(v=>Array.isArray(v)?v.length:v);
 
-  /* corridors */
+  /* country pairs */
   const corr=tally(R,r=>{
     const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
     return (a&&b)?a+" \u2192 "+b:null;
@@ -3323,40 +3854,42 @@ function renderAnalytics(){
     return `<div class="corr-r">
       <div class="corr-l"><span class="corr-a">${esc(a)}</span><span class="corr-x">&#8594;</span><span class="corr-b">${esc(b)}</span></div>
       <div class="corr-track"><div class="corr-fill" style="width:${Math.max(2,v/corrMax*100)}%"></div></div>
-      <div class="corr-v">${v} · ${Math.round(v/Math.max(R.length,1)*100)}%</div></div>`;
+      <div class="corr-v"><span class="corr-n">${v}</span><span class="corr-p">${Math.round(v/Math.max(R.length,1)*100)}%</span></div></div>`;
   }).join("")}</div>`:'<div class="mini-empty">No data</div>';
 
-  /* cycle time */
-  const cd=cycleDays(R);
-  const med=quant(cd,.5), p90=quant(cd,.9);
-  const mean=cd.length?Math.round(cd.reduce((a,b)=>a+b,0)/cd.length):null;
-  const cycHTML=cd.length?`<div class="cyc">
-      <div class="cyc-b"><div class="cyc-n">${med}</div><div class="cyc-l">Median</div><div class="cyc-s">days to implement</div></div>
-      <div class="cyc-b"><div class="cyc-n">${mean}</div><div class="cyc-l">Mean</div><div class="cyc-s">pulled up by the tail</div></div>
-      <div class="cyc-b"><div class="cyc-n">${p90}</div><div class="cyc-l">90th percentile</div><div class="cyc-s">one case in ten exceeds this</div></div>
-    </div>
-    <div class="basis">Measured from date created to implementation date on ${cd.length} of ${R.length} cases.
-    ${p90&&med&&p90>med*2?`The gap between the median and the tail is where the process loses time.`:""}</div>`
-    :'<div class="mini-empty">No case in this selection carries both a creation and an implementation date.</div>';
+  /* Time to implementation was removed: the creation date is entered loosely on
+     most rows, so any elapsed-time figure built on it read as precise while
+     resting on a date nobody treats as exact. */
 
-  /* cancellation rate by corridor */
-  const byCorr=new Map();
+  /* Cases that did not reach implementation, by country pair. Cancelled and on
+     hold are counted together: both are cases that stopped, and separating them
+     hid the smaller corridors entirely. The old eight-case floor left only the
+     busiest route visible, so every pair with a stalled case is shown. */
+  const byPair=new Map();
   R.forEach(r=>{
     const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
     if(!a||!b)return; const k=a+" \u2192 "+b;
-    const o=byCorr.get(k)||{n:0,c:0}; o.n++; if(statusOf(r)==="Cancelled")o.c++; byCorr.set(k,o);
+    const o=byPair.get(k)||{n:0,c:0,h:0}; o.n++;
+    const st=statusOf(r);
+    if(st==="Cancelled")o.c++; else if(st==="On hold")o.h++;
+    byPair.set(k,o);
   });
-  const rates=[...byCorr.entries()].filter(([,o])=>o.n>=8)
-    .map(([k,o])=>[k,o.c/o.n,o.c,o.n]).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const rateHTML=rates.length?`<div class="rate">${rates.map(([k,p,c,n])=>`
+  const rates=[...byPair.entries()].filter(([,o])=>o.c+o.h>0)
+    .map(([k,o])=>[k,(o.c+o.h)/o.n,o.c,o.h,o.n])
+    .sort((a,b)=>(b[2]+b[3])-(a[2]+a[3])||b[1]-a[1]).slice(0,10);
+  const rateHTML=rates.length?`<div class="rate">${rates.map(([k,pr,c,h,n])=>`
     <div class="rate-r"><div class="rate-l" title="${esc(k)}">${esc(k)}</div>
       <div class="rate-track">
-        <div class="rate-seg" style="width:${p*100}%;background:var(--neg)"></div>
-        <div class="rate-seg" style="width:${(1-p)*100}%;background:var(--pos);opacity:.3"></div>
+        <div class="rate-seg" style="width:${c/n*100}%;background:var(--neg)"></div>
+        <div class="rate-seg" style="width:${h/n*100}%;background:#c99a2e"></div>
+        <div class="rate-seg" style="width:${(n-c-h)/n*100}%;background:var(--pos);opacity:.28"></div>
       </div>
-      <div class="rate-v" style="color:${p>.2?"var(--neg)":"var(--ink-2)"}">${Math.round(p*100)}% · ${c}/${n}</div></div>`).join("")}</div>
-    <div class="basis">Corridors with at least eight cases. Red is the share that did not complete.</div>`
-    :'<div class="mini-empty">Not enough volume in this selection to show a meaningful rate.</div>';
+      <div class="rate-v"><span class="corr-n">${c+h}/${n}</span><span class="corr-p">${Math.round(pr*100)}%</span></div></div>`).join("")}</div>
+    <div class="rate-key"><span><i style="background:var(--neg)"></i>cancelled</span>
+      <span><i style="background:#c99a2e"></i>on hold</span>
+      <span><i style="background:var(--pos);opacity:.5"></i>still moving or done</span></div>
+    <div class="basis">Every country pair carrying at least one case that stopped.</div>`
+    :'<div class="mini-empty">No case in this selection was cancelled or put on hold.</div>';
 
   /* partial-base charts */
   const pots=R.map(r=>num(r["POTENTIAL"])).filter(v=>v!==null&&v>=20&&v<=50);
@@ -3379,35 +3912,40 @@ function renderAnalytics(){
 
   body.innerHTML=`<div class="canvas">
     <div class="filters">
-      <label>Type</label>${opts(FL.type,types,"type","All types")}
-      <label>Year</label>${opts(FL.yr,yrs,"yr","All years")}
-      <label>Status</label>${opts(FL.status,[["Active","Active"],["Completed","Completed"],["Cancelled","Cancelled"]],"status","All")}
+      <label>Type</label>${multi(FL.type,types,"type","All types")}
+      <label>Year</label>${multi(FL.yr,yrs,"yr","All years")}
+      <label>Status</label>${multi(FL.status,STATUSES.map(x=>[x,x]),"status","All")}
       <label>Destination</label>${opts(FL.dest,[["us","Into the US"],["non","Everywhere else"]],"dest","All")}
-      <label>Business line</label>${opts(FL.bl,bls,"bl","All")}
+      <label>Business line</label>${multi(FL.bl,bls,"bl","All")}
       ${anyFl?`<button class="btn" style="padding:5px 12px;font-size:11.5px" onclick="clearFl()">Clear</button>`:""}
       <div class="f-count"><b>${R.length.toLocaleString("en-US")}</b> of ${ALL.length.toLocaleString("en-US")} cases</div>
     </div>
 
     <div class="kpis">
-      <div class="kpi"><div class="kpi-n">${R.length.toLocaleString("en-US")}</div><div class="kpi-l">Cases in view</div></div>
-      <div class="kpi"><div class="kpi-n">${active.length}</div><div class="kpi-l">Active</div><div class="kpi-s">in progress or on hold</div></div>
+      <div class="kpi"><div class="kpi-n">${R.length.toLocaleString("en-US")}</div><div class="kpi-l">Cases selected</div><div class="kpi-s">matching the filters above</div></div>
+      <div class="kpi"><div class="kpi-n">${active.length}</div><div class="kpi-l">In progress</div><div class="kpi-s">moving</div></div>
+      <div class="kpi"><div class="kpi-n">${onHold.length}</div><div class="kpi-l">On hold</div><div class="kpi-s">stalled, not cancelled</div></div>
       <div class="kpi"><div class="kpi-n">${closed.length.toLocaleString("en-US")}</div><div class="kpi-l">Completed</div><div class="kpi-s">${R.length?Math.round(closed.length/R.length*100):0}% of the selection</div></div>
       <div class="kpi"><div class="kpi-n">${R.length?Math.round(cancelled.length/R.length*100):0}%</div><div class="kpi-l">Cancelled</div><div class="kpi-s">${cancelled.length} cases</div></div>
-      <div class="kpi"><div class="kpi-n">${med!==null?med:"—"}</div><div class="kpi-l">Median days</div><div class="kpi-s">to implementation</div></div>
       <div class="kpi"><div class="kpi-n">${R.length?Math.round(intoUS.length/R.length*100):0}%</div><div class="kpi-l">Into the US</div><div class="kpi-s">${intoUS.length.toLocaleString("en-US")} cases</div></div>
     </div>
 
     <div class="charts">
-      <div class="chart wide">
-        <div class="chart-t">Corridors</div>
-        <div class="chart-s">origin to destination · ${corr.length} distinct in this selection · top 10</div>
-        ${corrHTML}
+      <div class="chart wide ins-card">
+        <div class="chart-t">What stands out</div>
+        <div class="chart-s">read from the ${ALL.length.toLocaleString("en-US")} rows in the tracker &middot; ${R.length} in this selection</div>
+        ${(()=>{const I=insights(R,ALL);
+          return I.length?`<div class="ins">${I.map(x=>`<div class="ins-r">
+            <span class="ins-tag">${esc(x.tag)}</span><span class="ins-t">${esc(x.t)}</span></div>`).join("")}</div>`
+          :'<div class="mini-empty">Nothing to call out in this selection.</div>';})()}
+        <div class="basis">Each line states the count behind it. These are observations from the tracker,
+          not conclusions &mdash; a figure worth acting on is worth checking against the cases themselves.</div>
       </div>
 
       <div class="chart wide">
-        <div class="chart-t">Time to implementation</div>
-        <div class="chart-s">from the day the case is created</div>
-        ${cycHTML}
+        <div class="chart-t">Country pairs</div>
+        <div class="chart-s">origin to destination · ${corr.length} distinct in this selection · top 10</div>
+        ${corrHTML}
       </div>
 
       <div class="chart">
@@ -3418,14 +3956,14 @@ function renderAnalytics(){
 
       <div class="chart">
         <div class="chart-t">Where cases are lost</div>
-        <div class="chart-s">cancellation rate by corridor</div>
+        <div class="chart-s">cases that stopped, by country pair</div>
         ${rateHTML}
       </div>
 
       <div class="chart">
         <div class="chart-t">Type of case</div>
-        <div class="chart-s">as recorded in the tracker</div>
-        ${barsHTML(tally(R,r=>String(r["Type of Case"]||"").trim()).slice(0,8),R.length)}
+        <div class="chart-s">full, direct, resign-rehire and PRV</div>
+        ${barsHTML(tally(R,r=>subtypeOf(r)).slice(0,8),R.length)}
       </div>
 
       <div class="chart">
@@ -3443,7 +3981,7 @@ function renderAnalytics(){
       </div>
 
       <div class="chart">
-        <div class="chart-t">Career level</div>
+        <div class="chart-t">Classification level</div>
         <div class="chart-s">at the time of the request</div>
         ${barsHTML(clBands,clv.length)}
         <div class="basis">Recorded on ${clv.length} of ${R.length} cases in this selection.</div>
@@ -3477,9 +4015,12 @@ function keepFx(){overrides.fx=D.fxRaw;render();}
    browser so the work survives closing the tab. */
 function caseStore(){
   return new Promise((res,rej)=>{
-    const r=indexedDB.open("loc-cases",1);
+    const r=indexedDB.open("loc-cases",2);
     r.onupgradeneeded=e=>{const db=e.target.result;
-      if(!db.objectStoreNames.contains("c"))db.createObjectStore("c",{keyPath:"id"});};
+      if(!db.objectStoreNames.contains("c"))db.createObjectStore("c",{keyPath:"id"});
+      /* the tracker's file handle lives here so the same workbook comes back
+         next session without hunting for the path again */
+      if(!db.objectStoreNames.contains("h"))db.createObjectStore("h");};
     r.onsuccess=e=>res(e.target.result); r.onerror=rej;
   });
 }
@@ -3546,7 +4087,22 @@ async function renderCaseList(){
     </div>`).join("");
 }
 
+/* Wipes the loaded case so the next one starts clean: files, typed values and
+   the resolved data. The tracker link and saved cases are left alone. */
+function clearCase(){
+  if(!Object.keys(F).length&&!Object.keys(overrides).length){ toast("Nothing loaded"); return; }
+  if(!confirm("Clear the loaded files and everything typed on this case?\n\nSaved cases and the tracker link are not affected."))return;
+  Object.keys(F).forEach(k=>delete F[k]);
+  Object.keys(FILEMETA).forEach(k=>delete FILEMETA[k]);
+  overrides={}; D=null; seedFor=null;
+  Object.keys(caseSeed).forEach(k=>caseSeed[k]="");
+  railHTML(); render(); toast("Case cleared");
+}
+
 function pickFile(id){
+  /* The tracker is not a vendor file: it is the workbook the app reads and
+     writes back to, so it goes through the database picker that keeps a handle. */
+  if(id==="db"){ pendingDb?resumeDb():pickDb(); return; }
   const i=document.createElement("input");
   i.type="file"; i.accept=".xlsx,.xls,.xlsm,.csv";
   i.onchange=e=>{
@@ -3566,8 +4122,38 @@ function pickFile(id){
 }
 
 
+const THEMES={
+  brick:   {bg:"#8c3236", dim:"rgba(255,255,255,.58)"},
+  skin:    {bg:"#c9a98f", dim:"rgba(40,26,18,.62)",  ink:"#2a1c14"},
+  slate:   {bg:"#5b6670", dim:"rgba(255,255,255,.58)"},
+  charcoal:{bg:"#24272b", dim:"rgba(255,255,255,.52)"},
+  forest:  {bg:"#33513f", dim:"rgba(255,255,255,.58)"},
+  navy:    {bg:"#28405e", dim:"rgba(255,255,255,.58)"}
+};
+function setTheme(k){
+  const t=THEMES[k]||THEMES.brick, r=document.documentElement.style;
+  r.setProperty("--rail-bg",t.bg);
+  r.setProperty("--rail-dim",t.dim);
+  /* a pale panel needs dark text on it, the dark ones need light */
+  r.setProperty("--rail-ink",t.ink||"#fff");
+  try{ caseStore().then(db=>db.transaction("h","readwrite").objectStore("h").put(k,"theme")); }catch(e){}
+  const sel=document.querySelector(".rail-theme"); if(sel)sel.value=k;
+}
+async function recallTheme(){
+  try{
+    const db=await caseStore();
+    const k=await new Promise(res=>{const t=db.transaction("h","readonly").objectStore("h").get("theme");
+      t.onsuccess=()=>res(t.result); t.onerror=()=>res(null);});
+    if(k)setTheme(k);
+  }catch(e){}
+}
+
 railHTML();
 renderCaseList();
+recallTheme();
+/* Bring the tracker back on open. If the browser still trusts the handle the
+   file loads silently; otherwise the rail shows it as waiting for one click. */
+recallDb().then(ok=>{ railHTML(); if(ok&&D)render(); });
 </script>
 </body>
 </html>
