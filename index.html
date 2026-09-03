@@ -134,6 +134,73 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
 .kc-ind-prod-badge{font-family:'Fira Code',monospace;font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:#fff;background:var(--orange);padding:5px 10px;border-radius:5px;white-space:nowrap;flex-shrink:0}
 .kc-ind-prod-desc{font-size:13px;line-height:1.55;color:rgba(242,240,235,0.85)}
 @media(max-width:760px){.kc-ind-body{grid-template-columns:1fr}.kc-ind-solgrid{grid-template-columns:1fr}.kc-ind-tabs{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:6px}}
+/* ── TARS ── */
+#page-tars{--tars-steel:#2a3f5f;--tars-steel-light:#3d5578}
+.tars-hero{background:linear-gradient(160deg,#1a2438 0%,#141b2b 100%);color:#f2f0eb;padding:clamp(3.5rem,8vw,6.5rem) 7vw clamp(3rem,6vw,5rem)}
+.tars-hero-inner{max-width:1000px;margin:0 auto}
+.tars-brand-row{display:flex;align-items:center;gap:8px;margin-bottom:1.8rem}
+.tars-kip{font-family:'Syne',sans-serif;font-weight:800;font-size:0.85rem;color:rgba(242,240,235,0.7);letter-spacing:-0.02em}
+.tars-div{color:rgba(242,240,235,0.3)}
+.tars-unit{font-family:'Fira Code',monospace;font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;color:rgba(242,240,235,0.4)}
+.tars-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(3rem,9vw,5.5rem);letter-spacing:0.08em;line-height:1;background:linear-gradient(90deg,#f05a00 0%,#ff7a2e 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.6rem}
+.tars-expand{font-family:'Fira Code',monospace;font-size:0.8rem;letter-spacing:0.1em;color:rgba(242,240,235,0.55);margin-bottom:2.2rem}
+.tars-h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,3rem);line-height:1.08;letter-spacing:-0.03em;color:#f2f0eb;margin-bottom:1.4rem}
+.tars-lead{font-size:1.02rem;line-height:1.7;color:rgba(242,240,235,0.62);max-width:680px;margin-bottom:2.4rem}
+.tars-hero-btns{display:flex;gap:0.8rem;flex-wrap:wrap}
+.tars-btn-primary{background:#f05a00;color:#fff;border:none;border-radius:9px;padding:0.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.tars-btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(240,90,0,0.3)}
+.tars-btn-lg{padding:1rem 2.2rem;font-size:1rem}
+.tars-btn-ghost{background:transparent;color:#f2f0eb;border:1.5px solid rgba(242,240,235,0.25);border-radius:9px;padding:0.85rem 1.8rem;font-family:'Inter',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:border-color .2s}
+.tars-btn-ghost:hover{border-color:rgba(242,240,235,0.55)}
+.tars-dual{background:var(--bg);padding:clamp(3rem,6vw,5rem) 7vw}
+.tars-dual-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.tars-dual-card{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:2.5rem 2.2rem}
+.tars-dual-card-alt{background:var(--tars-steel);border-color:var(--tars-steel)}
+.tars-dual-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--orange);margin-bottom:0.8rem}
+.tars-dual-card-alt .tars-dual-num{color:#ff7a2e}
+.tars-dual-tag{font-family:'Fira Code',monospace;font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:1rem}
+.tars-dual-card-alt .tars-dual-tag{color:rgba(242,240,235,0.5)}
+.tars-dual-h{font-family:'Syne',sans-serif;font-weight:700;font-size:1.4rem;line-height:1.2;letter-spacing:-0.02em;color:var(--ink);margin-bottom:1rem}
+.tars-dual-card-alt .tars-dual-h{color:#f2f0eb}
+.tars-dual-p{font-size:0.9rem;line-height:1.65;color:var(--ink2);margin-bottom:1.6rem}
+.tars-dual-card-alt .tars-dual-p{color:rgba(242,240,235,0.7)}
+.tars-dual-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0.7rem}
+.tars-dual-list li{position:relative;padding-left:1.3rem;font-size:0.86rem;color:var(--ink2);line-height:1.4}
+.tars-dual-list li::before{content:"→";position:absolute;left:0;color:var(--orange);font-weight:700}
+.tars-dual-card-alt .tars-dual-list li{color:rgba(242,240,235,0.75)}
+.tars-dual-card-alt .tars-dual-list li::before{color:#ff7a2e}
+.tars-areas{background:var(--bg2);padding:clamp(3rem,6vw,5rem) 7vw;border-top:1px solid var(--border)}
+.tars-areas-inner{max-width:1100px;margin:0 auto}
+.tars-section-head{margin-bottom:2.5rem}
+.tars-eyebrow{display:inline-block;font-family:'Fira Code',monospace;font-size:0.7rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--orange);margin-bottom:0.9rem}
+.tars-section-h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,3vw,2.3rem);line-height:1.12;letter-spacing:-0.03em;color:var(--ink)}
+.tars-areas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.tars-area{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1.8rem 1.7rem;transition:transform .2s ease,box-shadow .2s ease}
+.tars-area:hover{transform:translateY(-3px);box-shadow:0 12px 34px rgba(26,25,22,0.09)}
+.tars-area-ico{font-size:1.7rem;margin-bottom:0.9rem}
+.tars-area-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;letter-spacing:-0.02em;color:var(--ink);margin-bottom:0.5rem}
+.tars-area-desc{font-size:0.83rem;line-height:1.6;color:var(--ink2)}
+.tars-process{background:var(--bg);padding:clamp(3rem,6vw,5rem) 7vw}
+.tars-process-inner{max-width:1000px;margin:0 auto}
+.tars-steps{display:flex;flex-direction:column;gap:0}
+.tars-step{display:flex;gap:1.8rem;padding:1.8rem 0;border-top:1px solid var(--border)}
+.tars-step:last-child{border-bottom:1px solid var(--border)}
+.tars-step-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--tars-steel);flex-shrink:0;width:3rem;letter-spacing:-0.02em}
+.tars-step-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;color:var(--ink);margin-bottom:0.4rem}
+.tars-step-desc{font-size:0.9rem;line-height:1.65;color:var(--ink2);max-width:640px}
+.tars-cta-section{background:linear-gradient(160deg,#1a2438 0%,#141b2b 100%);color:#f2f0eb;padding:clamp(3.5rem,7vw,5.5rem) 7vw;text-align:center}
+.tars-cta-inner{max-width:720px;margin:0 auto}
+.tars-cta-h{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.6rem,3.5vw,2.6rem);line-height:1.12;letter-spacing:-0.03em;margin-bottom:1.1rem}
+.tars-cta-p{font-size:1.02rem;line-height:1.65;color:rgba(242,240,235,0.62);margin-bottom:2rem}
+@media(max-width:900px){
+  .tars-dual-inner{grid-template-columns:1fr}
+  .tars-areas-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .tars-areas-grid{grid-template-columns:1fr}
+  .tars-step{gap:1rem}
+  .tars-step-num{font-size:1.3rem;width:2.2rem}
+}
 .ticker{background:var(--orange);overflow:hidden;padding:0.7rem 0;display:flex}
 .ticker-track{display:flex;gap:2.5rem;white-space:nowrap;animation:tick 22s linear infinite;align-items:center}
 @keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -374,6 +441,7 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   <button class="mnc" onclick="navigate('soluciones')">Soluciones</button>
   <button class="mnc" onclick="navigate('proceso')">Proceso</button>
   <button class="mnc" onclick="navigate('productos')">Productos</button>
+  <button class="mnc" onclick="navigate('tars')">TARS</button>
   <button class="mnc" onclick="navigate('nosotros')" ontouchstart="navigate('nosotros')">Nosotros</button>
   <button class="mnc" onclick="navigate('contacto')" ontouchstart="navigate('contacto')">Contacto</button>
   <button class="mobile-cta-btn" onclick="navigate('contacto')" ontouchstart="navigate('contacto')">Hablar con el equipo →</button>
@@ -388,6 +456,7 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
     <button class="nc" onclick="navigate('soluciones')">Soluciones</button>
     <button class="nc" onclick="navigate('proceso')">Proceso</button>
     <button class="nc" onclick="navigate('productos')">Productos</button>
+    <button class="nc" onclick="navigate('tars')">TARS</button>
     <button class="nc" onclick="navigate('nosotros')">Nosotros</button>
     <button class="nc" onclick="navigate('contacto')">Contacto</button>
   </div>
@@ -725,6 +794,146 @@ footer{background:#1a1916;padding:1.4rem 3rem;display:flex;justify-content:space
   </section>
 
   <div class="cta-banner"><div><div class="cta-h">¿Necesitás algo a medida?</div><div class="cta-sub">Estos productos son la base. Podemos adaptarlos a tu operación.</div></div><button class="btn-white" onclick="navigate('contacto')">Iniciar conversación →</button></div>
+  <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
+</div>
+
+<div class="page" id="page-tars">
+  <section class="tars-hero">
+    <div class="tars-hero-inner">
+      <div class="tars-brand-row">
+        <span class="tars-kip">kippcode</span>
+        <span class="tars-div">·</span>
+        <span class="tars-unit">Unidad de negocio</span>
+      </div>
+      <div class="tars-logo">TARS</div>
+      <div class="tars-expand">Technology, Automation &amp; Resource Solutions</div>
+      <h1 class="tars-h1">Tecnología y consultoría para<br>la gestión de tu organización.</h1>
+      <p class="tars-lead">Ayudamos a áreas de administración, finanzas y recursos humanos a trabajar mejor: analizamos cómo operan hoy, proponemos mejoras concretas y desarrollamos el software que las hace realidad. Diagnóstico y tecnología, en un mismo lugar.</p>
+      <div class="tars-hero-btns">
+        <button class="tars-btn-primary" onclick="navigate('contacto')">Solicitar diagnóstico →</button>
+        <button class="tars-btn-ghost" onclick="document.getElementById('tars-areas').scrollIntoView({behavior:'smooth'})">Ver áreas de trabajo</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="tars-dual">
+    <div class="tars-dual-inner">
+      <div class="tars-dual-card">
+        <div class="tars-dual-num">01</div>
+        <div class="tars-dual-tag">Consultoría</div>
+        <h3 class="tars-dual-h">Entendemos cómo opera<br>tu organización.</h3>
+        <p class="tars-dual-p">Relevamos procesos, identificamos ineficiencias y puntos de fricción, y armamos un plan de mejora priorizado. No teoría: un diagnóstico accionable sobre tu operación real.</p>
+        <ul class="tars-dual-list">
+          <li>Diagnóstico organizacional y de procesos</li>
+          <li>Mapeo de flujos de trabajo actuales</li>
+          <li>Análisis de eficiencia y costos operativos</li>
+          <li>Propuestas de mejora priorizadas</li>
+        </ul>
+      </div>
+      <div class="tars-dual-card tars-dual-card-alt">
+        <div class="tars-dual-num">02</div>
+        <div class="tars-dual-tag">Tecnología</div>
+        <h3 class="tars-dual-h">Y construimos las herramientas<br>que la hacen más eficiente.</h3>
+        <p class="tars-dual-p">Desarrollamos software a medida para las áreas de soporte del negocio. Automatizamos lo repetitivo, centralizamos la información y damos visibilidad donde antes había planillas dispersas.</p>
+        <ul class="tars-dual-list">
+          <li>Software de gestión para RRHH y finanzas</li>
+          <li>Automatización de procesos administrativos</li>
+          <li>Integración de sistemas existentes</li>
+          <li>Tableros de control y reportería</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="tars-areas" id="tars-areas">
+    <div class="tars-areas-inner">
+      <div class="tars-section-head">
+        <span class="tars-eyebrow">Áreas de trabajo</span>
+        <h2 class="tars-section-h2">Cubrimos el ciclo completo<br>de la gestión de personas y recursos.</h2>
+      </div>
+      <div class="tars-areas-grid">
+        <div class="tars-area">
+          <div class="tars-area-ico">👥</div>
+          <div class="tars-area-name">Recursos Humanos</div>
+          <div class="tars-area-desc">Gestión de legajos, ausentismo, evaluaciones de desempeño y clima. Todo el ciclo del empleado, ordenado y accesible.</div>
+        </div>
+        <div class="tars-area">
+          <div class="tars-area-ico">🎯</div>
+          <div class="tars-area-name">Recruiting &amp; Selección</div>
+          <div class="tars-area-desc">Seguimiento de búsquedas, base de candidatos, pipeline de selección y reportes de gestión para el equipo y sus clientes.</div>
+        </div>
+        <div class="tars-area">
+          <div class="tars-area-ico">💰</div>
+          <div class="tars-area-name">Payroll &amp; Liquidación</div>
+          <div class="tars-area-desc">Herramientas para ordenar y dar visibilidad al proceso de liquidación de sueldos, con trazabilidad y control.</div>
+        </div>
+        <div class="tars-area">
+          <div class="tars-area-ico">🎁</div>
+          <div class="tars-area-name">Beneficios &amp; Compensaciones</div>
+          <div class="tars-area-desc">Administración de planes de beneficios, comunicación al equipo y seguimiento de su uso y costo real.</div>
+        </div>
+        <div class="tars-area">
+          <div class="tars-area-ico">📊</div>
+          <div class="tars-area-name">Finanzas &amp; Administración</div>
+          <div class="tars-area-desc">Control de flujo de caja, cobros, gastos y reportería financiera. Del dato disperso al tablero en tiempo real.</div>
+        </div>
+        <div class="tars-area">
+          <div class="tars-area-ico">⚙️</div>
+          <div class="tars-area-name">Procesos &amp; Operaciones</div>
+          <div class="tars-area-desc">Automatización de tareas administrativas repetitivas y rediseño de flujos para que el equipo foco en lo importante.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tars-process">
+    <div class="tars-process-inner">
+      <div class="tars-section-head">
+        <span class="tars-eyebrow">Cómo trabajamos</span>
+        <h2 class="tars-section-h2">Un camino claro, de la<br>foto actual a la mejora concreta.</h2>
+      </div>
+      <div class="tars-steps">
+        <div class="tars-step">
+          <div class="tars-step-num">01</div>
+          <div class="tars-step-body">
+            <div class="tars-step-name">Diagnóstico</div>
+            <div class="tars-step-desc">Relevamos cómo funcionan hoy tus áreas de administración, finanzas y RRHH. Entendemos procesos, herramientas y dolores reales.</div>
+          </div>
+        </div>
+        <div class="tars-step">
+          <div class="tars-step-num">02</div>
+          <div class="tars-step-body">
+            <div class="tars-step-name">Propuesta</div>
+            <div class="tars-step-desc">Presentamos un plan de mejora priorizado: qué ordenar primero, qué automatizar y qué impacto esperar en cada paso.</div>
+          </div>
+        </div>
+        <div class="tars-step">
+          <div class="tars-step-num">03</div>
+          <div class="tars-step-body">
+            <div class="tars-step-name">Implementación</div>
+            <div class="tars-step-desc">Desarrollamos e implementamos las soluciones, de forma iterativa y acompañando al equipo en la adopción.</div>
+          </div>
+        </div>
+        <div class="tars-step">
+          <div class="tars-step-num">04</div>
+          <div class="tars-step-body">
+            <div class="tars-step-name">Acompañamiento</div>
+            <div class="tars-step-desc">Medimos resultados, ajustamos y seguimos mejorando. La eficiencia es un proceso continuo, no un proyecto que termina.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tars-cta-section">
+    <div class="tars-cta-inner">
+      <h2 class="tars-cta-h">¿Tu operación crece pero<br>los procesos no acompañan?</h2>
+      <p class="tars-cta-p">Empecemos por entender dónde estás parado. El diagnóstico inicial es el primer paso — sin compromiso.</p>
+      <button class="tars-btn-primary tars-btn-lg" onclick="navigate('contacto')">Solicitar diagnóstico →</button>
+    </div>
+  </section>
+
+  <div class="cta-banner"><div><div class="cta-h">TARS es parte de kippcode</div><div class="cta-sub">Misma experiencia técnica, aplicada a la gestión de tu organización.</div></div><button class="btn-white" onclick="navigate('contacto')">Iniciar conversación →</button></div>
   <footer><div class="f-logo" onclick="navigate('home')"><div class="f-dot"></div> kippcode</div><a class="f-ig" href="https://instagram.com/kippcode" target="_blank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg> @kippcode</a><div class="f-copy">© 2026 kippcode</div></footer>
 </div>
 
