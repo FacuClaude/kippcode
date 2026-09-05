@@ -165,6 +165,8 @@ input,select{font:inherit;color:inherit}
 .note-warn{border-left:3px solid var(--accent);background:var(--accent-bg)}
 .note code{font-family:var(--mono);font-size:11.5px;background:var(--surface-2);
   padding:2px 6px;border-radius:3px;display:inline-block;margin:4px 0;line-height:1.7}
+.nowrap{white-space:nowrap}
+.diag td:nth-child(2){white-space:nowrap}
 .ins{display:flex;flex-direction:column;gap:0}
 .ins-r{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
 .ins-r:last-child{border-bottom:0}
@@ -172,6 +174,17 @@ input,select{font:inherit;color:inherit}
   color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-line);
   padding:3px 7px;border-radius:4px;flex-shrink:0;min-width:92px;text-align:center}
 .ins-t{font-size:13px;line-height:1.55;color:var(--ink-1)}
+.tape{background:var(--ink);color:#fff;overflow:hidden;height:30px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:25;font-size:12px}
+.tape.none{background:var(--surface-2);color:var(--ink-3)}
+.tape-in{display:inline-flex;gap:34px;white-space:nowrap;padding-left:100%;
+  animation:tape 42s linear infinite}
+.tape:hover .tape-in{animation-play-state:paused}
+.tape-i{display:inline-flex;align-items:center;gap:8px}
+.tape-i b{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;
+  background:var(--accent);padding:2px 7px;border-radius:3px;font-weight:500}
+@keyframes tape{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@media (prefers-reduced-motion:reduce){.tape-in{animation:none;padding-left:14px}}
 .side{position:sticky;top:86px;align-self:start;width:260px;flex:0 0 260px}
 .canvas-wrap{display:flex;gap:20px;align-items:flex-start}
 .canvas-wrap>.canvas{flex:1;min-width:0}
@@ -206,23 +219,27 @@ input,select{font:inherit;color:inherit}
 .tick-dots{display:flex;gap:3px;flex-shrink:0}
 .tick-dots i{width:5px;height:5px;border-radius:50%;background:var(--accent-line);transition:background .2s}
 .tick-dots i.on{background:var(--accent)}
-.tl{display:flex;gap:0;padding:20px 22px 8px;overflow-x:auto}
-.tl-s{flex:1;min-width:96px;position:relative;text-align:center;padding:0 4px}
-.tl-s::before{content:"";position:absolute;top:13px;left:-50%;width:100%;height:2px;background:var(--line-2)}
+.tl{display:flex;gap:0;padding:16px 18px 6px}
+.tl-s{flex:1;min-width:0;position:relative;text-align:center;padding:0 3px}
+.tl-s::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:var(--line-2)}
 .tl-s:first-child::before{display:none}
 .tl-s.done::before{background:var(--accent)}
-.tl-dot{width:27px;height:27px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;
+.tl-dot{width:23px;height:23px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;
   justify-content:center;font-size:11px;font-weight:600;position:relative;z-index:1;
   background:var(--surface);border:2px solid var(--line-2);color:var(--ink-3)}
 .tl-s.done .tl-dot{background:var(--accent);border-color:var(--accent);color:#fff}
 .tl-s.doing .tl-dot{border-color:var(--accent);color:var(--accent);
   box-shadow:0 0 0 4px var(--accent-bg)}
 .tl-s.na .tl-dot{opacity:.4}
-.tl-lab{font-size:11px;line-height:1.35;color:var(--ink-2)}
+.tl-lab{font-size:10px;line-height:1.3;color:var(--ink-2);overflow-wrap:anywhere}
 .tl-s.done .tl-lab,.tl-s.doing .tl-lab{color:var(--ink);font-weight:500}
 .tl-s.na .tl-lab{opacity:.45}
 .tl-note{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:3px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mode-sw{display:flex;gap:2px;margin-top:14px;background:rgba(0,0,0,.18);padding:3px;border-radius:8px}
+.mode-sw button{flex:1;padding:6px 8px;border:0;background:none;color:var(--rail-ink,#fff);opacity:.72;
+  font-size:11px;border-radius:6px;cursor:pointer;font-family:var(--mono);letter-spacing:.03em}
+.mode-sw button.on{background:var(--rail-ink,#fff);color:var(--rail-bg);opacity:1;font-weight:600}
 .rail-theme-l{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.13em;
   text-transform:uppercase;color:var(--rail-dim);margin-top:14px}
 .rail-theme{margin-top:6px;width:100%;background:rgba(255,255,255,.12);color:var(--rail-ink,#fff);
@@ -396,6 +413,10 @@ input[type=file]{display:none}
   <div class="rail-head">
     <div class="rail-title">Localization Centre</div>
     <div class="rail-sub">Management &amp; Analytics</div>
+      <div class="mode-sw">
+        <button id="mode-loc" onclick="setMode('loc')">Localization</button>
+        <button id="mode-rr" onclick="setMode('rr')">Resign-rehire</button>
+      </div>
 
   </div>
   <div class="rail-scroll">
@@ -411,7 +432,6 @@ input[type=file]{display:none}
     <label class="rail-theme-l">Skin colour</label>
     <select class="rail-theme" onchange="setTheme(this.value)">
       <option value="brick">Brick red</option>
-      <option value="skin">Skin</option>
       <option value="slate">Grey</option>
       <option value="charcoal">Black</option>
       <option value="forest">Green</option>
@@ -422,6 +442,7 @@ input[type=file]{display:none}
 </aside>
 
 <main class="main">
+  <div class="tape" id="tape"></div>
   <div class="topbar">
     <div>
       <div class="crumb" id="crumb">No case loaded</div>
@@ -446,6 +467,9 @@ input[type=file]{display:none}
           <button onclick="doExp(2,'pdf')">PDF</button><button onclick="doExp(2,'xls')">Excel</button>
           <div class="menu-h">Other outputs</div>
           <button onclick="doExp('emp','pdf')">Employee output</button>
+          <div class="menu-h" id="menu-rr" style="display:none">Resign-rehire</div>
+          <button id="btn-rr-pdf" style="display:none" onclick="exportRR('pdf')">Full form &mdash; PDF</button>
+          <button id="btn-rr-xls" style="display:none" onclick="exportRR('xls')">Full form &mdash; Excel</button>
           <div class="menu-h">BAL immigration request</div>
           <button onclick="doExp('bal','pdf')">PDF</button><button onclick="doExp('bal','xls')">Excel</button>
           <div class="menu-h">Nova report</div>
@@ -467,6 +491,11 @@ input[type=file]{display:none}
 "use strict";
 
 /* ═══ CURRENCY BY COUNTRY ═══ */
+/* Indicative rates against the dollar, used only when a figure is stated in a
+   currency that is neither the origin's nor the destination's. The TMO rate is
+   preferred wherever it applies. */
+const FX_TO_USD={USD:1,CAD:0.73,EUR:1.08,GBP:1.27,ARS:0.0011,BRL:0.18,MYR:0.22,SGD:0.74};
+const CUR_LIST=["USD","CAD","EUR","GBP","ARS","BRL","MYR","SGD"];
 const CCY={"Angola":"USD","Argentina":"ARS","Australia":"AUD","Austria":"EUR","Azerbaijan Republic":"AZN","Bahamas":"BSD","Barbados":"BBD","Belgium":"EUR","Belize":"BZD","Brazil":"BRL","Cameroon":"XAF","Canada":"CAD","Chad":"XAF","Chile":"CLP","China":"CNY","Colombia":"COP","Cote d'Ivoire":"XOF","Cyprus":"EUR","Czech Republic":"CZK","Denmark":"DKK","Dominican Republic":"DOP","Ecuador":"USD","Egypt":"EGP","El Salvador":"USD","Equatorial Guinea":"XAF","Fiji":"FJD","Finland":"EUR","France":"EUR","French West Indies":"EUR","Gabon":"XAF","Germany":"EUR","Ghana":"GHS","Greece":"EUR","Guam":"USD","Guatemala":"GTQ","Guyana":"GYD","Hong Kong":"HKD","Hungary":"HUF","India":"INR","Indonesia":"IDR","Iraq":"USD","Iraq-Kurdistan":"IQD","Ireland":"EUR","Italy":"EUR","Japan":"JPY","Kazakhstan Republic":"KZT","Kuwait":"KWD","Liberia":"USD","Libya":"LYD","Luxembourg":"EUR","Madagascar":"MGA","Malaysia":"MYR","Mauritania":"MRU","Mexico":"MXN","Mozambique":"MZN","Netherlands":"EUR","New Caledonia":"XPF","New Zealand":"NZD","Nicaragua":"NIO","Nigeria":"NGN","Norway":"NOK","Panama":"USD","Papua New Guinea":"PGK","Paraguay":"PYG","Peru":"PEN","Philippines":"PHP","Poland":"PLN","Portugal":"EUR","Puerto Rico":"USD","Qatar":"QAR","Romania":"RON","Russia":"RUB","Saudi Arabia":"SAR","Senegal":"XOF","Singapore":"SGD","South Africa":"ZAR","South Korea":"KRW","Spain":"EUR","Sweden":"SEK","Switzerland":"CHF","Taiwan":"TWD","Tanzania":"TZS","Thailand":"THB","Trinidad and Tobago":"TTD","Tunisia":"TND","Turkey":"TRY","Turkmenistan":"USD","Ukraine":"UAH","United Arab Emirates":"AED","United Kingdom":"GBP","United States":"USD","Venezuela":"VEF","Vietnam":"VND","Virgin Islands":"USD"};
 
 /* rough USD parity — only used to sanity-check FX direction, never in the maths */
@@ -713,6 +742,41 @@ const REGISTRY={
       {name:"Bonus / BBU",fields:[
         {label:"Original Home Country BBU Guide",alt:["OHC - BBU Guide"],type:"money",need:0},
         {label:"NHC - BBU Guide",type:"money",need:0}
+      ]}
+    ]
+  },
+
+  gcbdrr:{
+    title:"GC&BD Request — Resign-Rehire",
+    to:"Compensation & Benefit Design advisor for the original home country",
+    note:"For a resign-rehire the business case is completed by BHR. Only the benefits position is "+
+         "needed here: whether prior service carries across, and what happens to the pension on each side.",
+    email:"Attached is the benefits request for {name}, a resign-rehire from {ohc} into {nhc}.\n\n"+
+      "We need the prior service recognition position and the pension implications on both sides. "+
+      "The business case itself has already been completed by BHR, so only the sections in this file are "+
+      "outstanding.",
+    sections:[
+      {name:"Prior service recognition",
+       note:"Answer the checklist for the destination that applies. Leave the other blank.",
+       fields:[
+        {label:"Into the U.S. — Policy Service",type:"yesno",need:0,when:"intoUS"},
+        {label:"Into the U.S. — Vacation Service",type:"yesno",need:0,when:"intoUS"},
+        {label:"Into the U.S. — Vesting Service",type:"yesno",need:0,when:"intoUS"},
+        {label:"Into the U.S. — Benefit Service",type:"yesno",need:0,when:"intoUS"},
+        {label:"Into the U.S. — Pension Service",type:"yesno",need:0,when:"intoUS"},
+        {label:"Into a non-U.S. country — Policy Service",type:"yesno",need:0},
+        {label:"Into a non-U.S. country — Vesting Service",type:"yesno",need:0},
+        {label:"Into a non-U.S. country — Benefit Service",type:"yesno",need:0},
+        {label:"Into a non-U.S. country — Pension Service",type:"yesno",need:0},
+        {label:"Into a non-U.S. country — Redundancy / Severance",type:"yesno",need:0},
+        {label:"Comments on prior service recognition",type:"text",need:1,
+         help:"The guideline relied on, and anything the employee should be told."}
+      ]},
+      {name:"Pension implications",fields:[
+        {label:"Pension implications in OHC",type:"text",need:1,
+         help:"What happens to the accrued benefit on resignation, and any action the employee must take."},
+        {label:"Pension implications in NHC",type:"text",need:1,
+         help:"What the employee starts or resumes participating in on rehire."}
       ]}
     ]
   },
@@ -1898,6 +1962,10 @@ function resolve(){
      happened to supply one anyway, it is used rather than left blank, and the
      source says so. */
   d.taxNHC    = d.intoUS ? (d.taxNHCDel ?? null) : d.taxNHCDel;
+  /* Deloitte report each side in whichever currency the country uses; declaring
+     it lets the figure be converted instead of silently treated as USD. */
+  d.taxOHCCcy = overrides.taxOHCCcy || d.ohcCcy || null;
+  d.taxNHCCcy = overrides.taxNHCCcy || d.nhcCcy || null;
   d.taxNHCSrc = d.intoUS
     ? (d.taxNHCDel!==null&&d.taxNHCDel!==undefined ? "Deloitte — replace with the calculator figure"
                                                    : "paycheck calculator, by hand")
@@ -1936,7 +2004,7 @@ function resolve(){
   /* performance is entered per year against a fixed category list; potential is a single number */
   d.perfYears=[new Date().getFullYear(),new Date().getFullYear()-1,new Date().getFullYear()-2];
   d.perfText=[["perfCur",d.perfYears[0]],["perfY1",d.perfYears[1]],["perfY2",d.perfYears[2]]]
-    .filter(([k])=>d[k]).map(([k,y])=>y+": "+d[k]).join(" · ")||null;
+    .filter(([k])=>d[k]).map(([k,y])=>String(y).slice(2)+" "+d[k]).join(" · ")||null;
 
   /* ── FX direction check ── */
   d.fx=d.fxRaw; d.fxFlip=false;
@@ -2115,9 +2183,18 @@ function calc(d){
   c.e.o.salary = ov("e.o.salary",S(d.ohcSalary));
   c.e.l.salary = ov("e.l.salary",d.nhcSalary);
   c.e.x.afp    = S(sum(d.ohcAFP)??0);     c.e.o.afp    = S(sum(d.ohcAFP)??0); c.e.l.afp    = sum(d.nhcAFP)??0;
-  c.e.x.tax    = ov("e.x.tax",d.taxOHC!==null?-Math.abs(d.taxOHC):null);
+  /* Each side is converted from whatever currency it was reported in, so a
+     Deloitte figure in euros is not read as dollars. */
+  const toNHC=(v,ccy)=>{
+    if(v===null||v===undefined)return null;
+    if(!ccy||!d.nhcCcy||ccy===d.nhcCcy)return v;
+    if(ccy===d.ohcCcy&&d.fx)return v*d.fx;
+    const r=FX_TO_USD[ccy], n=FX_TO_USD[d.nhcCcy];
+    return (r&&n)?v*(r/n):v;
+  };
+  c.e.x.tax    = ov("e.x.tax",d.taxOHC!==null?-Math.abs(toNHC(d.taxOHC,d.taxOHCCcy)):null);
   c.e.o.tax    = ov("e.o.tax",c.e.x.tax);
-  c.e.l.tax    = ov("e.l.tax",d.taxNHC!==null?-Math.abs(d.taxNHC):null);
+  c.e.l.tax    = ov("e.l.tax",d.taxNHC!==null?-Math.abs(toNHC(d.taxNHC,d.taxNHCCcy)):null);
   ["x","o","l"].forEach(k=>{
     c.e[k].sub = c.e[k].salary===null?null:sum([c.e[k].salary,c.e[k].afp,c.e[k].tax]);
   });
@@ -2282,7 +2359,7 @@ function gate(d,c){
 
 /* ═══ RENDER ═══ */
 function railHTML(){
-  const html=g=>SLOTS.filter(s=>s.req===g).map(s=>{
+  const html=g=>activeSlots().filter(s=>s.req===g).map(s=>{
     const on=s.db?!!dbHandle:!!F[s.id];
     const m=s.db?{n:dbHandle?dbName:(pendingDb?"click to reconnect "+pendingDb.name:"")}:FILEMETA[s.id];
     return `<div class="slot ${on?"on":""} ${s.req&&!on?"req":""}" onclick="pickFile('${s.id}')">
@@ -2294,8 +2371,11 @@ function railHTML(){
   }).join("");
   document.getElementById("slots-req").innerHTML=html(1);
   document.getElementById("slots-opt").innerHTML=html(0);
-  const req=SLOTS.filter(s=>s.req), got=req.filter(s=>F[s.id]).length;
-  const opt=SLOTS.filter(s=>!s.req).filter(s=>F[s.id]).length;
+  const ml=document.getElementById("mode-loc"), mr=document.getElementById("mode-rr");
+  if(ml)ml.classList.toggle("on",MODE==="loc");
+  if(mr)mr.classList.toggle("on",MODE==="rr");
+  const req=activeSlots().filter(s=>s.req), got=req.filter(s=>F[s.id]).length;
+  const opt=activeSlots().filter(s=>!s.req).filter(s=>F[s.id]).length;
   document.getElementById("status").innerHTML =
     got===0 ? "No files loaded"
     : `<b>${got} of ${req.length}</b> required${opt?` · <b>${opt}</b> optional`:""}` +
@@ -2311,7 +2391,7 @@ const PERF_CATS=["OPwD","OP","EP","VG","GP","NI","NSI"];
    the reader can judge the weight. Anything resting on too few cases is either
    left out or says so; a portfolio of thirty does not carry a confident trend,
    and dressing one up would be worse than saying nothing. */
-function insights(R,ALL){
+function insights(R){
   const out=[], n=R.length;
   if(!n)return out;
   const pct=(a,b)=>Math.round(a/b*100);
@@ -2383,7 +2463,7 @@ function insights(R,ALL){
     t:`Green card initiation is recorded as done on ${gc} of the ${usRows.length} U.S. moves in this selection.`});
 
   /* volume shift, only when both years are genuinely present */
-  const byYear=tally(ALL,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
+  const byYear=tally(R,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
     .sort((a,b)=>a[0]-b[0]);
   if(byYear.length>=2){
     const [py,pv]=byYear[byYear.length-2], [cy,cv]=byYear[byYear.length-1];
@@ -2440,6 +2520,21 @@ function pendingItems(d,c){
 }
 
 let R_NOVA=null;
+/* The running tape across the top. Two copies of the list so the loop reads
+   continuously rather than snapping back to an empty strip. */
+function paintTape(d,c){
+  const el=document.getElementById("tape"); if(!el)return;
+  const items=d?pendingItems(d,c):[];
+  if(!items.length){
+    el.className="tape none";
+    el.innerHTML=`<div style="padding-left:22px">${d?"Nothing outstanding on this case.":"No case loaded."}</div>`;
+    return;
+  }
+  el.className="tape";
+  const strip=items.map(x=>`<span class="tape-i"><b>${esc(x.tag)}</b>${esc(x.t)}</span>`).join("");
+  el.innerHTML=`<div class="tape-in">${strip}${strip}</div>`;
+}
+
 function pendHTML(d,c){
   const items=pendingItems(d,c);
   return `<div class="pend">
@@ -2453,6 +2548,18 @@ function pendHTML(d,c){
 /* A guided mode for someone using this for the first time: one instruction at a
    time, in the order the process actually runs, rather than a list of everything
    outstanding at once. */
+let MODE="loc";
+/* Two kinds of case, each with its own files and its own screen. The switch
+   changes what the rail asks for and what the main panel renders; nothing is
+   shared but the tracker. */
+function setMode(m){
+  MODE=m;
+  try{ caseStore().then(db=>db.transaction("h","readwrite").objectStore("h").put(m,"mode")); }catch(e){}
+  railHTML();
+  if(m==="rr")renderRR(); else { D=null; render(); }
+}
+function activeSlots(){ return MODE==="rr"?RR_SLOTS:SLOTS; }
+
 let guideOn=false;
 function setGuide(v){
   guideOn=v;
@@ -2503,6 +2610,442 @@ function guideHTML(d){
   </div>`;
 }
 
+
+
+
+/* ═══ RESIGN-REHIRE ═════════════════════════════════════════════════════════
+   A second kind of case with a different shape. BHR complete almost all of the
+   business case template and send it in; the coordinator adds two things — the
+   salary work-up Compensation return, and the benefits analysis — and the whole
+   form goes to a single approver.
+
+   The template's own colour key says who owns what: blue is Compensation's
+   input, green is the coordinator's. Everything else is read from the file and
+   shown but not edited here, so the app never becomes a second source of truth
+   for what BHR already wrote. */
+
+const RR_SLOTS=[
+  {id:"rr",  name:"Resign-rehire business case", req:1, hint:"the template BHR completed and sent"},
+  {id:"comp",name:"Compensation data request",   req:1, hint:"salary work-up in the new home country"},
+  {id:"gcbd",name:"GC&BD information data request",req:1,hint:"prior service recognition and pension impact"},
+  {id:"db",  name:"Case tracker / database",     req:0, hint:"Full Tracker.xlsx", db:1}
+];
+
+/* label → key, in the order the template lays them out */
+const RR_MAP=[
+  ["§Case",null],
+  ["Type of Case","type"],["Targeted Effective Date of Rehire","effDate"],
+  ["From (OHC - Original Home Country)","ohc"],["To (NHC - New Home Country)","nhc"],
+  ["§Candidate / Employee Data",null],
+  ["Employee Name (Last Name, First Name)","name"],["Employee Date of Birth","dob"],
+  ["Employee Age","age"],["Original Home Country PERNR","ohcPernr"],
+  ["Date of Hire / Employment Date","hire"],
+  ["§Candidate / Employee Current Situation",null],
+  ["Is Employee an Expat in the New Home Country","isExpat"],
+  ["Expatriate Assignment Start Date","expatStart"],["New Home Country PERNR","nhcPernr"],
+  ["§Recruiting Target Confirmation",null],
+  ["Recruiting Target available in New Home Country","targetAvail"],["Recruiting Target ID","targetId"],
+  ["§Organizational Data",null],
+  ["Current Position Title","curTitle"],["Current Position Function (L1)","curL1"],
+  ["Current Position Sub-Function (L2)","curL2"],["Current Position Department (L3)","curL3"],
+  ["Current Position Sub-Department (L4)","curL4"],["Current Position Company / Affiliate Name","curCo"],
+  ["New Position Title","newTitle"],["New Position Function (L1)","newL1"],
+  ["New Position Sub-Function (L2)","newL2"],["New Position Department (L3)","newL3"],
+  ["New Position Sub-Department (L4)","newL4"],["New Position Company / Affiliate Name","newCo"],
+  ["§Business Case",null],
+  ["Personal Interest to Relocate","personal"],
+  ["Business Need / Business Justification","need"],
+  ["Immigration Strategy & Other Considerations","immigration"],
+  ["§Compensation Data — Section A",null],
+  ["Current CL","curCL"],["Year End Experience (YEE)","yee"],["Length of Service","los"],
+  ["Performance","perf"],["Potential","pot"],["Peer/s for Comparison","peers"]
+];
+
+/* the two blocks the coordinator owns */
+const RR_COMP=[
+  ["Proposed CL","propCL","from Compensation"],
+  ["Salary Workup in New Home Country Payroll","salary","amount and currency"],
+  ["Salary Workup Assumptions","assump",""],
+  ["Salary Workup Comments","comments",""],
+  ["Is the B/L aligned with the Salary Workup?","aligned","Yes / No"],
+  ["B/L / BHR Comments","blComments",""]
+];
+const RR_US=["Policy Service","Vacation Service","Vesting Service","Benefit Service","Pension Service"];
+const RR_NONUS=["Policy Service","Vesting Service","Benefit Service","Pension Service","Redundancy / Severance"];
+
+function rrGet(k,...alts){
+  const g=(...ks)=>pickStrict("rr",...ks)??pick("rr",...ks);
+  return g(k,...alts);
+}
+function resolveRR(){
+  const d={mode:"rr"};
+  RR_MAP.forEach(([label,key])=>{ if(key)d[key]=rrGet(label); });
+  d.ohc=canonCountry(d.ohc); d.nhc=canonCountry(d.nhc);
+  d.intoUS=d.nhc==="United States";
+  d.dob=xlDate(d.dob); d.hire=xlDate(d.hire);
+  d.effDate=xlDate(d.effDate); d.expatStart=xlDate(d.expatStart);
+  /* employment history block, same shape as the localization career table */
+  d.history=[];
+  const g=F.rr&&F.rr.grids;
+  if(g)for(const sh of Object.keys(g)){
+    const rows=g[sh]; if(!rows)continue;
+    let hdr=-1;
+    rows.forEach((r,i)=>{ if(hdr<0&&r&&r.some(c=>/^date$/i.test(String(c??"").trim()))
+      &&r.some(c=>/^position$/i.test(String(c??"").trim())))hdr=i; });
+    if(hdr<0)continue;
+    for(let i=hdr+1;i<rows.length;i++){
+      const r=rows[i]; if(!r)continue;
+      const cells=r.filter(c=>c!==null&&c!=="");
+      if(cells.length<3)break;
+      const dt=xlDate(r.find(c=>c!==null&&c!==""));
+      if(!dt)break;
+      const t=r.filter(c=>typeof c==="string"&&c.trim());
+      d.history.push({date:usd(dt),position:t[0]||"",fn:t[1]||"",loc:t[2]||""});
+    }
+    break;
+  }
+  /* approver and contact table */
+  d.contacts=[];
+  if(g)for(const sh of Object.keys(g)){
+    const rows=g[sh]; if(!rows)continue;
+    let hdr=-1;
+    rows.forEach((r,i)=>{ if(hdr<0&&r&&r.some(c=>/contact\s*\/\s*role/i.test(String(c??""))))hdr=i; });
+    if(hdr<0)continue;
+    for(let i=hdr+1;i<rows.length;i++){
+      const r=rows[i]; if(!r)continue;
+      const t=r.map(c=>String(c??"").trim());
+      const role=t.find(x=>x);
+      if(!role||/compensation data/i.test(role))break;
+      const rest=t.filter(x=>x&&x!==role);
+      d.contacts.push({role,name:rest[0]||"",title:rest[1]||"",loc:rest[2]||""});
+    }
+    break;
+  }
+  /* what the coordinator adds */
+  const ov=k=>overrides["rr:"+k];
+  d.comp={}; RR_COMP.forEach(([,k])=>d.comp[k]=ov(k)??null);
+  d.svcUS={}; RR_US.forEach(x=>d.svcUS[x]=ov("us:"+x)??null);
+  d.svcNon={}; RR_NONUS.forEach(x=>d.svcNon[x]=ov("non:"+x)??null);
+  d.svcComments=ov("svcComments")??null;
+  d.pensionOHC=ov("pensionOHC")??(pickStrict("gcbd","Pension implications in OHC")??pick("gcbd","Pension implications in OHC"))??null;
+  d.pensionNHC=ov("pensionNHC")??(pickStrict("gcbd","Pension implications in NHC")??pick("gcbd","Pension implications in NHC"))??null;
+
+  d.missing=[];
+  RR_COMP.forEach(([l,k])=>{ if(!d.comp[k])d.missing.push(l); });
+  (d.intoUS?RR_US:RR_NONUS).forEach(x=>{
+    const v=d.intoUS?d.svcUS[x]:d.svcNon[x];
+    if(v===null||v==="")d.missing.push("Prior service — "+x);
+  });
+  if(!d.svcComments)d.missing.push("Comments on prior service recognition");
+  if(!d.pensionOHC)d.missing.push("Pension implications in the origin country");
+  if(!d.pensionNHC)d.missing.push("Pension implications in the new home country");
+  return d;
+}
+
+function rrRows(d){
+  const out=[];
+  RR_MAP.forEach(([label,key])=>{
+    if(!key){out.push({h:label.slice(1)});return;}
+    let v=d[key];
+    if(v instanceof Date)v=usd(v);
+    out.push({label,value:(v===null||v===undefined||v==="")?null:v});
+  });
+  if(d.history.length){
+    out.push({h:"ExxonMobil Employment History"});
+    d.history.forEach(h=>out.push({label:h.date,value:[h.position,h.fn,h.loc].filter(Boolean).join(" · ")}));
+  }
+  if(d.contacts.length){
+    out.push({h:"Functional & HR Approvers / Points of Contact"});
+    d.contacts.forEach(c=>out.push({label:c.role,value:[c.name,c.title,c.loc].filter(Boolean).join(" · ")}));
+  }
+  out.push({h:"Compensation Data — Section B"});
+  RR_COMP.forEach(([l,k])=>out.push({label:l,value:d.comp[k],pending:!d.comp[k]}));
+  out.push({h:"Benefits Analysis — prior service recognition"});
+  const list=d.intoUS?RR_US:RR_NONUS, src=d.intoUS?d.svcUS:d.svcNon;
+  out.push({label:d.intoUS?"Into the U.S.":"Into a non-U.S. country",value:null,sub:true});
+  list.forEach(x=>out.push({label:"    "+x,value:src[x],pending:!src[x]}));
+  out.push({label:"Comments on prior service recognition",value:d.svcComments,pending:!d.svcComments});
+  out.push({label:"Pension implications in "+(d.ohc||"OHC"),value:d.pensionOHC,pending:!d.pensionOHC});
+  out.push({label:"Pension implications in "+(d.nhc||"NHC"),value:d.pensionNHC,pending:!d.pensionNHC});
+  return out;
+}
+
+
+function rrHTML(d){
+  const ed=(l,k,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">coordinator</span></div>
+    <input class="${val?"":"blank"}" value="${esc(val??"")}" placeholder="${ph}"
+      onchange="setOv('rr:${k}',this.value)"></div>`;
+  const ta=(l,k,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">coordinator</span></div>
+    <textarea rows="3" style="width:100%;font:inherit;font-size:13px;padding:7px 9px;border:1px solid var(--line);
+      border-radius:3px;resize:vertical" placeholder="${ph}"
+      onchange="setOv('rr:${k}',this.value)">${esc(val??"")}</textarea></div>`;
+  const yn=(l,k,val)=>`<div class="f"><div class="f-l">${l}<span class="f-src">coordinator</span></div>
+    <select class="${val?"":"blank"}" onchange="setOv('rr:${k}',this.value)">
+      <option value=""${val?"":" selected"}>—</option>
+      <option value="Yes"${val==="Yes"?" selected":""}>Yes — recognized</option>
+      <option value="No"${val==="No"?" selected":""}>No — not recognized</option>
+    </select></div>`;
+  const f=(l,v)=>`<div class="f"><div class="f-l">${l}<span class="f-src">BHR</span></div>
+    <div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v instanceof Date?usd(v):v))}</div></div>`;
+
+  const list=d.intoUS?RR_US:RR_NONUS, src=d.intoUS?d.svcUS:d.svcNon;
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">From BHR</div>
+      <div class="panel-n">read from the template &middot; not edited here</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("Type of case",d.type)} ${f("Targeted effective date of rehire",d.effDate)}
+      ${f("Employee",d.name)} ${f("Date of birth",d.dob)} ${f("Age",d.age)}
+      ${f("From",d.ohc)} ${f("To",d.nhc)}
+      ${f("OHC PERNR",d.ohcPernr)} ${f("NHC PERNR",d.nhcPernr)}
+      ${f("Employment date",d.hire)} ${f("Expat in the new home country",d.isExpat)}
+      ${f("Recruiting target",d.targetAvail)} ${f("Recruiting target ID",d.targetId)}
+      ${f("Current position",d.curTitle)} ${f("New position",d.newTitle)}
+      ${f("Current CL",d.curCL)} ${f("Year end experience",d.yee)} ${f("Length of service",d.los)}
+      ${f("Performance",d.perf)} ${f("Potential",d.pot)} ${f("Peers for comparison",d.peers)}
+    </div></div>
+    ${d.need?`<div class="note"><strong>Business need.</strong> ${esc(String(d.need))}</div>`:""}
+    ${d.immigration?`<div class="note"><strong>Immigration.</strong> ${esc(String(d.immigration))}</div>`:""}
+    ${d.contacts.length?`<div class="note"><strong>${d.contacts.length} approvers and contacts</strong> read from the template.</div>`:""}
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">Compensation — Section B</div>
+      <div class="panel-n">what you obtain from Compensation</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${ed("Proposed CL","propCL",d.comp.propCL,"e.g. 29")}
+      ${ed("Salary work-up in NHC payroll","salary",d.comp.salary,"amount and currency")}
+      ${ed("Is the B/L aligned with the work-up?","aligned",d.comp.aligned,"Yes / No")}
+    </div></div>
+    <div class="panel-b"><div class="fgrid" style="grid-template-columns:1fr">
+      ${ta("Salary work-up assumptions","assump",d.comp.assump)}
+      ${ta("Salary work-up comments","comments",d.comp.comments,"e.g. Provided 98%SR based on VGP curve.")}
+      ${ta("B/L and BHR comments","blComments",d.comp.blComments)}
+    </div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-h"><div class="panel-t">Benefits analysis</div>
+      <div class="panel-n">prior service recognition &middot; ${d.intoUS?"into the U.S.":"into "+(d.nhc||"a non-U.S. country")}</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${list.map(x=>yn(x,(d.intoUS?"us:":"non:")+x,src[x])).join("")}
+    </div></div>
+    <div class="panel-b"><div class="fgrid" style="grid-template-columns:1fr">
+      ${ta("Comments on prior service recognition","svcComments",d.svcComments,
+        "e.g. Prior service with the origin affiliate will be recognized as per Service Crediting Guidelines.")}
+      ${ta("Pension implications in "+(d.ohc||"the origin country"),"pensionOHC",d.pensionOHC)}
+      ${ta("Pension implications in "+(d.nhc||"the new home country"),"pensionNHC",d.pensionNHC)}
+    </div></div>
+    <div class="note">Only the checklist that applies to this destination is shown. GC&amp;BD supply the
+      pension wording; anything they returned is filled in and can be edited.</div>
+  </div>`;
+}
+
+function renderRR(){
+  if(!F.rr){
+    document.getElementById("body").innerHTML=`<div class="canvas"><div class="empty">
+      <div class="empty-i">RR</div><h2>No resign-rehire case loaded</h2>
+      <p>Load the business case template BHR sent you. Everything they completed is read from it;
+      you add the salary work-up and the benefits analysis.</p></div></div>`;
+    document.getElementById("subject").textContent="—";
+    document.getElementById("crumb").textContent="RESIGN-REHIRE";
+    document.getElementById("route").textContent="";
+    paintTape(null,null); railHTML(); return;
+  }
+  const d=resolveRR(); D=d;
+  document.getElementById("crumb").textContent=String(d.type||"Resign-rehire").toUpperCase();
+  document.getElementById("subject").textContent=d.name||"—";
+  document.getElementById("route").textContent=[d.ohc,d.nhc].filter(Boolean).join(" \u2192 ");
+  document.getElementById("body").innerHTML=`<div class="canvas">${rrHTML(d)}</div>`;
+  const el=document.getElementById("tape");
+  if(el){
+    if(!d.missing.length){ el.className="tape none";
+      el.innerHTML='<div style="padding-left:22px">The form is complete and ready for the approver.</div>'; }
+    else{ el.className="tape";
+      const strip=d.missing.map(x=>`<span class="tape-i"><b>to add</b>${esc(x)}</span>`).join("");
+      el.innerHTML=`<div class="tape-in">${strip}${strip}</div>`; }
+  }
+  railHTML();
+}
+
+function exportRR(fmt){
+  if(!F.rr){alert("Load the resign-rehire template first.");return;}
+  const d=resolveRR(), rows=rrRows(d);
+  const who=(d.name||"Resign-rehire").replace(/[^A-Za-z0-9]+/g,"_").replace(/^_|_$/g,"");
+  if(fmt==="xls"){
+    const aoa=[["RESIGN-REHIRE BUSINESS CASE",""]];
+    rows.forEach(r=>{ if(r.h)aoa.push([],[r.h.toUpperCase(),""]);
+      else aoa.push([r.label,r.value===null?null:r.value]); });
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"]=[{wch:52},{wch:70}];
+    ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:1}}];
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"Resign-Rehire");
+    if(d.missing.length)XLSX.utils.book_append_sheet(wb,
+      XLSX.utils.aoa_to_sheet([["STILL TO COMPLETE"],...d.missing.map(x=>[x])]),"Pending");
+    XLSX.writeFile(wb,`${who}_Resign-Rehire_${new Date().toISOString().slice(0,10)}.xlsx`);
+    return;
+  }
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    <title>${esc(d.name||"Resign-rehire")} — Resign-rehire business case</title>${PDF_CSS}</head><body>
+    <div class="sheet">
+      <header><span>ExxonMobil &middot; Global Mobility</span><span>Private</span></header>
+      <h1>Resign-rehire business case</h1>
+      <div class="lede-row"><div><div class="who">${esc(d.name||"—")}</div>
+        <div class="route">${esc([d.ohc,d.nhc].filter(Boolean).join(" \u2192 "))}</div></div>
+        <dl><div class="kv"><dt>Type</dt><dd>${esc(d.type||"Resign-rehire")}</dd></div>
+        <div class="kv"><dt>Effective</dt><dd>${esc(d.effDate?usd(d.effDate):"—")}</dd></div>
+        <div class="kv"><dt>Produced</dt><dd>${usd(new Date())}</dd></div></dl></div>
+      <dl>${rows.map(r=>{
+        if(r.h)return `</dl><h3>${esc(r.h)}</h3><dl>`;
+        const long=typeof r.value==="string"&&r.value.length>110;
+        const cls=(long?"kvb":"kv")+(r.pending?" pending":"");
+        const v=r.value===null?"&mdash;":esc(String(r.value)).replace(/\n/g,"<br>");
+        return `<div class="${cls}"><dt>${esc(r.label)}</dt><dd>${v}</dd></div>`;
+      }).join("")}</dl>
+      ${d.missing.length?`<div class="callout"><b>Still to complete before this goes to the approver.</b>
+        ${d.missing.map(esc).join(" &middot; ")}</div>`:""}
+      <footer><span>Localization Centre</span><span>${esc(d.name||"")} &middot; ${usd(new Date())}</span>
+        <span>Private</span></footer>
+    </div></body></html>`);
+  w.document.close(); setTimeout(()=>{w.focus();w.print();},350);
+}
+
+/* ═══ PROCESS EMAILS ════════════════════════════════════════════════════════
+   Two notes that go out late in the process. Both are built from the case so
+   the employee's own pension wording, countries and dates carry through rather
+   than being retyped, and both open as drafts for review before sending. */
+
+function offerEmail(d){
+  d=d||{};
+  /* Anything the case has not supplied is left as a bracketed placeholder, so
+     the draft is usable as a blank template and every gap is visible rather
+     than quietly filled with a guess. */
+  const P=(v,ph)=>{const t=(v===null||v===undefined)?"":String(v).trim();return t||`[${ph}]`;};
+  const first=d.name?String(d.name).trim().split(/\s+/)[0]:"[first name]";
+  const advFirst=overrides.dsAdvisor?String(overrides.dsAdvisor).trim().split(/\s+/)[0]:"[advisor]";
+  const g=d.gc||{};
+  const pension=[
+    g.elig&&String(g.elig).trim(),
+    g.payOpts&&String(g.payOpts).trim(),
+    /^y/i.test(d.offset||"")
+      ? "Prior service is recognized in the NHC for Pension purposes. Nova will provide additional details on this topic during the Benefits session."
+      : (/^n/i.test(d.offset||"")?"Prior service is not recognized in the NHC for Pension purposes.":null),
+    g.dcDesc&&String(g.dcDesc).trim()
+  ].filter(Boolean).join("\n\n") || "[pension integration wording from GC&BD]";
+
+  const subject=`Localization (${P(d.ohc,"original home country")} into the ${P(d.nhc,"new home country")}) - Initial Employee Offer`;
+  const body=
+`Hi ${advFirst},
+
+Hope this note finds you well.
+
+The purpose of this e-mail is to let you know that the case of ${P(d.name,"employee name")} has been reviewed and received preliminary endorsement from HR (GC&BD Manager & CB&P Manager). Final endorsements required as per PMG guidelines will be obtained post employee acceptance of the Localization offer.
+
+This is a summary of next steps:
+
+1) Employee Inform Discussion
+
+Please schedule time with ${first} to present the materials attached to this note, which are intended to facilitate the discussion. A summary of the documents attached follows:
+
+Attachment 1 - Information regarding U.S. Benefit Plan Counseling Assistance / Personal Tax - Financial Counseling Assistance / U.S. Pension Considerations & FAQs.
+
+Attachment 2 - Employee Sheet: Information regarding the Compensation and Benefit calculations for the employee. It is important that the employee understands that the localization template is an estimate at this time. If required, the calculations will be updated a month prior to the localization effective date to reflect current exchange rate, salary, expat pay components, etc. The tax deduction lines included in the analysis are also approximations and do not encompass all the items that will ultimately be deducted through payroll once localization occurs. For this reason, it is important for the employee to engage in the appropriate discussions with Deloitte to address any potential questions related to tax deductions.
+
+Password to follow.
+
+Upon the employee accepting the localization offer, please have the employee sign the offer letter and return it to me.
+
+2) Employee Benefits Session (Nova)
+
+Localization counseling is offered to the employee via NOVA (Pension Consultants) and Deloitte (Tax consultation). This 3rd party service provides additional information regarding the U.S. benefit plans, including pension, savings, health plans, and Tax. I will request a session once you confirm that the employee is aware of this process.
+
+When sending me the employee offer signed, please also attach PMG A approval and the sending and receiving organization alignment.
+
+Additional comments to communicate during the employee session:
+- Classification level ${d.clNew&&d.cl&&d.clNew!==d.cl?`moves from CL ${d.cl} to CL ${d.clNew}.`:"remains unchanged. No promotion."}
+- Immigration strategy: ${d.immStrategy?String(d.immStrategy).trim():"[BAL's confirmation]"}
+- Pension integration / DB Plan considerations:
+${pension}
+
+Let me know if you have any questions,
+Regards,`;
+  return {subject,body,
+    attach:["Attachment I - U.S. Payroll Benefits Retirement Considerations & FAQs.pdf",
+            `${d.name?String(d.name).toUpperCase():"[EMPLOYEE]"} - Employee Offer Letter.pdf`,
+            "Employee Output (from Export)"]};
+}
+
+function implNote(d){
+  d=d||{};
+  const P=(v,ph)=>{const t=(v===null||v===undefined)?"":String(v).trim();return t||`[${ph}]`;};
+  const eff=d.targetDate?usd(d.targetDate):"[effective date]";
+  const shortType=/full/i.test(d.locType||"")?"Full localization"
+    :/3rd/i.test(d.locType||"")?"Direct from 3rd country localization"
+    :/direct/i.test(d.locType||"")?"Direct from home localization"
+    :"[type of localization]";
+  const route=`${P(d.ohc,"OHC")} into ${P(d.nhc,"NHC")}`;
+  const subject=`ACTION REQUIRED: Transfer to ${P(d.nhc,"NHC")} Payroll - ${P(d.name,"employee name")} - Effective ${eff}`;
+  const body=
+`Hi all,
+
+This will serve as the official notification to transfer the subject employee ${P(d.name,"employee name")} (${shortType}: ${route}) to the ${P(d.nhc,"NHC")} payroll effective ${eff} as all required PMG reviews/approvals have been obtained.
+
+- Country Reassignment, please ensure all systems are updated accordingly.
+- Cartus team, this is a ${shortType==="[type of localization]"?"[type of localization]":shortType.toLowerCase()}. Please assist accordingly.
+- The provisions applicable to a ${shortType==="[type of localization]"?"[type of localization]":shortType.toLowerCase()} should apply.
+
+Further employee details:
+  Original Home Country: ${P(d.ohc,"OHC")} (PERNR ${P(d.ohcPernr,"PERNR")})
+  New Home Country: ${P(d.nhc,"NHC")} (PERNR ${d.nhcPernr?d.nhcPernr:"TBD"})
+
+New Home Country point of contact is ${P(overrides.nhcContact,"NHC contact")}.
+Original Home Country HR contact is ${P(overrides.ohcContact,"OHC HR contact")}.
+
+MAPs & Relocations Team, more information to follow to initiate the file with Cartus.
+D&SA team, please update Performance/Potential information on the effective date or before the effective date for the day after the new Personnel ID number is created by DM.
+DM team, please update Actions for both the old Home and new Home Personnel ID numbers correctly before the new effective date. Any required missing information, please contact the Business Line directly.
+
+Let me know if you have any questions,
+Regards,`;
+  return {subject,body,attach:[]};
+}
+
+function openMail(kind){
+  /* Works with no case loaded too, so a blank template can be pulled at any time. */
+  const m=kind==="offer"?offerEmail(D):implNote(D);
+  const to=kind==="offer"?(overrides.dsEmail||""):(overrides.implTo||"");
+  const url=`mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(m.subject)}`
+    +`&body=${encodeURIComponent(m.body+(m.attach.length?`\n\nAttachments: ${m.attach.join("; ")}`:""))}`;
+  lastMailto=url;
+  window.location.href=url;
+  toast("Draft opened"+(m.attach.length?" — attach the listed files":""));
+}
+
+function mailHTML(d){
+  const ed=(l,key,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
+    <input value="${esc(overrides[key]||"")}" placeholder="${ph}"
+      onchange="setOv('${key}',this.value)"></div>`;
+  return `<div class="panel">
+    <div class="panel-h"><div class="panel-t">Process emails</div>
+      <div class="panel-n">built from this case</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${ed("D&amp;S advisor name","dsAdvisor","who the offer package goes to")}
+      ${ed("D&amp;S advisor email","dsEmail")}
+      ${ed("Implementation note recipients","implTo","MAPs &amp; Relocations, payroll, Cartus…")}
+      ${ed("New home country contact","nhcContact")}
+      ${ed("Origin country HR contact","ohcContact")}
+    </div></div>
+    <div class="panel-b" style="display:flex;gap:9px;flex-wrap:wrap">
+      <button class="mini-btn" onclick="openMail('offer')">Employee offer package</button>
+      <button class="mini-btn" onclick="openMail('impl')">Implementation note</button>
+    </div>
+    <div class="note">Both drafts fill from the case where it has the answer &mdash; the pension wording GC&amp;BD
+      returned, BAL's immigration strategy, the countries, the PERNRs, the effective date. Anything the case
+      does not carry is left as a <em>[bracketed placeholder]</em>, so the same button gives a clean blank
+      template with no case loaded and every gap stays visible. Attachments are named in the draft for you to add.</div>
+  </div>`;
+}
 
 /* ═══ CASE TIMELINE ════════════════════════════════════════════════════════
    The tracker records each stage of the process in its own column. Matching the
@@ -2603,6 +3146,10 @@ function fieldsHTML(d){
       <input class="${val===null||val===""?"blank":""}" value="${val??""}"
         onchange="setOv('${key}',this.value)">${ph?`<div class="f-hint">${ph}</div>`:""}</div>`;
   };
+  const ccySel=(l,key,val)=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
+    <select onchange="setOv('${key}',this.value)">
+      ${CUR_LIST.map(c=>`<option value="${c}"${val===c?" selected":""}>${c}</option>`).join("")}
+    </select></div>`;
   const sel=(l,key,val)=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
     <select class="${val?"":"blank"}" onchange="setOv('${key}',this.value)">
       <option value=""${val?"":" selected"}>—</option>
@@ -2709,10 +3256,10 @@ function fieldsHTML(d){
       ${ed("Life expectancy","life",d.life,"80")}
       ${ed("Tax equalization — home country","homeTax",d.homeTax,"from the cost matrix")}
       ${ed("Tax equalization — host country","hostTax",d.hostTax,"from the cost matrix")}
-      ${ed("Estimated income tax — original home country","taxOHC",d.taxOHC,
-        d.taxOHCSrc||"")}
-      ${ed("Estimated income tax — new home country","taxNHC",d.taxNHC,
-        d.taxNHCSrc||"")}
+      ${ed("Estimated income tax — original home country","taxOHC",d.taxOHC,d.taxOHCSrc||"")}
+      ${ccySel("Currency it is stated in","taxOHCCcy",d.taxOHCCcy)}
+      ${ed("Estimated income tax — new home country","taxNHC",d.taxNHC,d.taxNHCSrc||"")}
+      ${ccySel("Currency it is stated in","taxNHCCcy",d.taxNHCCcy)}
       ${ed("Year end age","yeAge",d.ageYE,"drives the retirement scenarios")}
     </div>
     <div class="fgrid" style="grid-template-columns:1fr">
@@ -2782,7 +3329,7 @@ function diagHTML(d,c){
     ["Years of service",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(4):null,d.yosSrc||"request form"],
     ["Year end age",d.ageYE,"SuccessFactors"],
     ["Classification level",d.cl?"CL "+d.cl:null,d.reqCL!==null?"request form":"SuccessFactors"],
-    ["Performance",d.perfText,"manual"],
+    ["Performance",d.perfText?`<span class="nowrap">${esc(d.perfText)}</span>`:null,"manual"],
     ["Potential",d.pot,"manual"]
   ];
   const missing=rows.filter(r=>r[1]===null||r[1]===undefined||r[1]==="").length;
@@ -3118,6 +3665,8 @@ function render(){
   const A=gate(D,c);
   R_NOVA=novaRows(D);
   document.getElementById("body").innerHTML=`<div class="canvas-wrap"><div class="canvas">
+    ${guideOn?guideHTML(D):`<div style="text-align:right;margin-bottom:10px">
+      <button class="mini-btn" onclick="setGuide(true)">Show me the steps</button></div>`}
     ${A.length?`<div class="alerts">${A.map(a=>`
       <div class="alert alert-${a.t}"><span class="alert-tag">${a.tag}</span>
       <div class="alert-b"><strong>${a.h}</strong><br>${a.b}
@@ -3128,16 +3677,12 @@ function render(){
     ${diagHTML(D,c)}
     ${gcbdHTML(D,c)}
     ${novaHTML(D)}
+    ${mailHTML(D)}
     ${empHTML(D,c)}
     ${costHTML(D,c)}
     ${scenHTML(D,c)}
-  </div>
-    <aside class="side">
-      ${guideOn?guideHTML(D):`<button class="mini-btn" style="width:100%;margin-bottom:12px"
-        onclick="setGuide(true)">Show me the steps</button>`}
-      ${pendHTML(D,c)}
-    </aside>
-  </div>`;
+  </div></div>`;
+  paintTape(D,c);
   railHTML();
 }
 
@@ -3203,7 +3748,7 @@ function novaRows(d){
   const yn=v=>v===null||v===undefined||v===""?null:/^y/i.test(String(v))?"Yes":/^n/i.test(String(v))?"No":String(v);
   const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"2-digit",day:"2-digit"});
   const rows=[
-    ["Date",n.date||today],
+    ["Date",n.date||usd(new Date())],
     ["Participant's Name",d.name],
     ["Date of Birth",dOnly(d.dob)],
     ["Estimated Potential Localization Date",dOnly(n.estLocDate)],
@@ -3359,6 +3904,10 @@ function reports(){
 /* Approver 1 sees the management output; approver 2 sees the economic analysis.
    Both always see the employee profile. */
 function toggleExp(e){
+  /* the resign-rehire pack only appears in that mode */
+  ["menu-rr","btn-rr-pdf","btn-rr-xls"].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.style.display=MODE==="rr"?"":"none";
+  });
   e.stopPropagation();
   document.getElementById("exp-menu").classList.toggle("open");
 }
@@ -3373,77 +3922,7 @@ function doExp(pack,fmt){
   if(fmt==="xls")exportXlsx(pack); else exportPdf(pack);
 }
 
-function exportPdf(pack){
-  if(!D){alert("Load the case files first.");return;}
-  const R=reports(), d=D, c=R.c, cc=R.cc;
-  const money=v=>v===null||v===undefined?"&mdash;":(v<0?"(":"")+Math.abs(v).toLocaleString("en-US")+(v<0?")":"");
-  const val=v=>v===null||v===undefined||v===""?"&mdash;":esc(String(v));
-
-  /* key/value block — labels left, figures right, hairline between */
-  const kv=rows=>{
-    let out="",open=false;
-    rows.forEach(([k,v])=>{
-      if(k===null){ if(open){out+="</dl>";open=false;} return; }
-      if(String(k).startsWith("\u00a7")){
-        if(open){out+="</dl>";open=false;}
-        out+=`<h3>${esc(k.slice(1))}</h3>`; return;
-      }
-      if(!open){out+="<dl>";open=true;}
-      /* Long prose — an immigration assessment, a justification — reads badly
-         squeezed opposite its label, so it runs full width underneath instead. */
-      const long=typeof v==="string"&&v.length>110;
-      out+=long
-        ? `<div class="kvb"><dt>${esc(k)}</dt><dd>${esc(v).replace(/\n/g,"<br>")}</dd></div>`
-        : `<div class="kv"><dt>${esc(k)}</dt><dd>${val(v)}</dd></div>`;
-    });
-    return out+(open?"</dl>":"");
-  };
-
-  /* figure table — no fills except the total rule */
-  const grid=(head,rows,unit,note)=>`
-    <table class="fig">
-      <thead><tr><th class="rowhead"></th>${head.map(h=>{
-        const parts=String(h).split("|");
-        return `<th><span class="h1">${esc(parts[0])}</span>${parts[1]?`<span class="h2">${esc(parts[1])}</span>`:""}</th>`;
-      }).join("")}</tr>
-      <tr class="unit"><td></td>${head.map(()=>`<td>${esc(unit)}</td>`).join("")}</tr></thead>
-      <tbody>${rows.map(r=>{
-        const isTot=String(r[0]).startsWith("*");
-        const lab=isTot?r[0].slice(1):r[0];
-        return `<tr class="${isTot?"total":""}"><td class="rowhead">${esc(lab)}</td>${
-          r.slice(1).map(v=>`<td class="${typeof v==="number"&&v<0?"neg":""}">${money(v)}</td>`).join("")}</tr>`;
-      }).join("")}</tbody>
-    </table>${note?`<p class="tnote">${note}</p>`:""}`;
-
-  /* headline figures */
-  const lede=(items)=>`<div class="lede">${items.map(([n,l,s2])=>
-    `<div><div class="lede-n">${n}</div><div class="lede-l">${esc(l)}</div>${s2?`<div class="lede-s">${esc(s2)}</div>`:""}</div>`
-  ).join("")}</div>`;
-
-  const route=`${esc(d.ohc||"—")} <span class="arw">&#8594;</span> ${esc(d.nhc||"—")}`;
-  const head=(title,idx)=>`
-    <header>
-      <div class="eyebrow"><span>ExxonMobil &middot; Global Mobility</span><span>Private</span></div>
-      <h1>${title}</h1>
-      <div class="subject">
-        <div class="who"><div class="nm">${esc(d.name||"—")}</div><div class="rt">${route}</div></div>
-        <dl class="meta">
-          <div class="kv"><dt>Type</dt><dd>${val(d.locType)}</dd></div>
-          <div class="kv"><dt>Report date</dt><dd>${R.today}</dd></div>
-          ${d.cl?`<div class="kv"><dt>Classification level</dt><dd>CL ${val(d.cl)}</dd></div>`:""}
-        </dl>
-      </div>
-    </header>`;
-  const foot=`<footer><span>Localization Centre</span><span>${esc(d.name||"")} &middot; ${R.today}</span><span>Private</span></footer>`;
-
-  const delta=c.delta&&c.delta.total!==null?c.delta.total:null;
-  const cashDelta=(c.e&&c.e.deltaPct!==null&&c.e.deltaPct!==undefined)?c.e.deltaPct:null;
-
-  const w=window.open("","_blank");
-  if(!w){alert("The browser blocked the print window. Allow pop-ups for this page and try again.");return;}
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>${esc(d.name||"Localization")} &mdash; ${pack===1?"Management Output":"Economic Analysis"}</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap" rel="stylesheet">
+const PDF_CSS=`<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap" rel="stylesheet">
 <style>
   @page{size:A4 portrait;margin:18mm 16mm 16mm}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -3517,7 +3996,79 @@ function exportPdf(pack){
     font-family:"IBM Plex Mono",monospace;font-size:6.4pt;letter-spacing:.1em;text-transform:uppercase;
     color:#9aa4ad;margin-top:22pt;padding-top:6pt;border-top:.4pt solid #c6cfd6}
   @media print{ .sheet{page-break-after:always} }
-</style></head><body>
+</style>`;
+
+function exportPdf(pack){
+  if(!D){alert("Load the case files first.");return;}
+  const R=reports(), d=D, c=R.c, cc=R.cc;
+  const money=v=>v===null||v===undefined?"&mdash;":(v<0?"(":"")+Math.abs(v).toLocaleString("en-US")+(v<0?")":"");
+  const val=v=>v===null||v===undefined||v===""?"&mdash;":esc(String(v));
+
+  /* key/value block — labels left, figures right, hairline between */
+  const kv=rows=>{
+    let out="",open=false;
+    rows.forEach(([k,v])=>{
+      if(k===null){ if(open){out+="</dl>";open=false;} return; }
+      if(String(k).startsWith("\u00a7")){
+        if(open){out+="</dl>";open=false;}
+        out+=`<h3>${esc(k.slice(1))}</h3>`; return;
+      }
+      if(!open){out+="<dl>";open=true;}
+      /* Long prose — an immigration assessment, a justification — reads badly
+         squeezed opposite its label, so it runs full width underneath instead. */
+      const long=typeof v==="string"&&v.length>110;
+      out+=long
+        ? `<div class="kvb"><dt>${esc(k)}</dt><dd>${esc(v).replace(/\n/g,"<br>")}</dd></div>`
+        : `<div class="kv"><dt>${esc(k)}</dt><dd>${val(v)}</dd></div>`;
+    });
+    return out+(open?"</dl>":"");
+  };
+
+  /* figure table — no fills except the total rule */
+  const grid=(head,rows,unit,note)=>`
+    <table class="fig">
+      <thead><tr><th class="rowhead"></th>${head.map(h=>{
+        const parts=String(h).split("|");
+        return `<th><span class="h1">${esc(parts[0])}</span>${parts[1]?`<span class="h2">${esc(parts[1])}</span>`:""}</th>`;
+      }).join("")}</tr>
+      <tr class="unit"><td></td>${head.map(()=>`<td>${esc(unit)}</td>`).join("")}</tr></thead>
+      <tbody>${rows.map(r=>{
+        const isTot=String(r[0]).startsWith("*");
+        const lab=isTot?r[0].slice(1):r[0];
+        return `<tr class="${isTot?"total":""}"><td class="rowhead">${esc(lab)}</td>${
+          r.slice(1).map(v=>`<td class="${typeof v==="number"&&v<0?"neg":""}">${money(v)}</td>`).join("")}</tr>`;
+      }).join("")}</tbody>
+    </table>${note?`<p class="tnote">${note}</p>`:""}`;
+
+  /* headline figures */
+  const lede=(items)=>`<div class="lede">${items.map(([n,l,s2])=>
+    `<div><div class="lede-n">${n}</div><div class="lede-l">${esc(l)}</div>${s2?`<div class="lede-s">${esc(s2)}</div>`:""}</div>`
+  ).join("")}</div>`;
+
+  const route=`${esc(d.ohc||"—")} <span class="arw">&#8594;</span> ${esc(d.nhc||"—")}`;
+  const head=(title,idx)=>`
+    <header>
+      <div class="eyebrow"><span>ExxonMobil &middot; Global Mobility</span><span>Private</span></div>
+      <h1>${title}</h1>
+      <div class="subject">
+        <div class="who"><div class="nm">${esc(d.name||"—")}</div><div class="rt">${route}</div></div>
+        <dl class="meta">
+          <div class="kv"><dt>Type</dt><dd>${val(d.locType)}</dd></div>
+          <div class="kv"><dt>Report date</dt><dd>${R.today}</dd></div>
+          ${d.cl?`<div class="kv"><dt>Classification level</dt><dd>CL ${val(d.cl)}</dd></div>`:""}
+        </dl>
+      </div>
+    </header>`;
+  const foot=`<footer><span>Localization Centre</span><span>${esc(d.name||"")} &middot; ${R.today}</span><span>Private</span></footer>`;
+
+  const delta=c.delta&&c.delta.total!==null?c.delta.total:null;
+  const cashDelta=(c.e&&c.e.deltaPct!==null&&c.e.deltaPct!==undefined)?c.e.deltaPct:null;
+
+  const w=window.open("","_blank");
+  if(!w){alert("The browser blocked the print window. Allow pop-ups for this page and try again.");return;}
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${esc(d.name||"Localization")} &mdash; ${pack===1?"Management Output":"Economic Analysis"}</title>
+${PDF_CSS}</head><body>
 
 ${(pack==="emp")?`<div class="sheet">
   ${head("Localization details &mdash; employee communication")}
@@ -3569,13 +4120,13 @@ ${(pack==="nova")?`<div class="sheet">
   ${foot}
 </div>`:""}
 
-${(pack==="emp"||pack==="nova")?"":`<div class="sheet">
+${(pack==="emp"||pack==="nova"||pack==="bal")?"":`<div class="sheet">
   ${head("Employee profile")}
   ${kv(R.profile.slice(3))}
   ${foot}
 </div>`}
 
-${(pack===2||pack==="emp"||pack==="nova")?"":`<div class="sheet">
+${(pack===2||pack==="emp"||pack==="nova"||pack==="bal")?"":`<div class="sheet">
   ${head("Localization analysis &mdash; management output")}
   <h2>Employee perspective</h2>
   ${grid(R.empCols.map(h=>h.replace(" in "," in|")),R.emp,cc)}
@@ -3592,7 +4143,7 @@ ${(pack===2||pack==="emp"||pack==="nova")?"":`<div class="sheet">
   ${foot}
 </div>`}
 
-${(pack===1||pack==="emp"||pack==="nova")?"":`<div class="sheet">
+${(pack===1||pack==="emp"||pack==="nova"||pack==="bal")?"":`<div class="sheet">
   ${head("Localization analysis &mdash; economic analysis")}
   <h2>Assumptions</h2>
   ${kv(R.assum)}
@@ -3664,7 +4215,7 @@ function exportXlsx(pack){
     return;
   }
 
-  put("Employee Profile",[
+  if(pack!=="bal")put("Employee Profile",[
     ["EMPLOYEE PROFILE REPORT"],["Report Date",R.today],[],
     ...R.profile.slice(3).map(([k,v])=>k===null?[]:
       String(k).startsWith("§")?[k.slice(1).toUpperCase()]:[k,v===undefined?null:v])
@@ -3720,7 +4271,7 @@ const DB_COLS=["Date Created","Original Home Country PERNR","New Home Country PE
 const DB_FIN=["Currency","FX Rate","Annual Cost OHC","Annual Cost NHC","Annual Delta",
  "Transition Payments","Lifetime Cost at 60","Cut-off Status","Analysis Date"];
 let dbHandle=null, DB=[], dbName="";
-let FL={type:[],yr:[],status:[],dest:"",bl:[]};
+let FL={top:[],type:[],yr:[],status:[],dest:"",bl:[]};
 function setFl(k,v){FL[k]=v;renderAnalytics();}
 /* multi-selects hand back a list of chosen options */
 function toggleFl(k,v,on){
@@ -3728,7 +4279,7 @@ function toggleFl(k,v,on){
   FL[k]=on?[...new Set([...cur,v])]:cur.filter(x=>x!==v);
   renderAnalytics();
 }
-function clearFl(){FL={type:[],yr:[],status:[],dest:"",bl:[]};renderAnalytics();}
+function clearFl(){FL={top:[],type:[],yr:[],status:[],dest:"",bl:[]};renderAnalytics();}
 
 /* On hold is kept apart from in progress: a case that has stalled is a
    different problem from one that is moving. */
@@ -3756,6 +4307,7 @@ function subtypeOf(r){
 
 function applyFl(rows){
   return rows.filter(r=>{
+    if(!has(FL.top,String(r["Type of Case"]||"").trim()))return false;
     if(!has(FL.type,subtypeOf(r)))return false;
     if(!has(FL.yr,yearOf(r["Date Created"])))return false;
     if(!has(FL.status,statusOf(r)))return false;
@@ -4032,6 +4584,7 @@ function renderAnalytics(){
       </div></details>`;
   };
 
+  const tops=tally(ALL,r=>String(r["Type of Case"]||"").trim()).filter(([k])=>k).map(([k,v])=>[k,`${k} (${v})`]);
   const types=tally(ALL,r=>subtypeOf(r)).map(([k,v])=>[k,`${k} (${v})`]);
   const yrs=tally(ALL,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
             .sort((a,b)=>b[0]-a[0]).map(([y,v])=>[String(y),`${y} (${v})`]);
@@ -4112,7 +4665,8 @@ function renderAnalytics(){
 
   body.innerHTML=`<div class="canvas">
     <div class="filters">
-      <label>Type</label>${multi(FL.type,types,"type","All types")}
+      <label>Case</label>${multi(FL.top,tops,"top","All cases")}
+      <label>Subtype</label>${multi(FL.type,types,"type","All subtypes")}
       <label>Year</label>${multi(FL.yr,yrs,"yr","All years")}
       <label>Status</label>${multi(FL.status,STATUSES.map(x=>[x,x]),"status","All")}
       <label>Destination</label>${opts(FL.dest,[["us","Into the US"],["non","Everywhere else"]],"dest","All")}
@@ -4133,8 +4687,8 @@ function renderAnalytics(){
     <div class="charts">
       <div class="chart wide ins-card">
         <div class="chart-t">What stands out</div>
-        <div class="chart-s">read from the ${ALL.length.toLocaleString("en-US")} rows in the tracker &middot; ${R.length} in this selection</div>
-        ${(()=>{const I=insights(R,ALL);
+        <div class="chart-s">${anyFl?`the ${R.length.toLocaleString("en-US")} cases in this selection`:`all ${R.length.toLocaleString("en-US")} cases in the tracker`}</div>
+        ${(()=>{const I=insights(R);
           return I.length?`<div class="ins">${I.map(x=>`<div class="ins-r">
             <span class="ins-tag">${esc(x.tag)}</span><span class="ins-t">${esc(x.t)}</span></div>`).join("")}</div>`
           :'<div class="mini-empty">Nothing to call out in this selection.</div>';})()}
@@ -4168,7 +4722,10 @@ function renderAnalytics(){
 
       <div class="chart">
         <div class="chart-t">Business line</div>
-        <div class="chart-s">top 8</div>
+        <div class="chart-s">${(()=>{const t=tally(R,r=>String(r["Business Line"]||"").trim()).filter(([k])=>k);
+          const shown=t.slice(0,8).reduce((a,[,v])=>a+v,0);
+          return t.length>8?`top 8 of ${t.length} &middot; ${Math.round(shown/Math.max(R.length,1)*100)}% of the selection`
+                           :`all ${t.length} in this selection`;})()}</div>
         ${barsHTML(tally(R,r=>String(r["Business Line"]||"").trim()).slice(0,8),R.length,true)}
       </div>
 
@@ -4313,7 +4870,7 @@ function pickFile(id){
         const wb=XLSX.read(new Uint8Array(ev.target.result),{type:"array",cellDates:true});
         F[id]=parseWB(wb);
         FILEMETA[id]={n:f.name};
-        render();
+        if(MODE==="rr")renderRR(); else render();
       }catch(err){alert("That file could not be read as a spreadsheet.\n\n"+err.message);}
     };
     rd.readAsArrayBuffer(f);
@@ -4324,7 +4881,6 @@ function pickFile(id){
 
 const THEMES={
   brick:   {bg:"#8c3236", dim:"rgba(255,255,255,.58)"},
-  skin:    {bg:"#c9a98f", dim:"rgba(40,26,18,.62)",  ink:"#2a1c14"},
   slate:   {bg:"#5b6670", dim:"rgba(255,255,255,.58)"},
   charcoal:{bg:"#24272b", dim:"rgba(255,255,255,.52)"},
   forest:  {bg:"#33513f", dim:"rgba(255,255,255,.58)"},
@@ -4348,9 +4904,18 @@ async function recallTheme(){
   }catch(e){}
 }
 
+/* an open filter closes when anything else is clicked, not only its own summary */
+document.addEventListener("click",e=>{
+  document.querySelectorAll("details.fdd[open]").forEach(d=>{ if(!d.contains(e.target))d.open=false; });
+});
+
 railHTML();
 renderCaseList();
 recallTheme();
+caseStore().then(db=>{
+  const t=db.transaction("h","readonly").objectStore("h").get("mode");
+  t.onsuccess=()=>{ if(t.result==="rr")setMode("rr"); };
+}).catch(()=>{});
 /* Bring the tracker back on open. If the browser still trusts the handle the
    file loads silently; otherwise the rail shows it as waiting for one click. */
 recallDb().then(ok=>{ railHTML(); if(ok&&D)render(); });
