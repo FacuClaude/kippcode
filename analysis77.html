@@ -246,6 +246,15 @@ input,select{font:inherit;color:inherit}
   border:1px solid rgba(255,255,255,.2);border-radius:7px;font-size:11px;padding:5px 8px;
   font-family:var(--mono);letter-spacing:.06em}
 .rail-theme option{color:#16191d}
+.lk{list-style:none;margin:0;padding:0}
+.lk li{display:flex;align-items:baseline;gap:9px;padding:8px 0;border-bottom:1px solid var(--line);
+  font-size:13px;line-height:1.45;flex-wrap:wrap}
+.lk li:last-child{border-bottom:0}
+.lk a{color:var(--accent);text-decoration:none}
+.lk a:hover{text-decoration:underline}
+.lk-kb{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.lk-hr{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink-3);padding:2px 6px;border-radius:3px}
 .mini-btn{font:inherit;font-size:11.5px;padding:5px 12px;border:1px solid var(--line);
   background:#fff;border-radius:3px;cursor:pointer;color:var(--ink-1);white-space:nowrap}
 .mini-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -454,6 +463,7 @@ input[type=file]{display:none}
         <button class="btn" id="nav-start" onclick="setView('start')">Communications</button>
         <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
         <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
+      <button class="btn" id="nav-links" onclick="setView('links')">Useful links</button>
       </nav>
       <span class="topbar-sep"></span>
       <button class="btn btn-q" id="btn-db" onclick="pickDb()">Link database</button>
@@ -3012,6 +3022,199 @@ function exportRR(fmt){
   w.document.close(); setTimeout(()=>{w.focus();w.print();},350);
 }
 
+
+/* ═══ USEFUL LINKS ══════════════════════════════════════════════════════════
+   The policy articles behind the process, and the two link sets that go out
+   with an offer letter. Kept in one place so the same URLs are used every time
+   rather than hunted for in an old email. */
+const KB=n=>`https://emprod.service-now.com/ec?id=kb_article&sysparm_article=${n}`;
+const REL_SYNOPSIS="https://ishareteam5.na.xom.com/sites/TMO/TMOExtSP/Shared%20Documents/"+
+  "EMConnect/US/Localizations%20to%20US%20Payroll%20Relocation%20Synopsis-May%202024.pdf";
+
+const LINKS={
+  policy:{
+    title:"Localization policy and guidance",
+    note:"The main articles behind the process. The HR-only ones are not for sharing with employees.",
+    items:[
+      {t:"US Relocation Guidelines — Localization to US Payroll",u:REL_SYNOPSIS},
+      {t:"Understanding Localization",kb:"KB0020618"},
+      {t:"Localization Resources for HR ONLY",kb:"KB0020620",hr:1},
+      {t:"US Localization / Payroll Transfer — HR & Supervisor Use Only",kb:"KB0019763",hr:1},
+      {t:"Localization vs. International Resign/Rehire vs. U.S. PRV Comparison Table",kb:"KB0038787"},
+      {t:"Localization Quick Guide — Start Here!",kb:"KB0029935"},
+      {t:"Localization to New Home Country Payroll Guidelines",kb:"KB0017512"},
+      {t:"US — Localization: Compensation, Benefits, and Programs",kb:"KB0018068"},
+      {t:"Understanding Localization for HR ONLY",kb:"KB0020619",hr:1},
+      {t:"US — FAQs for Localizing Employees",kb:"KB0019568"},
+      {t:"US — FAQs for Localizing Employees, HR Only",kb:"KB0019759",hr:1}
+    ]},
+  us:{
+    title:"For the offer letter — into the U.S.",
+    note:"What goes to the employee and D&S when the new home country is the United States.",
+    items:[
+      {t:"US Relocation Guidelines — Localization to US Payroll",u:REL_SYNOPSIS},
+      {t:"Localization to New Home Country Payroll Guidelines",kb:"KB0017512"},
+      {t:"US — Localization: Compensation, Benefits, and Programs",kb:"KB0018068"},
+      {t:"US — FAQs for Localizing Employees",kb:"KB0019568"}
+    ]},
+  nonus:{
+    title:"For the offer letter — into any other country",
+    note:"The U.S.-specific articles do not apply to these moves, so only the payroll guidelines go out.",
+    items:[
+      {t:"Localization to New Home Country Payroll Guidelines",kb:"KB0017512"}
+    ]}
+};
+const linkUrl=i=>i.u||KB(i.kb);
+
+/* the block pasted into an offer letter, as HTML so it keeps its links */
+function linkBlockHTML(which){
+  const g=LINKS[which];
+  return `<p><strong>Useful links</strong></p><ul>${g.items.map(i=>
+    `<li><a href="${linkUrl(i)}">${esc(i.t)}</a>${i.kb?` (${i.kb})`:""}</li>`).join("")}</ul>`;
+}
+function copyLinks(which){
+  const g=LINKS[which];
+  const text="Useful links\n"+g.items.map(i=>`• ${i.t}${i.kb?` (${i.kb})`:""} — ${linkUrl(i)}`).join("\n");
+  const done=()=>toast("Copied — paste into the offer letter");
+  if(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem){
+    navigator.clipboard.write([new ClipboardItem({
+      "text/html":new Blob([linkBlockHTML(which)],{type:"text/html"}),
+      "text/plain":new Blob([text],{type:"text/plain"})
+    })]).then(done,()=>navigator.clipboard.writeText(text).then(done));
+  } else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(done); }
+  else { alert(text); }
+}
+
+
+/* The employee-facing one-pager, in the house layout: red rule and title band,
+   a sidebar that says what the guide is, the letter itself, and the cards that
+   say where to go next. The link set follows the destination. */
+function exportGuide(){
+  const d=D||{};
+  const intoUS=d.nhc==="United States";
+  const set=intoUS?LINKS.us:LINKS.nonus;
+  const nhc=d.nhc||"your new home country";
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${esc(d.name||"Localization")} — Localization Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page{size:A4 portrait;margin:0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"IBM Plex Sans",sans-serif;color:#1b2026;font-size:9.6pt;line-height:1.55}
+  .band{background:#0f1c2e;color:#fff;padding:26mm 16mm 10mm;position:relative}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:7pt;letter-spacing:.28em;
+    text-transform:uppercase;color:#c7d0da;margin-bottom:9mm}
+  .eyebrow b{color:#e02a2a}
+  .band h1{font-size:27pt;line-height:1.08;font-weight:700;letter-spacing:-.01em;max-width:120mm}
+  .band p{margin-top:5mm;color:#c7d0da;font-size:9.4pt;max-width:120mm}
+  .rule{display:flex;align-items:center;gap:5mm;margin-top:11mm;
+    font-family:"IBM Plex Mono",monospace;font-size:6.6pt;letter-spacing:.24em;
+    text-transform:uppercase;color:#8fa0b3}
+  .rule i{flex:1;height:1px;background:repeating-linear-gradient(90deg,#3d5068 0 4px,transparent 4px 9px)}
+  .body{display:grid;grid-template-columns:52mm 1fr;gap:12mm;padding:11mm 16mm 9mm}
+  .aside h2{font-size:12pt;font-weight:700;margin-bottom:4mm;padding-top:3mm;border-top:2.5pt solid #e02a2a}
+  .aside p{font-size:8.4pt;color:#5b6875;margin-bottom:3.5mm}
+  .letter{border-left:1px solid #e3e7eb;padding-left:12mm}
+  .letter h3{font-size:12pt;font-weight:600;margin-bottom:5mm}
+  .letter p{margin-bottom:3.6mm}
+  .letter strong{font-weight:600}
+  .sign{margin-top:6mm;padding-top:4mm;border-top:1px solid #e3e7eb;color:#5b6875}
+  .sign b{display:block;color:#1b2026}
+  .next{background:#f5f7f9;padding:8mm 16mm;border-top:1px solid #e3e7eb}
+  .next-h{font-family:"IBM Plex Mono",monospace;font-size:6.8pt;letter-spacing:.24em;
+    text-transform:uppercase;color:#7b8794;margin-bottom:5mm}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(48mm,1fr));gap:5mm}
+  .card{background:#fff;border:1px solid #e3e7eb;border-radius:2mm;padding:5mm}
+  .card h4{font-size:9.6pt;font-weight:600;margin-bottom:2.5mm}
+  .card p{font-size:8pt;color:#5b6875;line-height:1.45;margin-bottom:3.5mm}
+  .card a{font-family:"IBM Plex Mono",monospace;font-size:7.6pt;color:#c8102e;text-decoration:none;
+    word-break:break-all}
+  foot{display:flex;justify-content:space-between;padding:5mm 16mm;
+    font-family:"IBM Plex Mono",monospace;font-size:6.6pt;letter-spacing:.16em;
+    text-transform:uppercase;color:#98a3ae;border-top:1px solid #e3e7eb}
+</style></head><body>
+  <div class="band">
+    <div class="eyebrow"><b>&#9679;</b> ExxonMobil</div>
+    <h1>${intoUS?"U.S.":esc(nhc)} Localization<br>Guide</h1>
+    <p>Health, retirement and financial benefits for employees transitioning to the ${esc(intoUS?"U.S.":nhc)} payroll.</p>
+    <div class="rule"><span>&#9675;</span><i></i><span>Localization in the ${esc(intoUS?"U.S.":nhc)} payroll</span><i></i><span>&#9679;</span></div>
+  </div>
+
+  <div class="body">
+    <div class="aside">
+      <h2>About this guide</h2>
+      <p>This guide outlines the support services ExxonMobil offers. The enclosed materials will help ease
+         your transition to ${esc(intoUS?"U.S.":nhc)} payroll and benefits, such as health and pension benefits.</p>
+      <p>There are also resources available to answer your questions along the way.</p>
+    </div>
+    <div class="letter">
+      <h3>Dear ${esc(d.name?String(d.name).split(/\s+/)[0]:"ExxonMobil employee")},</h3>
+      <p>At ExxonMobil, we are committed to placing talented individuals in roles where they can thrive and
+        contribute their best work. We recognize that professional growth supports both individual success
+        and the continued strength of our Company.</p>
+      <p>As part of this commitment, ExxonMobil provides support to employees and their families who are
+        transitioning to local employment arrangements through a process known as <strong>localization</strong>.
+        We understand that decisions related to localization can be significant and often involve important
+        personal and financial considerations.</p>
+      <p>This guide has been developed to help you better understand the health, retirement and financial
+        benefits available as part of your transition${d.ohc?` from the ${esc(d.ohc)} payroll`:""} to the
+        ${esc(intoUS?"U.S.":nhc)} payroll. We encourage you to review these materials carefully to understand
+        how the transfer may affect you and your family.</p>
+      <p>Thank you for taking the time to review these resources. We look forward to supporting you throughout
+        your localization journey.</p>
+      <div class="sign">Regards,<b>Benefits Administration</b></div>
+    </div>
+  </div>
+
+  <div class="next">
+    <div class="next-h">Where to go next</div>
+    <div class="cards">${set.items.map(i=>`<div class="card">
+      <h4>${esc(i.t)}</h4>
+      <p>${i.kb?`Knowledge article ${i.kb}.`:"Relocation synopsis for moves onto the U.S. payroll."}</p>
+      <a href="${linkUrl(i)}">Open &rarr;</a></div>`).join("")}
+      <div class="card"><h4>ExxonMobil Family</h4>
+        <p>Summary Plan Descriptions, medical and retirement plans, enrollment instructions, financial
+           resources and family support services.</p>
+        <a href="https://www.exxonmobilfamily.com">exxonmobilfamily.com &rarr;</a></div>
+    </div>
+  </div>
+  <foot><span>ExxonMobil &middot; Benefits Administration</span>
+    <span>Localization in the ${esc(intoUS?"U.S.":nhc)} payroll</span></foot>
+</body></html>`);
+  w.document.close(); setTimeout(()=>{w.focus();w.print();},400);
+}
+
+function renderLinks(){
+  const grp=k=>{
+    const g=LINKS[k];
+    return `<div class="panel">
+      <div class="panel-h"><div class="panel-t">${esc(g.title)}</div>
+        ${k!=="policy"?`<button class="mini-btn" onclick="copyLinks('${k}')">Copy for the offer letter</button>`:""}
+      </div>
+      <div class="note">${esc(g.note)}</div>
+      <div class="panel-b"><ul class="lk">${g.items.map(i=>`<li>
+        <a href="${linkUrl(i)}" target="_blank" rel="noopener">${esc(i.t)}</a>
+        ${i.kb?`<span class="lk-kb">${i.kb}</span>`:""}
+        ${i.hr?`<span class="lk-hr">HR only</span>`:""}
+      </li>`).join("")}</ul></div>
+    </div>`;
+  };
+  document.getElementById("body").innerHTML=`<div class="canvas">
+    <div class="panel">
+      <div class="panel-h"><div class="panel-t">Useful links</div></div>
+      <div class="note">The main articles on localization policy, and the two link sets that go out with an
+        offer letter &mdash; one for moves into the U.S., one for everywhere else. Use <em>Copy for the offer
+        letter</em> to take a group as a formatted list, links intact.</div>
+    </div>
+    ${grp("policy")}${grp("us")}${grp("nonus")}
+    <div class="panel"><div class="panel-h"><div class="panel-t">Employee guide</div>
+      <button class="mini-btn" onclick="exportGuide()">Generate one-pager</button></div>
+      <div class="note">A one-page guide for the employee, in the house format, carrying the link set that
+        matches this case. Goes out with the offer package.</div></div>`;
+  paintTape(D,null);
+}
+
 /* ═══ PROCESS EMAILS ════════════════════════════════════════════════════════
    Two notes that go out late in the process. Both are built from the case so
    the employee's own pension wording, countries and dates carry through rather
@@ -3779,6 +3982,7 @@ function scenHTML(d,c){
 }
 
 function render(){
+  if(VIEW==="links"){renderLinks();railHTML();return;}
   if(VIEW==="analytics"){renderAnalytics();return;}
   D=resolve(); const c=calc(D);
   document.getElementById("crumb").textContent=D.locType||"Case";
@@ -4643,6 +4847,8 @@ function setView(v){
   document.getElementById("nav-start").classList.toggle("on",v==="start");
   document.getElementById("nav-case").classList.toggle("on",v==="case");
   document.getElementById("nav-an").classList.toggle("on",v==="analytics");
+  const nl=document.getElementById("nav-links");
+  if(nl)nl.classList.toggle("on",v==="links");
   if(v==="analytics")renderAnalytics();
   else if(v==="start")document.getElementById("body").innerHTML=startCaseHTML();
   else render();
