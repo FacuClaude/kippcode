@@ -84,7 +84,7 @@ input,select{font:inherit;color:inherit}
 
 /* ── MAIN ── */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-.topbar{background:rgba(255,255,255,.92);backdrop-filter:saturate(1.6) blur(8px);
+.topbar{top:32px !important;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.6) blur(8px);
   border-bottom:1px solid var(--line);padding:13px 32px;display:flex;align-items:center;
   justify-content:space-between;gap:24px;position:sticky;top:0;z-index:20}
 .crumb{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
@@ -174,8 +174,8 @@ input,select{font:inherit;color:inherit}
   color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-line);
   padding:3px 7px;border-radius:4px;flex-shrink:0;min-width:92px;text-align:center}
 .ins-t{font-size:13px;line-height:1.55;color:var(--ink-1)}
-.tape{background:var(--ink);color:#fff;overflow:hidden;height:30px;display:flex;align-items:center;
-  position:sticky;top:0;z-index:25;font-size:12px}
+.tape{background:var(--ink);color:#fff;overflow:hidden;height:32px;display:flex;align-items:center;
+  position:sticky;top:0;z-index:26;font-size:12px;flex:none}
 .tape.none{background:var(--surface-2);color:var(--ink-3)}
 .tape-in{display:inline-flex;gap:34px;white-space:nowrap;padding-left:100%;
   animation:tape 42s linear infinite}
@@ -451,7 +451,7 @@ input[type=file]{display:none}
     </div>
     <div class="topbar-act">
       <nav class="navseg" aria-label="Views">
-        <button class="btn" id="nav-start" onclick="setView('start')">Start case</button>
+        <button class="btn" id="nav-start" onclick="setView('start')">Communications</button>
         <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
         <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
       </nav>
@@ -742,6 +742,29 @@ const REGISTRY={
       {name:"Bonus / BBU",fields:[
         {label:"Original Home Country BBU Guide",alt:["OHC - BBU Guide"],type:"money",need:0},
         {label:"NHC - BBU Guide",type:"money",need:0}
+      ]}
+    ]
+  },
+
+  comprr:{
+    title:"Compensation Request — Resign-Rehire",
+    to:"Compensation advisor for the new home country",
+    note:"Section B of the resign-rehire business case. BHR have completed the rest; this is the salary "+
+         "work-up and the level it assumes.",
+    email:"Attached is the compensation request for {name}, a resign-rehire from {ohc} into {nhc}.\n\n"+
+      "We need the salary work-up for the new home country payroll and the level it assumes. The business "+
+      "case has already been completed by BHR, so only the section in this file is outstanding.",
+    sections:[
+      {name:"Compensation Data — Section B",fields:[
+        {label:"Proposed CL",type:"number",need:1},
+        {label:"Salary Workup in New Home Country Payroll",type:"money",need:1,
+         help:"Amount and currency."},
+        {label:"Salary Workup Assumptions",type:"text",need:1,
+         help:"The curve or reference the work-up rests on."},
+        {label:"Salary Workup Comments",type:"text",need:0,
+         help:"e.g. Provided 98%SR based on VGP curve."},
+        {label:"Is the B/L aligned with the Salary Workup?",type:"yesno",need:1},
+        {label:"B/L / BHR Comments",type:"text",need:0}
       ]}
     ]
   },
@@ -1136,7 +1159,8 @@ function genAllTemplates(){
           "Load the D&S request form and the SuccessFactors profile, or fill them in by hand.");
     return;
   }
-  const slots=Object.keys(REGISTRY).filter(s=>{
+  const pack=MODE==="rr"?["comprr","gcbdrr"]:["gcbd","tmo","comp","exec","bal","tax"];
+  const slots=Object.keys(REGISTRY).filter(s=>pack.includes(s)).filter(s=>{
     const w=REGISTRY[s].when;
     return !w||seedApplies({when:w},seed);
   });
@@ -1189,7 +1213,9 @@ function startCaseHTML(){
         oninput="readSeed()" onchange="setView('start')" style="width:100%"></div>`;
   };
 
-  const cards=Object.entries(REGISTRY).map(([slot,def])=>{
+  const RR_PACK=["comprr","gcbdrr"], LOC_PACK=["gcbd","tmo","comp","exec","bal","tax"];
+  const pack=MODE==="rr"?RR_PACK:LOC_PACK;
+  const cards=Object.entries(REGISTRY).filter(([slot])=>pack.includes(slot)).map(([slot,def])=>{
     const fields=def.sections.flatMap(s=>s.fields).filter(f=>seedApplies(f,seed));
     const req=fields.filter(f=>f.need).length;
     const skipped=(def.when&&!seedApplies({when:def.when},seed));
@@ -1205,7 +1231,7 @@ function startCaseHTML(){
   }).join("");
 
   return `<div class="panel">
-    <div class="panel-h"><div class="panel-t">Start a case</div>
+    <div class="panel-h"><div class="panel-t">${MODE==="rr"?"Start a resign-rehire":"Request templates"}</div>
       <div class="panel-n">${loaded.length?"read from "+loaded.join(" + "):"load the intake files on the left"}</div></div>
     ${loaded.length
       ? `<div class="note">Taken from the ${loaded.join(" and ")}. Type over anything that needs correcting &mdash;
@@ -1232,7 +1258,8 @@ function startCaseHTML(){
       already written. Browsers cannot attach a file to a mail draft, so attach the file that lands in your
       downloads folder &mdash; the draft names it for you.</div>
     <div class="panel-b"><button class="mini-btn solid" onclick="genAllTemplates()">Generate all templates</button></div>
-  </div>`;
+  </div>
+  ${MODE==="rr"?"":mailHTML(D||{})}`;
 }
 
 /* ═══ FILE SLOTS ═══ */
@@ -2424,7 +2451,7 @@ function insights(R){
   const stalls=new Map();
   live.forEach(r=>{
     const steps=(/resign/i.test(subtypeOf(r))?RR_STEPS:LOC_STEPS);
-    const open=steps.find(([col])=>{const st=stepState(r[col]);return st==="doing"||st==="todo";});
+    const open=steps.find(([col])=>{const st=stepState(stepValue(r,col));return st==="doing"||st==="todo";});
     if(open)stalls.set(open[1],(stalls.get(open[1])||0)+1);
   });
   const st=[...stalls.entries()].sort((a,b)=>b[1]-a[1]);
@@ -2458,7 +2485,7 @@ function insights(R){
 
   /* green card, for U.S. moves */
   const usRows=R.filter(r=>/united states|^us$/i.test(String(r["New Home Country"]||"").trim()));
-  const gc=usRows.filter(r=>stepState(r["U.S. Green Card Initiation"])==="done").length;
+  const gc=usRows.filter(r=>stepState(stepValue(r,"U.S. Green Card Initiation"))==="done").length;
   if(usRows.length>=5)out.push({tag:"immigration",
     t:`Green card initiation is recorded as done on ${gc} of the ${usRows.length} U.S. moves in this selection.`});
 
@@ -2510,7 +2537,7 @@ function pendingItems(d,c){
   const row=trackerRow(d);
   if(row){
     const rr=/resign/i.test(subtypeOf(row));
-    const open=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>({label,state:stepState(row[col])}))
+    const open=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>({label,state:stepState(stepValue(row,col))}))
       .filter(x=>x.state==="doing"||x.state==="todo");
     if(open.length)out.push({tag:"stage",t:`Next stage in the tracker: ${open[0].label}.`});
     const act=row["Action Required Notes"];
@@ -2652,14 +2679,15 @@ const RR_MAP=[
   ["New Position Title","newTitle"],["New Position Function (L1)","newL1"],
   ["New Position Sub-Function (L2)","newL2"],["New Position Department (L3)","newL3"],
   ["New Position Sub-Department (L4)","newL4"],["New Position Company / Affiliate Name","newCo"],
-  ["§Business Case",null],
-  ["Personal Interest to Relocate","personal"],
-  ["Business Need / Business Justification","need"],
-  ["Immigration Strategy & Other Considerations","immigration"],
   ["§Compensation Data — Section A",null],
   ["Current CL","curCL"],["Year End Experience (YEE)","yee"],["Length of Service","los"],
   ["Performance","perf"],["Potential","pot"],["Peer/s for Comparison","peers"]
 ];
+/* the business case blocks read as prose, so they are placed after the tables
+   rather than squeezed between two label columns */
+const RR_PROSE=[["Personal interest to relocate","personal"],
+  ["Business need / justification","need"],
+  ["Immigration strategy and other considerations","immigration"]];
 
 /* the two blocks the coordinator owns */
 const RR_COMP=[
@@ -2684,6 +2712,37 @@ function resolveRR(){
   d.intoUS=d.nhc==="United States";
   d.dob=xlDate(d.dob); d.hire=xlDate(d.hire);
   d.effDate=xlDate(d.effDate); d.expatStart=xlDate(d.expatStart);
+  /* The business case blocks are written as a heading with the prose on the
+     rows beneath, not as a label beside a value, so a pair lookup finds nothing.
+     Each block is read from its heading down to the next one. */
+  const blockAfter=(heading,stops)=>{
+    const g=F.rr&&F.rr.grids; if(!g)return null;
+    for(const sh of Object.keys(g)){
+      const rows=g[sh]; if(!rows)continue;
+      let at=-1;
+      rows.forEach((r,i)=>{ if(at<0&&r&&r.some(c=>norm(c)===norm(heading)))at=i; });
+      if(at<0)continue;
+      const out=[];
+      for(let i=at+1;i<rows.length;i++){
+        const r=rows[i]; if(!r)continue;
+        const cells=r.map(c=>String(c??"").trim()).filter(Boolean);
+        if(!cells.length){ if(out.length)continue; else continue; }
+        if(stops.some(st=>cells.some(c=>norm(c)===norm(st))))break;
+        out.push(cells.join(" "));
+        if(out.length>14)break;
+      }
+      const t=out.join("\n").trim();
+      if(t)return t;
+    }
+    return null;
+  };
+  const BC_STOPS=["Personal Interest to Relocate","Business Need / Business Justification",
+    "Immigration Strategy & Other Considerations","Functional & HR Approvers / Points of Contact",
+    "Compensation Data - Section A","Compensation Data — Section A","Business Case","Contact / Role"];
+  d.personal   = d.personal   || blockAfter("Personal Interest to Relocate",BC_STOPS);
+  d.need       = d.need       || blockAfter("Business Need / Business Justification",BC_STOPS);
+  d.immigration= d.immigration|| blockAfter("Immigration Strategy & Other Considerations",BC_STOPS);
+
   /* employment history block, same shape as the localization career table */
   d.history=[];
   const g=F.rr&&F.rr.grids;
@@ -2723,10 +2782,42 @@ function resolveRR(){
   }
   /* what the coordinator adds */
   const ov=k=>overrides["rr:"+k];
-  d.comp={}; RR_COMP.forEach(([,k])=>d.comp[k]=ov(k)??null);
-  d.svcUS={}; RR_US.forEach(x=>d.svcUS[x]=ov("us:"+x)??null);
-  d.svcNon={}; RR_NONUS.forEach(x=>d.svcNon[x]=ov("non:"+x)??null);
-  d.svcComments=ov("svcComments")??null;
+  /* Compensation return the work-up in their own file; it fills the section
+     rather than being retyped, and anything typed here still wins. */
+  const cmp=(...ks)=>pickStrict("comp",...ks)??pick("comp",...ks);
+  const compFile={
+    propCL:cmp("Proposed CL","NHC - Pay Scale Group (CL)"),
+    salary:cmp("Salary Workup in New Home Country Payroll","NHC - Annual Base Salary"),
+    assump:cmp("Salary Workup Assumptions"),
+    comments:cmp("Salary Workup Comments","NHC - Salary Reference Percentage"),
+    aligned:cmp("Is the B/L aligned with the Salary Workup?"),
+    blComments:cmp("B/L / BHR Comments")
+  };
+  d.comp={}; d.compFrom={};
+  RR_COMP.forEach(([,k])=>{
+    const typed=ov(k);
+    if(typed){ d.comp[k]=typed; d.compFrom[k]="entered by hand"; }
+    else if(compFile[k]!==null&&compFile[k]!==undefined&&compFile[k]!==""){
+      d.comp[k]=compFile[k]; d.compFrom[k]="Compensation";
+    } else { d.comp[k]=null; d.compFrom[k]=null; }
+  });
+  /* GC&BD answer the checklist in the request file; a tick or a Yes both read
+     as recognized, an X or a No as not. */
+  const gb=(...ks)=>pickStrict("gcbd",...ks)??pick("gcbd",...ks);
+  const mark=v=>{
+    const t=String(v??"").trim();
+    if(!t)return null;
+    if(/^(y|yes|✓|✔|x?\s*yes)$/i.test(t)||t==="\u2713"||t==="\u2714")return "Yes";
+    if(/^(n|no|✗|✘|×)$/i.test(t)||t==="\u2717"||t==="\u2718"||t==="\u00d7")return "No";
+    if(/^x$/i.test(t))return "No";
+    return /^y/i.test(t)?"Yes":/^n/i.test(t)?"No":null;
+  };
+  d.svcUS={}; RR_US.forEach(x=>
+    d.svcUS[x]=ov("us:"+x)??mark(gb("Into the U.S. — "+x,"Into the U.S. - "+x,"Into US — "+x)));
+  d.svcNon={}; RR_NONUS.forEach(x=>
+    d.svcNon[x]=ov("non:"+x)??mark(gb("Into a non-U.S. country — "+x,"Into a non-U.S. country - "+x,
+      "Into Non-U.S. — "+x,"Into Non-U.S. - "+x)));
+  d.svcComments=ov("svcComments")??gb("Comments on prior service recognition")??null;
   d.pensionOHC=ov("pensionOHC")??(pickStrict("gcbd","Pension implications in OHC")??pick("gcbd","Pension implications in OHC"))??null;
   d.pensionNHC=ov("pensionNHC")??(pickStrict("gcbd","Pension implications in NHC")??pick("gcbd","Pension implications in NHC"))??null;
 
@@ -2744,20 +2835,23 @@ function resolveRR(){
 
 function rrRows(d){
   const out=[];
+  /* Order follows how the case is read, not how the spreadsheet happens to be
+     laid out: who and where, then the role, then the case for it, then the two
+     compensation sections together, then benefits, then the record and the
+     people who sign it. */
   RR_MAP.forEach(([label,key])=>{
-    if(!key){out.push({h:label.slice(1)});return;}
+    if(!key){
+      /* the case for the move sits between the role and the numbers */
+      if(label==="§Compensation Data — Section A"){
+        out.push({h:"Business Case"});
+        RR_PROSE.forEach(([l,k])=>out.push({label:l,value:d[k],pending:!d[k]}));
+      }
+      out.push({h:label.slice(1)});return;
+    }
     let v=d[key];
     if(v instanceof Date)v=usd(v);
     out.push({label,value:(v===null||v===undefined||v==="")?null:v});
   });
-  if(d.history.length){
-    out.push({h:"ExxonMobil Employment History"});
-    d.history.forEach(h=>out.push({label:h.date,value:[h.position,h.fn,h.loc].filter(Boolean).join(" · ")}));
-  }
-  if(d.contacts.length){
-    out.push({h:"Functional & HR Approvers / Points of Contact"});
-    d.contacts.forEach(c=>out.push({label:c.role,value:[c.name,c.title,c.loc].filter(Boolean).join(" · ")}));
-  }
   out.push({h:"Compensation Data — Section B"});
   RR_COMP.forEach(([l,k])=>out.push({label:l,value:d.comp[k],pending:!d.comp[k]}));
   out.push({h:"Benefits Analysis — prior service recognition"});
@@ -2767,9 +2861,16 @@ function rrRows(d){
   out.push({label:"Comments on prior service recognition",value:d.svcComments,pending:!d.svcComments});
   out.push({label:"Pension implications in "+(d.ohc||"OHC"),value:d.pensionOHC,pending:!d.pensionOHC});
   out.push({label:"Pension implications in "+(d.nhc||"NHC"),value:d.pensionNHC,pending:!d.pensionNHC});
+  if(d.history.length){
+    out.push({h:"ExxonMobil Employment History"});
+    d.history.forEach(h=>out.push({label:h.date,value:[h.position,h.fn,h.loc].filter(Boolean).join(" · ")}));
+  }
+  if(d.contacts.length){
+    out.push({h:"Functional & HR Approvers / Points of Contact"});
+    d.contacts.forEach(c=>out.push({label:c.role,value:[c.name,c.title,c.loc].filter(Boolean).join(" · ")}));
+  }
   return out;
 }
-
 
 function rrHTML(d){
   const ed=(l,k,val,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">coordinator</span></div>
@@ -3024,8 +3125,8 @@ function openMail(kind){
 
 function mailHTML(d){
   const ed=(l,key,ph="")=>`<div class="f"><div class="f-l">${l}<span class="f-src">manual</span></div>
-    <input value="${esc(overrides[key]||"")}" placeholder="${ph}"
-      onchange="setOv('${key}',this.value)"></div>`;
+    <input value="${esc(overrides[key]||"")}" onchange="setOv('${key}',this.value)">
+    ${ph?`<div class="f-hint">${ph}</div>`:""}</div>`;
   return `<div class="panel">
     <div class="panel-h"><div class="panel-t">Process emails</div>
       <div class="panel-n">built from this case</div></div>
@@ -3070,6 +3171,31 @@ const RR_STEPS=[
 ];
 
 /* A stage cell reads as done, in flight, not applicable, or untouched. */
+/* Header wording drifts and carries typos — the tracker spells one column
+   "Implemnentation Note". Match on the closest header rather than an exact
+   string, so a stage is not read as untouched because of a slip in the file. */
+function lev(a,b){
+  const m=a.length,n=b.length;
+  if(Math.abs(m-n)>3)return 99;
+  const d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);
+  for(let j=0;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[m][n];
+}
+function stepValue(row,col){
+  if(row[col]!==undefined&&row[col]!==null&&row[col]!=="")return row[col];
+  const want=norm(col);
+  let best=null,bd=3;
+  for(const k of Object.keys(row)){
+    const nk=norm(k);
+    if(nk===want)return row[k];
+    const dist=lev(nk,want);
+    if(dist<bd){bd=dist;best=k;}
+  }
+  return best?row[best]:null;
+}
+
 function stepState(v){
   const t=String(v??"").trim();
   if(!t)return "todo";
@@ -3110,7 +3236,7 @@ function timelineHTML(d){
     A case that has not been logged yet will not appear until it is added.</div></div>`;
 
   const rr=/resign/i.test(subtypeOf(row));
-  const steps=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>({label,raw:row[col],state:stepState(row[col])}));
+  const steps=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>{const v=stepValue(row,col);return {label,raw:v,state:stepState(v)};});
   const live=steps.filter(x=>x.state!=="na");
   const done=live.filter(x=>x.state==="done").length;
   const nextUp=live.find(x=>x.state!=="done");
@@ -3677,7 +3803,6 @@ function render(){
     ${diagHTML(D,c)}
     ${gcbdHTML(D,c)}
     ${novaHTML(D)}
-    ${mailHTML(D)}
     ${empHTML(D,c)}
     ${costHTML(D,c)}
     ${scenHTML(D,c)}
@@ -3904,9 +4029,11 @@ function reports(){
 /* Approver 1 sees the management output; approver 2 sees the economic analysis.
    Both always see the employee profile. */
 function toggleExp(e){
-  /* the resign-rehire pack only appears in that mode */
-  ["menu-rr","btn-rr-pdf","btn-rr-xls"].forEach(id=>{
-    const el=document.getElementById(id); if(el)el.style.display=MODE==="rr"?"":"none";
+  /* each mode shows only its own outputs */
+  const menu=document.getElementById("exp-menu");
+  if(menu)[...menu.children].forEach(el=>{
+    const rr=["menu-rr","btn-rr-pdf","btn-rr-xls"].includes(el.id);
+    el.style.display=(MODE==="rr")===rr?"":"none";
   });
   e.stopPropagation();
   document.getElementById("exp-menu").classList.toggle("open");
@@ -4762,7 +4889,7 @@ function setOv(k,v){
     const n=num(v); if(n===null)delete overrides[k]; else overrides[k]=n;
   }else if(v===""){delete overrides[k];}
   else overrides[k]=v;
-  render();
+  if(MODE==="rr")renderRR(); else render();
 }
 function ackFx(){render();}
 function keepFx(){overrides.fx=D.fxRaw;render();}
@@ -4900,7 +5027,7 @@ async function recallTheme(){
     const db=await caseStore();
     const k=await new Promise(res=>{const t=db.transaction("h","readonly").objectStore("h").get("theme");
       t.onsuccess=()=>res(t.result); t.onerror=()=>res(null);});
-    if(k)setTheme(k);
+    setTheme(k||"forest");
   }catch(e){}
 }
 
