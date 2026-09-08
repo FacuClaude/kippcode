@@ -158,6 +158,14 @@ input,select{font:inherit;color:inherit}
 .panel-t{font-family:var(--cond);font-size:15.5px;font-weight:700;letter-spacing:.01em}
 .panel-n{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.05em}
 .panel-b{padding:6px 20px 16px}
+/* collapsible sections — everything but the header hides when collapsed */
+.panel-h{cursor:pointer;user-select:none}
+.panel.collapsed>*:not(.panel-h){display:none}
+.panel.collapsed .panel-h{border-bottom:none}
+.panel-x{background:none;border:1px solid var(--line);color:var(--ink-3);cursor:pointer;
+  width:22px;height:22px;border-radius:4px;font-size:13px;line-height:1;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;margin-left:auto}
+.panel-x:hover{color:var(--ink);border-color:var(--ink-3)}
 
 /* ── FIELD GRID ── */
 .f-hint{font-size:11px;color:var(--ink-3);line-height:1.45;margin-top:4px}
@@ -332,7 +340,13 @@ input,select{font:inherit;color:inherit}
 .bar-track{flex:1;height:15px;background:var(--surface-2);border-radius:2px;overflow:hidden}
 .bar-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s}
 .bar-fill.alt{background:var(--ochre)}
-.bar-v{width:52px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--ink-2);flex-shrink:0}
+/* count and percentage each get their own fixed column: as one string they
+   overflowed the 52px box and wrapped onto a second line, which is what
+   knocked the figures out of line with their bars. */
+.bar-v{display:flex;justify-content:flex-end;gap:9px;white-space:nowrap;flex-shrink:0;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);line-height:15px}
+.bv-n{width:28px;text-align:right}
+.bv-p{width:34px;text-align:right;color:var(--ink-3)}
 .cols{display:flex;align-items:flex-end;gap:5px;height:150px;padding-top:8px}
 .col-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
 .col-b{width:100%;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;transition:height .5s}
@@ -557,16 +571,28 @@ const SCEN=[55,58,60];
    when   optional predicate on the case — a field only asked for when it
           actually applies, so vendors are not sent questions they cannot answer
 */
+/* The vendor requests all say the same thing, so the wording lives in one
+   place. {what} names the document; anything a particular vendor needs beyond
+   that is appended by its own entry. */
+/* "relocating from Canada to the United States" — a handful of country names
+   read wrongly without the article. Kept to a separate placeholder so wordings
+   that already supply their own "the" are untouched. */
+const THE_COUNTRIES=/^(united states|united kingdom|united arab emirates|netherlands|philippines|czech republic|dominican republic|bahamas|maldives)$/i;
+const theCountry=c=>{const t=String(c||"").trim();return THE_COUNTRIES.test(t)?"the "+t:t;};
+
+const REQ_MAIL = what =>
+  "Hi team,\n\nAttached is the "+what+" for {name}, who is relocating from {ohcThe} to {nhcThe}.\n\n"+
+  "Please complete all of the blank fields in the attached template and return it to me at your "+
+  "earliest convenience so that we can proceed with the analysis.";
+
 const REGISTRY={
 
   gcbd:{
     title:"GC&BD Information Data Request",
     to:"Compensation & Benefit Design advisor for the original home country",
-    email:"Attached is the GC&BD information data request for {name}, moving from {ohc} to {nhc}.\n\n"+
-      "Part III drives the pension offset in the economic analysis and the Nova pension counselling "+
-      "session, so the pension section matters most. Where a question does not apply, please leave it "+
-      "blank rather than entering zero or No, so the analysis can tell an answer from a gap.\n\n"+
-      "Please complete column B and return the file with the wording in column A unchanged.",
+    email:REQ_MAIL("GC&BD information data request")+
+      "\n\nIn Part III-A, please answer the pension formula shape first — only one of the two shapes "+
+      "applies, and the rows for the other one can be left blank.",
     note:"Pension and benefits position in the original home country. Part III drives the "+
          "pension offset, which is the figure approvers question most.",
     sections:[
@@ -606,39 +632,63 @@ const REGISTRY={
         {label:"Original Home Country DB Benefit",type:"text",need:1,
          help:"Nova asks for this in one block: what the employee is entitled to, when it becomes "+
               "payable, and how it can be taken. Written out here it goes straight into the Nova report."},
+        {label:"Is the employee already vested in the OHC plan?",
+         alt:["Already vested in OHC","Is the employee vested in the OHC pension plan?"],
+         type:"yesno",need:1,
+         help:"Whether vesting has already been reached, as opposed to the service accrued so far."},
+        {label:"Vested since",alt:["Date vested","Vested from"],type:"date",need:0,
+         help:"The date vesting was reached. Leave blank if not yet vested."},
         {label:"Vesting Service with Home Country",alt:["Vesting Service"],type:"number",need:1,
          help:"Years, four decimals. Required by Nova."},
         {label:"Comments on Pension / DB Plan Integration",alt:["Comments on Pension"],type:"text",need:0}
       ]},
       {name:"Part III-A — Origin country pension formula",
-       note:"The offset mirrors the origin country's own pension formula, so state which shape "+
-            "applies and its inputs. Supplying these lets the system compute the offset directly. "+
-            "If you would rather give the amounts, complete Part III-B instead and leave this blank.",
+       note:"The US pension is reduced by an offset representing what the employee already earns in "+
+            "the origin country plan, so the offset has to be rebuilt from that plan's own formula. "+
+            "Plans fall into one of two shapes. In an ACCRUAL plan the pension grows by a fixed "+
+            "percentage of salary for each year of service, and is then cut back if it is drawn "+
+            "early — so the figure differs at 55, 58 and 60. In a TIERED plan salary is divided into "+
+            "bands that earn at different rates, multiplied by years of service, with no reduction "+
+            "for drawing early — so the figure is the same at all three ages. State which shape "+
+            "applies, then complete only the rows marked for it and leave the other shape's rows "+
+            "blank. WHICH SHAPE APPLIES IS A PROPERTY OF THE PLAN, NOT OF THE COUNTRY — judge it "+
+            "from the plan rules, not from where the employee sits. Among the plans seen so far the "+
+            "Canadian plan is accrual and the Belgian plan is tiered, but that is an example rather "+
+            "than a rule.",
        fields:[
         {label:"Pension formula shape",alt:["Formula shape","Pension formula type"],type:"choice",
          choices:["accrual","tiered"],need:0,
-         help:"accrual = multiplier x lump-sum factor x salary x service x age factor (e.g. Canada). "+
-              "tiered = two accrual rates split at a salary cap x service, no age factor (e.g. Belgium)."},
+         help:"Answer this first — it decides which rows below apply.  "+
+              "ACCRUAL: the pension builds up year by year, each year of service earning the same "+
+              "percentage of salary, and the total is then reduced if the benefit is drawn before "+
+              "normal retirement age. Because that reduction depends on age, the same employee gets "+
+              "a different amount at 55, 58 and 60. The Canadian plan works this way.  "+
+              "TIERED: salary is split into bands and each band earns at its own rate — a lower rate "+
+              "on salary up to the cap, a higher rate above it, usually because a state pension "+
+              "already covers the lower band. That is multiplied by years of service, with no "+
+              "adjustment for the age at which the benefit is drawn, so the amount is the same at "+
+              "55, 58 and 60. The Belgian plan works this way.  "+
+              "Those are examples of each shape, not a country rule: pick the shape the plan actually "+
+              "uses."},
         {label:"Pension multiplier",alt:["Origin country pension multiplier","Accrual multiplier"],type:"percent",need:0,
-         help:"accrual shape only. Canada is 1.5%."},
-        {label:"Accrual rate — tier 1",alt:["Accrual rate tier 1"],type:"percent",need:0,help:"tiered shape only."},
-        {label:"Accrual rate — tier 2",alt:["Accrual rate tier 2"],type:"percent",need:0,help:"tiered shape only."},
-        {label:"Salary cap — tier 1",alt:["Salary threshold between tiers"],type:"money",need:0,help:"tiered shape only."},
-        {label:"Salary cap — tier 2",alt:["Salary threshold — tier 2"],type:"money",need:0,help:"tiered shape only."},
-        {label:"Discount factor at age 55",type:"number",need:0,help:"accrual shape only."},
-        {label:"Discount factor at age 58",type:"number",need:0,help:"accrual shape only."},
-        {label:"Discount factor at age 60",type:"number",need:0,help:"accrual shape only."},
-        {label:"Salary basis",type:"text",need:0,help:"e.g. final average earnings, career average."},
-        {label:"Credited service denominator",type:"number",need:0},
-        {label:"Early retirement discount per year",type:"percent",need:0},
-        {label:"Basis and assumptions used",type:"text",need:0}
+         help:"ACCRUAL SHAPE ONLY — any plan of that shape, not only Canadian ones. The percentage of salary earned per year of service under the plan (the Canadian plan is 1.5%). Multiplied by service and salary to build the offset."},
+        {label:"Accrual rate — tier 1",alt:["Accrual rate tier 1"],type:"percent",need:0,help:"TIERED SHAPE ONLY — any plan of that shape, not only Belgian ones. The rate applied to the part of salary at or below the tier 1 cap."},
+        {label:"Accrual rate — tier 2",alt:["Accrual rate tier 2"],type:"percent",need:0,help:"TIERED SHAPE ONLY. The higher rate applied to salary above the cap."},
+        {label:"Salary cap — tier 1",alt:["Salary threshold between tiers"],type:"money",need:0,help:"TIERED SHAPE ONLY. The salary level where the plan switches from the tier 1 rate to the tier 2 rate."},
+        {label:"Salary cap — tier 2",alt:["Salary threshold — tier 2"],type:"money",need:0,help:"TIERED SHAPE ONLY. Only if the plan applies a second, separate threshold; otherwise leave blank and the tier 1 cap is used."},
+        {label:"Discount factor at age 55",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. The factor the plan applies for taking the benefit at 55 rather than at normal retirement age (e.g. 0.75 = a 25% reduction)."},
+        {label:"Discount factor at age 58",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. Same factor, at age 58."},
+        {label:"Discount factor at age 60",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. Same factor, at age 60."},
+        {label:"Salary basis",type:"text",need:0,help:"Which salary definition the formula uses — final average earnings, career average, and over how many years. Context for the reviewer; not used in the calculation."},
+        {label:"Credited service denominator",type:"number",need:0,help:"If the plan expresses service as a fraction, the denominator it divides by. Context only."},
+        {label:"Early retirement discount per year",type:"percent",need:0,help:"The annual reduction for retiring early, if the plan states it as a rate rather than as the factors above. Context only."},
+        {label:"Basis and assumptions used",type:"text",need:0,help:"Anything the figures depend on — salary assumed, indexation, plan version. Recorded so the offset can be explained if an approver asks."}
       ]},
       {name:"Part III-B — Vesting and EMPP recognition",
        note:"Whether prior service is recognized in the new home country plan turns on what happens to "+
             "the origin country benefit. Answer each question separately rather than giving an overall "+
             "verdict; the system works the verdict out and shows its reasoning.",
        fields:[
-        {label:"Is the employee vested in the OHC pension plan?",type:"yesno",need:1},
         {label:"Vesting criteria applied",type:"text",need:1,
          help:"What the plan requires for vesting — years of service, age, plan entry date — and where "+
               "this employee stands against it."},
@@ -652,20 +702,6 @@ const REGISTRY={
          help:"Not distributed and not transferred. Needed for recognition to be possible."},
         {label:"Will the employee receive a future vested benefit from the OHC plan?",type:"yesno",need:0,
          help:"If they will, the US EMPP generally credits the service and applies an offset for it."}
-      ]},
-      {name:"Part III-C — Estimated OHC offset",
-       note:"Only if Part III-A is not supplied. Amounts in the original home country currency.",
-       fields:[
-        {label:"Estimated OHC offset — retirement at age 55",alt:["OHC Offset Amount @ Age 55"],type:"money",need:0},
-        {label:"Estimated OHC offset — retirement at age 58",alt:["OHC Offset Amount @ Age 58"],type:"money",need:0},
-        {label:"Estimated OHC offset — retirement at age 60",alt:["OHC Offset Amount @ Age 60"],type:"money",need:0}
-      ]},
-      {name:"Part III-D — EMPP affiliate service",
-       note:"Required by Nova for the pension counselling session.",
-       fields:[
-        {label:"Affiliate Pension Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"},
-        {label:"Affiliate Benefit Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"},
-        {label:"Affiliate Vesting Service Recognized under US EMPP at Localization Date",type:"yesno",need:0,when:"intoUS"}
       ]},
       {name:"Part IV — Savings plan / DC plan",fields:[
         {label:"OHC - Is there a DC / Savings Plan?",alt:["OHC — is there a DC / savings plan?"],type:"yesno",need:0},
@@ -685,9 +721,7 @@ const REGISTRY={
   tmo:{
     title:"TMO Data Request",
     to:"Cartus",
-    email:"Attached is the TMO data request for {name}, moving from {ohc} to {nhc}.\n\n"+
-      "Please state the direction of the exchange rate along with the figure. Tax equalization is taken "+
-      "from the cost matrix on our side, so please leave those two rows blank rather than returning zero.",
+    email:REQ_MAIL("TMO data request"),
     note:"Exchange rate, hypothetical tax and the expatriate benefit build-up.",
     sections:[
       {name:"Currency",fields:[
@@ -704,14 +738,6 @@ const REGISTRY={
         {label:"Full Expatriate Benefits - Travel Assistance Allowance",alt:["Travel Assistance Allowance"],type:"money",need:0},
         {label:"Full Expatriate Benefits - Others",alt:["Others (Transition Payment if applicable)"],type:"money",need:0},
         {label:"Full Expatriate Benefits - TOTAL",alt:["Full Expatriate Benefits TOTAL"],type:"money",need:1}
-      ]},
-      {name:"Tax equalization",
-       note:"These two come from the cost matrix and are keyed in by the coordinator. "+
-            "Leave blank rather than returning zero — a zero is read as a real figure and understates "+
-            "the cost of remaining an expatriate.",
-       fields:[
-        {label:"Cost to the Company - Home Country Tax",alt:["Home Country Tax"],type:"money",need:0},
-        {label:"Cost to the Company - Host Country Tax",alt:["Host Country Tax"],type:"money",need:0}
       ]}
     ]
   },
@@ -719,15 +745,13 @@ const REGISTRY={
   comp:{
     title:"Compensation Data Request",
     to:"Compensation advisor for the new home country",
-    email:"Attached is the compensation data request for {name}, localizing to {nhc}.\n\n"+
-      "We are looking for the reference pay in {nhc} for this level, developed independently of the "+
-      "{ohc} salary structure.",
+    email:REQ_MAIL("Compensation data request"),
     note:"Reference pay in the new home country, developed independently of the origin country structure.",
     sections:[
       {name:"New home country pay",fields:[
-        {label:"NHC - Annual Base Salary",alt:["NHC — Annual Base Salary","New Home Country Annual Base Salary"],type:"money",need:1},
         {label:"OHC - Annual Base Salary",alt:["OHC — Annual Base Salary","Original Home Country Annual Base Salary"],
          type:"money",need:1,help:"In the origin country currency. Confirms what SuccessFactors holds."},
+        {label:"NHC - Annual Base Salary",alt:["NHC — Annual Base Salary","New Home Country Annual Base Salary"],type:"money",need:1},
         {label:"NHC - Pay Scale Group (CL)",alt:["New Home Country CL (Promotion)"],type:"number",need:0,
          help:"Classification level on localizing, if it differs from today."},
         {label:"NHC - Pay Scale Type",type:"text",need:0},
@@ -735,7 +759,6 @@ const REGISTRY={
         {label:"NHC - Employee Subgroup",type:"text",need:0},
         {label:"NHC - Salary Reference Percentage",type:"text",need:0,
          help:"95% for MPT, 100% for executives."},
-        {label:"OHC - Salary Reference Percentage",type:"text",need:0},
         {label:"NHC - Advancement Guide",type:"text",need:0}
       ]}
     ]
@@ -744,8 +767,7 @@ const REGISTRY={
   exec:{
     title:"Exec Compensation Data Request",
     to:"Executive compensation advisor",
-    email:"Attached is the executive compensation data request for {name} (CL {cl}), "+
-      "moving from {ohc} to {nhc}.",
+    email:REQ_MAIL("Executive compensation data request"),
     note:"CL 30 and above only.",
     when:"execCase",
     sections:[
@@ -761,9 +783,7 @@ const REGISTRY={
     to:"Compensation advisor for the new home country",
     note:"Section B of the resign-rehire business case. BHR have completed the rest; this is the salary "+
          "work-up and the level it assumes.",
-    email:"Attached is the compensation request for {name}, a resign-rehire from {ohc} into {nhc}.\n\n"+
-      "We need the salary work-up for the new home country payroll and the level it assumes. The business "+
-      "case has already been completed by BHR, so only the section in this file is outstanding.",
+    email:REQ_MAIL("Compensation request"),
     sections:[
       {name:"Compensation Data — Section B",fields:[
         {label:"Proposed CL",type:"number",need:1},
@@ -784,10 +804,7 @@ const REGISTRY={
     to:"Compensation & Benefit Design advisor for the original home country",
     note:"For a resign-rehire the business case is completed by BHR. Only the benefits position is "+
          "needed here: whether prior service carries across, and what happens to the pension on each side.",
-    email:"Attached is the benefits request for {name}, a resign-rehire from {ohc} into {nhc}.\n\n"+
-      "We need the prior service recognition position and the pension implications on both sides. "+
-      "The business case itself has already been completed by BHR, so only the sections in this file are "+
-      "outstanding.",
+    email:REQ_MAIL("GC&BD benefits request"),
     sections:[
       {name:"Prior service recognition",
        note:"Answer the checklist for the destination that applies. Leave the other blank.",
@@ -848,9 +865,8 @@ const REGISTRY={
   tax:{
     title:"Deloitte Income Tax Estimate Request",
     to:"Deloitte",
-    email:"Attached is the income tax estimate request for {name}, moving from {ohc} to {nhc}.\n\n"+
-      "Income taxes only, excluding social taxes, on the same basis for both countries. The file lists "+
-      "only the side or sides we need for this case.",
+    email:REQ_MAIL("income tax estimate request")+
+      "\n\nIncome taxes only, excluding social taxes, on the same basis for both countries.",
     note:"Income taxes only, excluding social taxes, on the same basis for both countries. "+
          "Only the sides this case actually needs are listed below.",
     when:"needsDeloitte",
@@ -1088,7 +1104,7 @@ function buildTemplate(slot,seed){
   const span=(r,a,b)=>merges.push(`${a}${r}:${b}${r}`);
 
   span(push([C(def.title,XS.title)],30),"A","D");
-  push([C("Requested by Global Mobility",XS.meta),C("",XS.meta),
+  push([C("Requested by Global Localization Process",XS.meta),C("",XS.meta),
         C("Date requested",XS.meta),C(new Date().toISOString().slice(0,10),XS.meta)],16);
   push([]);
 
@@ -1137,15 +1153,23 @@ function emailTemplate(slot){
   }
   const def=REGISTRY[slot];
   const fill=t=>String(t||"")
-    .replace(/\{name\}/g,seed.name).replace(/\{ohc\}/g,seed.ohc)
-    .replace(/\{nhc\}/g,seed.nhc).replace(/\{cl\}/g,seed.cl||"");
+    .replace(/\{name\}/g,seed.name)
+    .replace(/\{ohcThe\}/g,theCountry(seed.ohc)).replace(/\{nhcThe\}/g,theCountry(seed.nhc))
+    .replace(/\{ohc\}/g,seed.ohc).replace(/\{nhc\}/g,seed.nhc)
+    .replace(/\{cl\}/g,seed.cl||"");
   const file=templateFilename(slot,seed);
 
   genTemplate(slot,seed);                       /* download it first */
 
-  const subject=`${def.title} — ${seed.name} (${seed.ohc} to ${seed.nhc})`;
-  const body=fill(def.email||`Attached is the ${def.title.toLowerCase()} for {name}.`)
-    +`\n\nAttachment: ${file}\n\nThank you,\nGlobal Mobility`;
+  const kind=MODE==="rr"?"Resign-rehire":"Localization";
+  /* two of the titles already end in "— Resign-Rehire"; strip it so the
+     subject does not carry the case type twice */
+  const base=def.title.replace(/\s+[—-]\s+Resign-?\s?Rehire$/i,"");
+  const subject=`${base} — New ${kind} case — ${seed.name} (${seed.ohc} to ${seed.nhc})`;
+  /* The filename is not written into the body — it would be sent to the vendor,
+     who has no use for it. The toast below names the file to attach instead. */
+  const body=fill(def.email||REQ_MAIL(def.title.toLowerCase()))
+    +`\n\nThank you,\nGlobal Localization Process`;
   const mail=`mailto:${encodeURIComponent(vendorEmail[slot]||"")}`
     +`?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   lastMailto=mail;
@@ -1203,10 +1227,16 @@ function effectiveSeed(){
   return out;
 }
 
+/* Only values that differ from the case are pinned. Storing every field
+   verbatim froze the type read at load time, so changing the localization type
+   in Case never reached here and Deloitte stayed marked "not needed". */
 function readSeed(){
+  const auto=seedAuto();
   ["name","ohc","nhc","type","cl","pernrOHC","pernrNHC"].forEach(k=>{
     const el=document.getElementById("seed-"+k);
-    if(el)caseSeed[k]=el.value.trim();
+    if(!el)return;
+    const v=el.value.trim();
+    caseSeed[k]=(v===String(auto[k]||"").trim())?"":v;
   });
   return effectiveSeed();
 }
@@ -1707,7 +1737,6 @@ function resolve(){
   d.offsetStated=d.offset;
   d.retAgeG= gAge("Normal retirement age","Normal Retirement Age");
   d.earlyRet = gAge("Early retirement age");
-  d.planStatus = gS("Plan status");
   /* Part III-A — the origin country's own pension formula, supplied by GC&BD */
   d.par={
     method:gS("Pension formula shape","Formula shape","Pension formula type"),
@@ -1735,7 +1764,9 @@ function resolve(){
     if(!t||/^select|^n\/?a$|^tbc$|^tbd$/i.test(t))return null;
     return /^y/i.test(t)?true:/^n/i.test(t)?false:null;};
   d.vest={
-    vested:      yn(gS("Is the employee vested in the OHC pension plan?")),
+    vested:      yn(gS("Is the employee already vested in the OHC plan?",
+                       "Is the employee vested in the OHC pension plan?",
+                       "Already vested in OHC")),
     criteria:    gS("Vesting criteria applied"),
     mustDistrib: yn(gS("Does the plan require distribution on leaving the affiliate?")),
     electDistrib:yn(gS("Has the employee elected to take distribution?")),
@@ -1758,7 +1789,6 @@ function resolve(){
     (/^y/i.test(d.offsetStated)?"yes":"no")!==d.empp.state)
     ?{stated:d.offsetStated,derived:d.empp.state}:null;
   d.gc={
-    planStatus:gS("Plan status"),
     entry:gS("Plan entry date"),
     elig:gS("Eligibility criteria"),
     retNotes:gS("Notes on retirement ages"),
@@ -2394,12 +2424,49 @@ function gate(d,c){
   return A;
 }
 
+/* Exec compensation is only asked for at CL 30 and above, so it should not be
+   marked required on cases below that. With no case loaded the level is not
+   known yet, and the slot stays optional rather than nagging. */
+function slotReq(s){
+  if(s.id==="exec")return (D&&D.cl!==null&&D.cl!==undefined&&+D.cl>=30)?1:0;
+  return s.req;
+}
+
 /* ═══ RENDER ═══ */
+/* Sections collapse on a click of their header. The open/closed state is kept
+   by section title in COLLAPSED because render() rebuilds the whole body on
+   every edit — without it, each keystroke in an override would pop every
+   section back open. Sections start expanded. */
+const COLLAPSED=new Set();
+function wirePanels(){
+  document.querySelectorAll("#body .panel").forEach(p=>{
+    const h=p.querySelector(".panel-h");
+    if(!h||h.dataset.wired)return;
+    h.dataset.wired="1";
+    const title=((p.querySelector(".panel-t")||{}).textContent||"").trim();
+    const btn=document.createElement("button");
+    btn.type="button"; btn.className="panel-x";
+    btn.setAttribute("aria-label","Collapse or expand this section");
+    h.appendChild(btn);
+    const paint=()=>{ btn.textContent=p.classList.contains("collapsed")?"+":"\u2212"; };
+    if(COLLAPSED.has(title))p.classList.add("collapsed");
+    paint();
+    h.addEventListener("click",e=>{
+      /* the header also carries action buttons; only the chevron toggles */
+      const b=e.target.closest("button");
+      if(b&&b!==btn)return;
+      const now=p.classList.toggle("collapsed");
+      if(now)COLLAPSED.add(title); else COLLAPSED.delete(title);
+      paint();
+    });
+  });
+}
+
 function railHTML(){
-  const html=g=>activeSlots().filter(s=>s.req===g).map(s=>{
+  const html=g=>activeSlots().filter(s=>slotReq(s)===g).map(s=>{
     const on=s.db?!!dbHandle:!!F[s.id];
     const m=s.db?{n:dbHandle?dbName:(pendingDb?"click to reconnect "+pendingDb.name:"")}:FILEMETA[s.id];
-    return `<div class="slot ${on?"on":""} ${s.req&&!on?"req":""}" onclick="pickFile('${s.id}')">
+    return `<div class="slot ${on?"on":""} ${slotReq(s)&&!on?"req":""}" onclick="pickFile('${s.id}')">
       <div class="slot-mark">${on?"✓":""}</div>
       <div class="slot-txt"><div class="slot-name">${s.name}</div>
       <div class="slot-meta">${on?esc(m.n):s.hint}</div></div>
@@ -2411,8 +2478,8 @@ function railHTML(){
   const ml=document.getElementById("mode-loc"), mr=document.getElementById("mode-rr");
   if(ml)ml.classList.toggle("on",MODE==="loc");
   if(mr)mr.classList.toggle("on",MODE==="rr");
-  const req=activeSlots().filter(s=>s.req), got=req.filter(s=>F[s.id]).length;
-  const opt=activeSlots().filter(s=>!s.req).filter(s=>F[s.id]).length;
+  const req=activeSlots().filter(s=>slotReq(s)), got=req.filter(s=>F[s.id]).length;
+  const opt=activeSlots().filter(s=>!slotReq(s)).filter(s=>F[s.id]).length;
   document.getElementById("status").innerHTML =
     got===0 ? "No files loaded"
     : `<b>${got} of ${req.length}</b> required${opt?` · <b>${opt}</b> optional`:""}` +
@@ -2521,7 +2588,7 @@ function pendingItems(d,c){
   const out=[];
   if(!d)return out;
 
-  SLOTS.filter(s=>s.req&&!F[s.id]&&!s.db).forEach(s=>
+  SLOTS.filter(s=>slotReq(s)&&!F[s.id]&&!s.db).forEach(s=>
     out.push({tag:"file",t:`${s.name} has not been loaded.`}));
 
   const miss=[];
@@ -2550,8 +2617,6 @@ function pendingItems(d,c){
     const open=(rr?RR_STEPS:LOC_STEPS).map(([col,label])=>({label,state:stepState(stepValue(row,col))}))
       .filter(x=>x.state==="doing"||x.state==="todo");
     if(open.length)out.push({tag:"stage",t:`Next stage in the tracker: ${open[0].label}.`});
-    const act=row["Action Required Notes"];
-    if(act&&String(act).trim())out.push({tag:"action",t:String(act).trim().slice(0,160)});
   }
   return out;
 }
@@ -2683,8 +2748,11 @@ function guideHTML(d){
 
 const RR_SLOTS=[
   {id:"rr",  name:"Resign-rehire business case", req:1, hint:"the template BHR completed and sent"},
-  {id:"comp",name:"Compensation data request",   req:1, hint:"salary work-up in the new home country"},
-  {id:"gcbd",name:"GC&BD information data request",req:1,hint:"prior service recognition and pension impact"},
+  /* distinct ids from the localization slots: both lists share one F store, so
+     reusing "comp"/"gcbd" made a file loaded on a localization case show up as
+     already loaded when you switched to resign-rehire. */
+  {id:"rrcomp",name:"Compensation data request",   req:1, hint:"salary work-up in the new home country"},
+  {id:"rrgcbd",name:"GC&BD information data request",req:1,hint:"prior service recognition and pension impact"},
   {id:"db",  name:"Case tracker / database",     req:0, hint:"Full Tracker.xlsx", db:1}
 ];
 
@@ -3015,7 +3083,7 @@ function exportRR(fmt){
   w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
     <title>${esc(d.name||"Resign-rehire")} — Resign-rehire business case</title>${PDF_CSS}</head><body>
     <div class="sheet">
-      <header><span>ExxonMobil &middot; Global Mobility</span><span>Private</span></header>
+      <header><span>ExxonMobil &middot; Global Localization Process</span><span>Private</span></header>
       <h1>Resign-rehire business case</h1>
       <div class="lede-row"><div><div class="who">${esc(d.name||"—")}</div>
         <div class="route">${esc([d.ohc,d.nhc].filter(Boolean).join(" \u2192 "))}</div></div>
@@ -3557,10 +3625,19 @@ function clearOv(key){ delete overrides["calc:"+key]; render(); }
    and without this there is no way to tell the two apart. */
 /* An origin-country figure is shown in its own currency and again converted, so
    a number can be checked against the vendor file without arithmetic. */
-function both(d,v){
-  const a=fmt(v)+(d.ohcCcy?" "+d.ohcCcy:"");
-  if(!d.fx||!d.nhcCcy||d.ohcCcy===d.nhcCcy)return a;
-  return a+"  ·  "+fmt(v*d.fx)+" "+d.nhcCcy;
+/* Shows a figure in the currency it was actually stated in, then its new-home
+   equivalent. The stated currency has to be passed in: some fields carry their
+   own selector (the income tax figures), and assuming the origin currency made
+   a tax already keyed in USD get labelled CAD and converted a second time.
+   Mirrors the conversion the calculation itself uses, so the two agree. */
+function both(d,v,ccy){
+  const from=ccy||d.ohcCcy;
+  const a=fmt(v)+(from?" "+from:"");
+  if(!d.nhcCcy||!from||from===d.nhcCcy)return a;
+  let conv=null;
+  if(from===d.ohcCcy&&d.fx)conv=v*d.fx;
+  else{ const r=FX_TO_USD[from], n=FX_TO_USD[d.nhcCcy]; if(r&&n)conv=v*(r/n); }
+  return conv===null?a:a+"  ·  "+fmt(conv)+" "+d.nhcCcy;
 }
 
 function diagHTML(d,c){
@@ -3578,20 +3655,25 @@ function diagHTML(d,c){
     ["NHC benefits rate",d.nhcSBR!==null?pct(d.nhcSBR):null,"GC&BD"],
     ["Expatriate benefits",d.expatTotal!==null?fmt(d.expatTotal):null,"TMO"],
     ["Tax equalization",(d.homeTax!==null||d.hostTax!==null)?fmt((d.homeTax||0)+(d.hostTax||0)):null,"cost matrix, by hand"],
-    ["Income tax OHC",d.taxOHC!==null?both(d,d.taxOHC):null,d.taxOHCSrc||"Deloitte"],
-    ["Income tax NHC",d.taxNHC!==null?fmt(d.taxNHC):null,d.taxNHCSrc||"Deloitte"],
+    ["Income tax OHC",d.taxOHC!==null?both(d,d.taxOHC,d.taxOHCCcy):null,d.taxOHCSrc||"Deloitte"],
+    ["Income tax NHC",d.taxNHC!==null?both(d,d.taxNHC,d.taxNHCCcy):null,d.taxNHCSrc||"Deloitte"],
     ["Prior service recognised",d.offset||null,"GC&BD"],
-    ["OHC offset @55",(c&&c.scen&&c.scen[55]&&c.scen[55].ohcOffset!==null&&c.scen[55].ohcOffset!==undefined)
-        ?fmt(c.scen[55].ohcOffset)
-        :(d.ohcOffset&&d.ohcOffset[55]!==null&&d.ohcOffset[55]!==undefined?fmt(d.ohcOffset[55]):null),
-      (d.ohcOffset&&d.ohcOffset[55]!==null&&d.ohcOffset[55]!==undefined)?"GC&BD"
-        :(d.par&&d.par.method?"calculated from the origin country formula":"GC&BD")],
+    ...[55,58,60].map(a=>{
+      /* all three retirement scenarios, not just 55 — same precedence in each:
+         what GC&BD returned wins, otherwise the origin-country formula. */
+      const fromCalc=(c&&c.scen&&c.scen[a]&&c.scen[a].ohcOffset!==null&&c.scen[a].ohcOffset!==undefined)
+        ?c.scen[a].ohcOffset:null;
+      const stated=(d.ohcOffset&&d.ohcOffset[a]!==null&&d.ohcOffset[a]!==undefined)?d.ohcOffset[a]:null;
+      const v=(fromCalc!==null)?fmt(fromCalc):(stated!==null?fmt(stated):null);
+      return ["OHC offset @"+a,v,
+        stated!==null?"GC&BD":(d.par&&d.par.method?"calculated from the origin country formula":"GC&BD")];
+    }),
     ["Retirement age NHC",d.retAgeNHC,"country rules"],
     ["Retirement age OHC",d.retAgeOHC,"GC&BD"],
     ["Years of service",d.yos!==null&&d.yos!==undefined?(+d.yos).toFixed(4):null,d.yosSrc||"request form"],
     ["Year end age",d.ageYE,"SuccessFactors"],
     ["Classification level",d.cl?"CL "+d.cl:null,d.reqCL!==null?"request form":"SuccessFactors"],
-    ["Performance",d.perfText?`<span class="nowrap">${esc(d.perfText)}</span>`:null,"manual"],
+    ["Performance",d.perfText||null,"manual"],
     ["Potential",d.pot,"manual"]
   ];
   const missing=rows.filter(r=>r[1]===null||r[1]===undefined||r[1]==="").length;
@@ -3649,7 +3731,6 @@ function gcbdHTML(d,c){
 
     <div class="sub-h">Part III — Pension plan / defined benefit</div>
     <div class="panel-b"><div class="fgrid">
-      ${f("Plan status",g.planStatus)}
       ${f("Plan entry date",dOnly(g.entry))}
       ${f("Normal retirement age",d.retAgeG)}
       ${f("Early retirement age",d.earlyRet)}
@@ -3664,14 +3745,14 @@ function gcbdHTML(d,c){
     ${anyPar?`<div class="sub-h">Part III-A — Origin country pension formula</div>
     <div class="panel-b"><div class="fgrid">
       ${fp("Formula shape","method",p.method)}
-      ${tiered?"":fp("Pension multiplier","mult",p.mult!==null&&p.mult!==undefined?pct(p.mult):null)}
+      ${tiered?"":fp("Pension multiplier — "+(d.ohc||"origin country")+" plan","mult",p.mult!==null&&p.mult!==undefined?pct(p.mult):null)}
       ${tiered?fp("Accrual rate — tier 1","rate1",p.rate1!==null&&p.rate1!==undefined?pct(p.rate1):null):""}
       ${tiered?fp("Accrual rate — tier 2","rate2",p.rate2!==null&&p.rate2!==undefined?pct(p.rate2):null):""}
       ${tiered?fp("Salary cap — tier 1","thresh",p.thresh!==null&&p.thresh!==undefined?fmt(p.thresh):null):""}
       ${tiered?fp("Salary cap — tier 2","thresh2",p.thresh2!==null&&p.thresh2!==undefined?fmt(p.thresh2):null):""}
-      ${tiered?"":fp("Discount factor at 55","f55",p.f55)}
-      ${tiered?"":fp("Discount factor at 58","f58",p.f58)}
-      ${tiered?"":fp("Discount factor at 60","f60",p.f60)}
+      ${tiered?"":fp("Age discount at 55 — "+(d.ohc||"origin country")+" plan","f55",p.f55)}
+      ${tiered?"":fp("Age discount at 58 — "+(d.ohc||"origin country")+" plan","f58",p.f58)}
+      ${tiered?"":fp("Age discount at 60 — "+(d.ohc||"origin country")+" plan","f60",p.f60)}
     </div></div>
     ${[["Salary basis",p.basis],["Service denominator",p.denom],
        ["Discount per year",p.discPerYr!==null&&p.discPerYr!==undefined?pct(p.discPerYr):null]]
@@ -3684,16 +3765,27 @@ function gcbdHTML(d,c){
          <div class="note">Extra detail GC&amp;BD supplied. Not used by the calculation.</div>`
       : ""}
     <div class="note">${String(p.method||"").toLowerCase().startsWith("tier")
-      ? `<strong>Tiered accrual</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
+      ? `<strong>Tiered</strong> &mdash; how the ${esc(d.ohc||"origin country")} plan works out a pension.<br>
+         Salary is split into bands and each band earns at its own rate: a lower rate on salary up to the
+         cap, a higher rate on the part above it &mdash; usually because a state pension already covers the
+         lower band. That is multiplied by years of service.<br>
          <code>(rate&nbsp;1 &times; salary up to the cap &nbsp;+&nbsp; rate&nbsp;2 &times; salary above it) &times; years of service</code><br>
-         The amount does not change with the age of retirement, so the three retirement scenarios all show the same figure. Only the age-discount shape varies by age.`
-      : `<strong>Accrual with an age discount</strong> &mdash; how ${esc(d.ohc||"the origin country")} works out a pension.<br>
+         There is no reduction for drawing the benefit early, so all three retirement scenarios show the
+         same figure.`
+      : `<strong>Accrual with an age discount</strong> &mdash; how the ${esc(d.ohc||"origin country")} plan works out a pension.<br>
+         The pension builds up year by year, each year of service earning the same percentage of salary.
+         The total is then cut back if the benefit is drawn before normal retirement age.<br>
          <code>multiplier &times; lump-sum factor &times; salary &times; (years of service + years to retirement)
          &times; the discount factor for that age</code><br>
-         The discount factors are why the three retirement ages give different amounts.`}
+         That reduction is why the three retirement ages give different amounts.`}
+      <br><br>The shape is a property of the plan, not of the country. The Canadian plan is accrual and
+      the Belgian plan is tiered, but those are the plans seen so far rather than a rule &mdash; another
+      country's plan can take either shape, and GC&amp;BD state which one applies.
       </div>
-    <div class="note">These parameters come from GC&amp;BD. They are only used when Part III-B below is left
-      empty: if GC&amp;BD send the offset amounts outright, those are used instead and this is ignored.</div>
+    <div class="note">These parameters come from GC&amp;BD. They are only used when no offset amounts are
+      supplied: if GC&amp;BD return the amounts at 55, 58 and 60 outright, those are used instead and this
+      is ignored. The request form no longer asks for those amounts, so normally this formula is what
+      drives the offset.</div>
     ${(d.parFromDefaults&&d.parFromDefaults.length)?`<div class="note"><strong>Marked
       <em>country default</em> above: ${d.parFromDefaults.length} parameter${d.parFromDefaults.length>1?"s":""}
       GC&amp;BD did not return.</strong> These come from what ${esc(d.ohc||"this country")} used on earlier
@@ -3719,7 +3811,10 @@ function gcbdHTML(d,c){
       questions above point to <em>${d.offsetClash.derived==="yes"?"yes":"no"}</em>. Worth settling before
       the offset goes into an endorsement.</div>`:""}
 
-    <div class="sub-h">Part III-C — Estimated OHC offset</div>
+    <!-- No longer a part of the request form: GC&BD are not asked for these
+         amounts any more, so the heading names what it is rather than a part
+         number the vendor would not recognise. -->
+    <div class="sub-h">Prior service recognition and OHC offset</div>
     <div class="panel-b"><div class="fgrid">
       <div class="f"><div class="f-l">Prior service recognised in the NHC<span class="f-src">${esc(d.offsetSrc||"not answered")}</span></div>
         <select onchange="setOv('offset',this.value)">
@@ -3735,7 +3830,7 @@ function gcbdHTML(d,c){
     <div class="panel-b"><div class="fgrid">
       ${SCEN.map(a=>`<div class="f"><div class="f-l">At age ${a}${d.ohcCcy?" · "+d.ohcCcy:""}<span class="f-src">manual</span></div>
         <input style="width:100%" value="${d.ohcOffset[a]??((c&&c.scen&&c.scen[a]&&c.scen[a].ohcOffset!==null&&c.scen[a].ohcOffset!==undefined)?Math.round(c.scen[a].ohcOffset):"")}" placeholder=""
-          title="Amount GC&BD reported for retirement at age ${a}, in ${esc(d.ohcCcy||"the origin country currency")}. Leave empty to use the formula above."
+          title="Offset for retirement at age ${a}, in ${esc(d.ohcCcy||"the origin country currency")}. Filled from the origin country formula above; key a figure in only to override it."
           onchange="setOv('ohcOffset${a}',this.value)"></div>`).join("")}
     </div></div>
     ${d.offsetBasis?`<div class="note"><strong>Basis.</strong> ${esc(String(d.offsetBasis))}</div>`:""}
@@ -3917,6 +4012,10 @@ function scenHTML(d,c){
 function render(){
   if(VIEW==="links"){renderLinks();railHTML();return;}
   if(VIEW==="analytics"){renderAnalytics();return;}
+  /* Loading a file re-renders. Without this the case canvas replaced whatever
+     view you were on while the nav still highlighted it — load a TMO file from
+     Communications and you landed on Case with Communications still lit. */
+  if(VIEW==="start"){document.getElementById("body").innerHTML=startCaseHTML();railHTML();return;}
   /* Every other trigger — clearing a case, reopening a saved one, toggling the
      guide, editing an override — calls this same function without checking
      which case type is active. Route resign-rehire cases to their own
@@ -4142,11 +4241,11 @@ function reports(){
     ["Life Expectancy",d.life],
     ["Prior Service Recognised in NHC",d.offset||null],
     ...(d.intoUS&&R2.ls?[
-      ["US Lump Sum Factor at 55",R2.ls[55]],
-      ["US Lump Sum Factor at 58",R2.ls[58]],
-      ["US Lump Sum Factor at 60",R2.ls[60]],
-      ["US Pension Multiplier",(R2.mult*100).toFixed(2)+"%"],
-      ["Early Retirement Factor at 55 / 58 / 60",[R2.erf[55],R2.erf[58],R2.erf[60]].join(" / ")]
+      ["U.S. plan lump sum factor at 55",R2.ls[55]],
+      ["U.S. plan lump sum factor at 58",R2.ls[58]],
+      ["U.S. plan lump sum factor at 60",R2.ls[60]],
+      ["U.S. plan pension multiplier",(R2.mult*100).toFixed(2)+"%"],
+      ["U.S. plan early retirement factor at 55 / 58 / 60",[R2.erf[55],R2.erf[58],R2.erf[60]].join(" / ")]
     ]:[])
   ];
 
@@ -4236,6 +4335,14 @@ const PDF_CSS=`<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+San
   h2{font-size:11.5pt;font-weight:600;color:#000;letter-spacing:-.008em;
      margin:22pt 0 9pt;padding-left:8pt;border-left:2.5pt solid #ED1B2D;line-height:1.25;
      break-after:avoid;page-break-after:avoid}
+  /* A heading and its rows must not be split by a page break: keeping each
+     group whole is what stops "General employee data" starting on one sheet
+     and finishing on the next. A group taller than a page still has to break
+     somewhere, but a heading never separates from the rows under it. */
+  .sec{break-inside:avoid;page-break-inside:avoid}
+  dl{break-inside:avoid;page-break-inside:avoid}
+  table.fig{break-inside:avoid;page-break-inside:avoid}
+  table.fig tr{break-inside:avoid;page-break-inside:avoid}
   h2:first-of-type{margin-top:0}
   h3{font-size:9.2pt;font-weight:600;color:#000;margin:15pt 0 4pt;letter-spacing:-.003em}
   h3::after{content:"";display:block;width:20pt;height:1.5pt;background:#ED1B2D;margin-top:4pt}
@@ -4293,7 +4400,7 @@ const PDF_CSS=`<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+San
     color:#ED1B2D;font-weight:500}
 
   footer{display:flex;justify-content:space-between;font-size:7.4pt;color:#8A9096;
-    margin-top:26pt;padding-top:8pt;border-top:.6pt solid #E6E8EA}
+    margin-top:16pt;padding-top:8pt;border-top:.6pt solid #E6E8EA;break-inside:avoid}
 
   /* ── offer letter only ──────────────────────────────────────────────────
      Employee-facing, so it opens with the photograph rather than the plain
@@ -4334,13 +4441,18 @@ function exportPdf(pack){
   const val=v=>v===null||v===undefined||v===""?"&mdash;":esc(String(v));
 
   /* key/value block — labels left, figures right, hairline between */
+  /* Each heading and the rows under it go in one .sec block. A bare <dl> with
+     break-inside:avoid was not enough — the heading and its list were siblings,
+     so a page could break between them or part-way down the list, which is how
+     "Sensitive employee data" ended up spread over two sheets. */
   const kv=rows=>{
-    let out="",open=false;
+    let out="",open=false,sec=false;
+    const shut=()=>{ if(open){out+="</dl>";open=false;} if(sec){out+="</div>";sec=false;} };
     rows.forEach(([k,v])=>{
-      if(k===null){ if(open){out+="</dl>";open=false;} return; }
+      if(k===null){ shut(); return; }
       if(String(k).startsWith("\u00a7")){
-        if(open){out+="</dl>";open=false;}
-        out+=`<h3>${esc(k.slice(1))}</h3>`; return;
+        shut();
+        out+=`<div class="sec"><h3>${esc(k.slice(1))}</h3>`; sec=true; return;
       }
       if(!open){out+="<dl>";open=true;}
       /* Long prose — an immigration assessment, a justification — reads badly
@@ -4350,7 +4462,8 @@ function exportPdf(pack){
         ? `<div class="kvb"><dt>${esc(k)}</dt><dd>${esc(v).replace(/\n/g,"<br>")}</dd></div>`
         : `<div class="kv"><dt>${esc(k)}</dt><dd>${val(v)}</dd></div>`;
     });
-    return out+(open?"</dl>":"");
+    shut();
+    return out;
   };
 
   /* figure table — no fills except the total rule */
@@ -4377,7 +4490,7 @@ function exportPdf(pack){
   const route=`${esc(d.ohc||"—")} <span class="arw">&#8594;</span> ${esc(d.nhc||"—")}`;
   const head=(title,idx)=>`
     <header>
-      <div class="eyebrow"><span>ExxonMobil &middot; Global Mobility</span><span>Private</span></div>
+      <div class="eyebrow"><span>ExxonMobil &middot; Global Localization Process</span><span>Private</span></div>
       <h1>${title}</h1>
       <div class="subject">
         <div class="who"><div class="nm">${esc(d.name||"—")}</div><div class="rt">${route}</div></div>
@@ -4397,20 +4510,6 @@ function exportPdf(pack){
      produced — nothing here is estimated for the report. A card is dropped
      when its figure is missing, and the whole row disappears on a blank
      template rather than printing a line of dashes. */
-  /* headline figures read as whole currency units; the tables below keep
-     whatever precision the calculation produced */
-  const signed=v=>v===null||v===undefined?"&mdash;"
-    :(v>0?"+":v<0?"\u2212":"")+Math.round(Math.abs(v)).toLocaleString("en-US");
-  const heroItems=[];
-  if(c.c&&c.c.total!==null&&c.c.total!==undefined)
-    heroItems.push([Math.round(c.c.total).toLocaleString("en-US"),"Total annual cost once localized",cc]);
-  if(delta!==null)
-    heroItems.push([signed(delta),"Change in annual cost",
-      delta<0?"saving on today\u2019s cost":"increase on today\u2019s cost"]);
-  if(cashDelta!==null)
-    heroItems.push([(cashDelta>0?"+":"\u2212")+Math.abs(cashDelta*100).toFixed(1)+"%",
-      "Employee cash change","localized vs remaining in "+(d.ohc||"the origin country")]);
-  const hero=heroItems.length?lede(heroItems):"";
 
   /* ── offer letter pieces ───────────────────────────────────────────────
      The photographic masthead, and the reference links for the destination.
@@ -4452,24 +4551,49 @@ function exportPdf(pack){
 ${PDF_CSS}</head><body>
 
 ${(pack==="emp"||pack==="offer")?`<div class="sheet">
-  ${pack==="offer"?offerHead:head("Localization details &mdash; employee communication")}
+  ${pack==="offer"?offerHead:head("Localization Offer Letter")}
   <h2>What changes</h2>
-  ${grid(["As expatriate today|in "+(d.nhc||"the host country"),"Once localized|in "+(d.nhc||"the new home country")],
-    [["Base salary",R.emp[0][1],R.emp[0][3]],
-     ["Alternate forms of pay",R.emp[1][1],R.emp[1][3]],
-     ["Estimated income tax",R.emp[2][1],R.emp[2][3]],
-     ["Expatriate benefits",R.emp[4][1],R.emp[4][3]],
-     ["*Cash to you",R.emp[5][1],R.emp[5][3]]],cc)}
+  ${(()=>{
+    /* Full localizations carry three scenarios, as the original template did:
+       staying an expatriate, returning to the origin payroll, and localizing.
+       The middle one is what the employee is really giving up, so leaving it
+       out understated the comparison. On a direct localization the employee is
+       not an expatriate today, so only the two relevant columns are shown. */
+    const full=d.locType==="Full Localization";
+    const cols=full
+      ? ["As expatriate today|in "+(d.nhc||"the host country"),
+         "Remain as employee|in "+(d.ohc||"the original home country"),
+         "Once localized|in "+(d.nhc||"the new home country")]
+      : ["As expatriate today|in "+(d.nhc||"the host country"),
+         "Once localized|in "+(d.nhc||"the new home country")];
+    const pick=r=>full?[r[1],r[2],r[3]]:[r[1],r[3]];
+    const rows=[
+      ["Base salary",...pick(R.emp[0])],
+      ["Alternate forms of pay",...pick(R.emp[1])],
+      ["Estimated income tax",...pick(R.emp[2])],
+      ["Expatriate benefits",...pick(R.emp[4])],
+      ["*Cash to you",...pick(R.emp[5])]
+    ];
+    return grid(cols,rows,cc);
+  })()}
   ${c.tp&&c.tp.applies?`
     <h2>Transition payments</h2>
     ${grid(["Annual value","Monthly value"],R.tp,cc,
       `Paid across the first two years to ease the change in cash. Year one restores the full difference
        in twelve instalments; year two restores half.`)}`:""}
-  <h2>Your pension</h2>
-  <p class="prose">${d.pensionNote?esc(String(d.pensionNote)):
-    "Pension treatment on localization will be confirmed by Global Compensation &amp; Benefits Design."}</p>
-  <div class="callout">These figures are estimates prepared for this proposal. A tax consultation and,
-  where applicable, a pension session will be arranged before you are asked to decide.</div>
+  <h2>Compensation and Benefits Calculations</h2>
+  <p class="prose">It is important to note that the localization template provided at this stage is an
+    <b>estimate</b>. Should the localization proceed, the calculations will be updated approximately one
+    month prior to the effective date to reflect current exchange rates, salary levels, expatriate
+    compensation components, and other relevant factors.</p>
+  <p class="prose">In addition, the tax deduction amounts included in the analysis are preliminary estimates
+    and do not capture all deductions that may ultimately be applied through payroll following localization.
+    Therefore, it is important that the employee engage in the appropriate discussions with Deloitte before
+    accepting the offer to address any questions regarding the tax implications and payroll deductions
+    associated with the localization.</p>
+  <p class="prose">Details regarding pension treatment and retirement plan considerations will be reviewed
+    separately by Nova during the Benefits session.</p>
+  ${d.pensionNote?`<div class="callout">${esc(String(d.pensionNote))}</div>`:""}
   ${pack==="offer"?offerLinks:""}
   ${foot}
 </div>`:""}
@@ -4509,8 +4633,7 @@ ${(pack==="emp"||pack==="nova"||pack==="bal"||pack==="offer")?"":`<div class="sh
 </div>`}
 
 ${(pack===2||pack==="emp"||pack==="nova"||pack==="bal"||pack==="offer")?"":`<div class="sheet">
-  ${head("Localization analysis &mdash; management output")}
-  ${hero}
+  ${head("Localization Analysis &mdash; Management Output")}
   <h2>Employee perspective</h2>
   ${grid(R.empCols.map(h=>h.replace(" in "," in|")),R.emp,cc)}
   ${c.tp&&c.tp.applies?`
@@ -4527,8 +4650,7 @@ ${(pack===2||pack==="emp"||pack==="nova"||pack==="bal"||pack==="offer")?"":`<div
 </div>`}
 
 ${(pack===1||pack==="emp"||pack==="nova"||pack==="bal"||pack==="offer")?"":`<div class="sheet">
-  ${head("Localization analysis &mdash; economic analysis")}
-  ${hero}
+  ${head("Localization Analysis &mdash; Economic Analysis")}
   <h2>Assumptions</h2>
   ${kv(R.assum)}
   <h2>Cost to company</h2>
@@ -4925,7 +5047,7 @@ function barsHTML(data,total,alt){
   return `<div class="bars">${data.map(([k,v])=>`<div class="bar-r">
     <div class="bar-lab" title="${esc(k)}">${esc(k)}</div>
     <div class="bar-track"><div class="bar-fill ${alt?"alt":""}" style="width:${Math.max(2,v/max*100)}%"></div></div>
-    <div class="bar-v">${v}${total?` · ${Math.round(v/total*100)}%`:""}</div></div>`).join("")}</div>`;
+    <div class="bar-v"><span class="bv-n">${v}</span>${total?`<span class="bv-p">${Math.round(v/total*100)}%</span>`:""}</div></div>`).join("")}</div>`;
 }
 function colsHTML(pairs){
   if(!pairs.length)return '<div style="color:var(--ink-3);font-size:12px;padding:14px 0">No data</div>';
@@ -5046,8 +5168,6 @@ function renderAnalytics(){
 
   const yrsChart=tally(R,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
     .sort((a,b)=>a[0]-b[0]).slice(-9);
-  const approved=R.filter(r=>/^y/i.test(String(r["Approved by GC&BD?"]||""))).length;
-  const actionReq=R.filter(r=>/^y/i.test(String(r["Action Required?"]||""))).length;
 
   body.innerHTML=`<div class="canvas">
     <div class="filters">
@@ -5130,11 +5250,6 @@ function renderAnalytics(){
         <div class="basis">Recorded on ${clv.length} of ${R.length} cases in this selection.</div>
       </div>
 
-      <div class="chart wide">
-        <div class="chart-t">Governance</div>
-        <div class="chart-s">endorsement and open items</div>
-        ${barsHTML([["Endorsed by GC&BD",approved],["Flagged as action required",actionReq]],R.length)}
-      </div>
     </div>
 
     <div class="dbtag">Reading ${esc(dbName)} · ${ALL.length.toLocaleString("en-US")} rows on file
@@ -5306,6 +5421,16 @@ caseStore().then(db=>{
 /* Bring the tracker back on open. If the browser still trusts the handle the
    file loads silently; otherwise the rail shows it as waiting for one click. */
 recallDb().then(ok=>{ railHTML(); if(ok&&D)render(); });
+
+/* Every view rewrites #body wholesale, from several different places. Watching
+   the container catches them all, so the collapse controls survive re-renders
+   without threading a call through each render path. */
+(function(){
+  const body=document.getElementById("body");
+  if(!body||!window.MutationObserver)return;
+  new MutationObserver(()=>wirePanels()).observe(body,{childList:true,subtree:false});
+  wirePanels();
+})();
 </script>
 </body>
 </html>
