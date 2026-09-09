@@ -158,6 +158,80 @@ input,select{font:inherit;color:inherit}
 .panel-t{font-family:var(--cond);font-size:15.5px;font-weight:700;letter-spacing:.01em}
 .panel-n{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.05em}
 .panel-b{padding:6px 20px 16px}
+/* master pension table viewer */
+#pt-modal{position:fixed;inset:0;z-index:9000;background:rgba(20,22,26,.55);
+  display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto}
+.pt-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  width:100%;max-width:940px;box-shadow:0 18px 50px rgba(0,0,0,.28)}
+.pt-h{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;
+  padding:16px 20px;border-bottom:1px solid var(--line)}
+.pt-t{font-size:15px;font-weight:600;color:var(--ink)}
+.pt-s{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:3px}
+.pt-b{padding:4px 0 8px}
+.pt-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.pt-tbl th{text-align:right;font-weight:600;color:var(--ink-2);font-size:11px;
+  padding:9px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+.pt-tbl th:first-child,.pt-tbl th:last-child{text-align:left}
+.pt-tbl td{text-align:right;padding:8px 12px;border-bottom:1px solid var(--line-2, #eee)}
+.pt-c{text-align:left !important;font-weight:600;color:var(--ink)}
+.pt-na{color:var(--ink-3)}
+.pt-src{text-align:left !important;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+.pt-src.ok{color:var(--accent)}
+.pt-n td{font-size:11.5px;color:var(--ink-2);padding:0 12px 10px 12px;border-bottom:1px solid var(--line);
+  text-align:left !important;line-height:1.5}
+.note.warn{background:var(--accent-bg);border-left:3px solid var(--accent);color:var(--ink)}
+.gd{font-size:13px;line-height:1.62;color:var(--ink-2);padding:12px 20px 18px}
+.gd p{margin:0 0 10px}
+.gd p:last-child{margin-bottom:0}
+.gd b{color:var(--ink);font-weight:600}
+.gd ul{margin:0 0 10px;padding-left:18px}
+.gd li{margin-bottom:5px}
+#vd-modal{position:fixed;inset:0;z-index:9000;background:rgba(20,22,26,.55);
+  display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto}
+#vd-modal .pt-card{max-width:760px}
+.vd-ok,.vd-w,.vd-x{margin:14px 20px 6px;padding:11px 14px;border-radius:6px;font-size:13.5px;font-weight:600}
+.vd-ok{background:#e8f4ec;color:#1c6b3f;border:1px solid #bfe0cd}
+.vd-w{background:var(--accent-bg);color:var(--ink);border:1px solid var(--line)}
+.vd-x{background:#fbe9ec;color:#8c1024;border:1px solid #f0c2ca}
+.vd-row{display:flex;gap:12px;align-items:flex-start;padding:10px 20px;border-bottom:1px solid var(--line)}
+.vd-b{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 7px;border-radius:3px;flex-shrink:0;margin-top:1px;min-width:58px;text-align:center}
+.vd-b.block{background:#8c1024;color:#fff}
+.vd-b.check{background:var(--accent);color:#fff}
+.vd-b.note{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.vd-t{font-size:13px;color:var(--ink);line-height:1.45}
+.vd-a{font-size:11.5px;color:var(--ink-3);margin-top:3px;line-height:1.5}
+.hm-h{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin:4px 0 18px}
+.hm-t{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.hm-sub{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:4px}
+.hm-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.hm-c{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--line);
+  border-top:2px solid var(--accent);border-radius:6px;padding:14px 16px}
+.hm-n{font-size:26px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.hm-l{font-size:12px;color:var(--ink-2);margin-top:6px}
+.hm-s{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:3px}
+#fq-modal{position:fixed;inset:0;z-index:9000;background:rgba(20,22,26,.55);
+  display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto}
+#fq-modal .pt-card{max-width:820px}
+.fq-bar{display:flex;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line);
+  flex-wrap:wrap}
+.fq-tabs{display:flex;gap:4px}
+.fq-tabs button{background:none;border:1px solid var(--line);color:var(--ink-2);cursor:pointer;
+  padding:6px 12px;border-radius:5px;font-size:12.5px;font-family:inherit}
+.fq-tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fq-in{flex:1;min-width:200px;padding:7px 10px;border:1px solid var(--line);border-radius:5px;
+  font-family:inherit;font-size:12.5px;color:var(--ink);background:var(--surface)}
+.fq-warn{background:var(--accent-bg);border-bottom:1px solid var(--line);padding:9px 20px;
+  font-size:11.5px;color:var(--ink);font-weight:600}
+.fq-body{padding:6px 20px 14px;max-height:62vh;overflow:auto}
+.fq-sec{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);margin:16px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.fq{border-bottom:1px solid var(--line)}
+.fq summary{cursor:pointer;padding:9px 0;font-size:13px;color:var(--ink);line-height:1.45;
+  list-style:none;display:flex;gap:9px}
+.fq summary::-webkit-details-marker{display:none}
+.fq-n{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex-shrink:0;min-width:20px}
+.fq-a{font-size:12.5px;color:var(--ink-2);line-height:1.65;padding:0 0 12px 29px}
 /* collapsible sections — everything but the header hides when collapsed */
 .panel-h{cursor:pointer;user-select:none}
 .panel.collapsed>*:not(.panel-h){display:none}
@@ -478,11 +552,13 @@ input[type=file]{display:none}
         <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
         <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
       <button class="btn" id="nav-links" onclick="setView('links')">Useful links</button>
+      <button class="btn" id="nav-guide" onclick="setView('guide')">Guide</button>
       </nav>
       <span class="topbar-sep"></span>
       <button class="btn btn-q" id="btn-db" onclick="pickDb()">Link database</button>
       <button class="btn btn-q" id="btn-log" disabled onclick="logCase()">Add to database</button>
       <div class="menu-wrap">
+        <button class="btn" id="btn-qc" onclick="openValidation()">Run validation</button>
         <button class="btn btn-p" id="btn-exp" disabled onclick="toggleExp(event)">Export &#9662;</button>
         <div class="menu" id="exp-menu">
           <div class="menu-h">Approver 1 &mdash; profile + management output</div>
@@ -585,6 +661,37 @@ const REQ_MAIL = what =>
   "Please complete all of the blank fields in the attached template and return it to me at your "+
   "earliest convenience so that we can proceed with the analysis.";
 
+/* ── Named plan formulas ─────────────────────────────────────────────────────
+   A closed list. GC&BD pick one by name and the app applies it, because a name
+   maps to a set of parameters. A formula typed as free text cannot be applied
+   automatically — the app will not execute arithmetic it was handed as prose —
+   so "Other" holds the offset back rather than guessing. */
+const PLAN_VARIANTS=[
+  {k:"canada-1.5", label:"Canada — 1.5% accrual",  plan:{method:"accrual",mult:0.015,f55:0.75,f58:0.88,f60:0.94}},
+  {k:"canada-1.0", label:"Canada — 1.0% accrual",  plan:{method:"accrual",mult:0.010,f55:0.75,f58:0.88,f60:0.94}},
+  {k:"canada-2.0", label:"Canada — 2.0% accrual",  plan:{method:"accrual",mult:0.020,f55:0.75,f58:0.88,f60:0.94}},
+  {k:"uk",         label:"United Kingdom — 1.85% accrual", plan:{method:"accrual",mult:0.0185,f55:0.75,f58:0.88,f60:0.94}},
+  {k:"brazil",     label:"Brazil — 59.5% accrual, service over 35",
+                   plan:{method:"accrual",mult:0.595,denom:35,f55:0.80,f58:0.92,f60:1.00}},
+  {k:"egypt",      label:"Egypt — 1.7% accrual",   plan:{method:"accrual",mult:0.017,f55:0.85,f58:0.94,f60:1.00}},
+  {k:"germany",    label:"Germany — 0.4% accrual", plan:{method:"accrual",mult:0.004,f55:0.76,f58:0.85,f60:0.91}},
+  {k:"argentina",  label:"Argentina — 1.0% accrual, no discount from 55",
+                   plan:{method:"accrual",mult:0.01,f55:1.00,f58:1.00,f60:1.00}},
+  {k:"belgium",    label:"Belgium — tiered 6.25% / 23.125% split at 54,000",
+                   plan:{method:"tiered",rate1:0.0625,rate2:0.23125,thresh:54000,thresh2:54500}},
+  {k:"none",       label:"N/A — this plan is not a defined benefit plan", plan:{method:"none"}},
+  {k:"other",      label:"Other — not listed, see the next row",          plan:null}
+];
+function variantByLabel(v){
+  const t=String(v||"").trim().toLowerCase();
+  if(!t)return null;
+  return PLAN_VARIANTS.find(x=>x.label.toLowerCase()===t)
+      || PLAN_VARIANTS.find(x=>x.k===t)
+      /* tolerant of a shortened answer: "Canada — 1.5%" or just "belgium" */
+      || PLAN_VARIANTS.find(x=>x.label.toLowerCase().startsWith(t)&&t.length>3)
+      || null;
+}
+
 const REGISTRY={
 
   gcbd:{
@@ -603,16 +710,18 @@ const REGISTRY={
          help:"Benefits loading applied in the new home country."}
       ]},
       {name:"Part II — Alternate forms of pay",fields:[
-        {label:"OHC - Allowance 1",type:"money",need:0,help:"Type, currency and annual amount. Repeat rows 1-5 as needed."},
+        /* Three rows a side rather than five: most cases use none, and the
+           reader matches on the row wording wherever it appears, so a vendor
+           who needs more can add "OHC - Allowance 4" and it is picked up. */
+        {label:"OHC - Allowance 1",type:"money",need:0,
+         help:"Type, currency and annual amount. If more than three apply, add further rows below "+
+              "following the same wording (OHC - Allowance 4, 5 ...) and they will be read."},
         {label:"OHC - Allowance 2",type:"money",need:0},
         {label:"OHC - Allowance 3",type:"money",need:0},
-        {label:"OHC - Allowance 4",type:"money",need:0},
-        {label:"OHC - Allowance 5",type:"money",need:0},
-        {label:"NHC - Allowance 1",type:"money",need:0},
+        {label:"NHC - Allowance 1",type:"money",need:0,
+         help:"Same again for the new home country; add further rows if needed."},
         {label:"NHC - Allowance 2",type:"money",need:0},
-        {label:"NHC - Allowance 3",type:"money",need:0},
-        {label:"NHC - Allowance 4",type:"money",need:0},
-        {label:"NHC - Allowance 5",type:"money",need:0}
+        {label:"NHC - Allowance 3",type:"money",need:0}
       ]},
       {name:"Part III — Pension plan / DB plan",fields:[
         {label:"Original Home Country Pension Plan Name",type:"text",need:1},
@@ -643,7 +752,16 @@ const REGISTRY={
         {label:"Comments on Pension / DB Plan Integration",alt:["Comments on Pension"],type:"text",need:0}
       ]},
       {name:"Part III-A — Origin country pension formula",
-       note:"The US pension is reduced by an offset representing what the employee already earns in "+
+       /* When the origin country plan is already on file the formula rows are
+          not asked for at all, so the two-shape explanation would be noise. */
+       note:seed=>planDefaults(seed&&seed.ohc)
+         ? "This is the formula we hold for the "+(seed.ohc||"origin country")+" plan and the one "+
+           "the analysis actually runs, so please check it rather than re-enter the parameters.  >>  "+
+           planFormulaText(seed&&seed.ohc)+"  <<  Confirm it below. Service and salary come from the "+
+           "employee's own record, so only the plan rules above need checking. If anything is wrong, "+
+           "say so and give the correction — a plan change, a different plan, or a special arrangement "+
+           "for this employee."
+         : "The US pension is reduced by an offset representing what the employee already earns in "+
             "the origin country plan, so the offset has to be rebuilt from that plan's own formula. "+
             "Plans fall into one of two shapes. In an ACCRUAL plan the pension grows by a fixed "+
             "percentage of salary for each year of service, and is then cut back if it is drawn "+
@@ -669,19 +787,28 @@ const REGISTRY={
               "adjustment for the age at which the benefit is drawn, so the amount is the same at "+
               "55, 58 and 60. The Belgian plan works this way.  "+
               "Those are examples of each shape, not a country rule: pick the shape the plan actually "+
-              "uses."},
+              "uses.",when:"planUnknown"},
         {label:"Pension multiplier",alt:["Origin country pension multiplier","Accrual multiplier"],type:"percent",need:0,
-         help:"ACCRUAL SHAPE ONLY — any plan of that shape, not only Canadian ones. The percentage of salary earned per year of service under the plan (the Canadian plan is 1.5%). Multiplied by service and salary to build the offset."},
-        {label:"Accrual rate — tier 1",alt:["Accrual rate tier 1"],type:"percent",need:0,help:"TIERED SHAPE ONLY — any plan of that shape, not only Belgian ones. The rate applied to the part of salary at or below the tier 1 cap."},
-        {label:"Accrual rate — tier 2",alt:["Accrual rate tier 2"],type:"percent",need:0,help:"TIERED SHAPE ONLY. The higher rate applied to salary above the cap."},
-        {label:"Salary cap — tier 1",alt:["Salary threshold between tiers"],type:"money",need:0,help:"TIERED SHAPE ONLY. The salary level where the plan switches from the tier 1 rate to the tier 2 rate."},
-        {label:"Salary cap — tier 2",alt:["Salary threshold — tier 2"],type:"money",need:0,help:"TIERED SHAPE ONLY. Only if the plan applies a second, separate threshold; otherwise leave blank and the tier 1 cap is used."},
-        {label:"Discount factor at age 55",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. The factor the plan applies for taking the benefit at 55 rather than at normal retirement age (e.g. 0.75 = a 25% reduction)."},
-        {label:"Discount factor at age 58",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. Same factor, at age 58."},
-        {label:"Discount factor at age 60",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. Same factor, at age 60."},
-        {label:"Salary basis",type:"text",need:0,help:"Which salary definition the formula uses — final average earnings, career average, and over how many years. Context for the reviewer; not used in the calculation."},
-        {label:"Credited service denominator",type:"number",need:0,help:"If the plan expresses service as a fraction, the denominator it divides by. Context only."},
-        {label:"Early retirement discount per year",type:"percent",need:0,help:"The annual reduction for retiring early, if the plan states it as a rate rather than as the factors above. Context only."},
+         help:"ACCRUAL SHAPE ONLY — any plan of that shape, not only Canadian ones. The percentage of salary earned per year of service under the plan (the Canadian plan is 1.5%). Multiplied by service and salary to build the offset.",when:"planUnknown"},
+        {label:"Accrual rate — tier 1",alt:["Accrual rate tier 1"],type:"percent",need:0,help:"TIERED SHAPE ONLY — any plan of that shape, not only Belgian ones. The rate applied to the part of salary at or below the tier 1 cap.",when:"planUnknown"},
+        {label:"Accrual rate — tier 2",alt:["Accrual rate tier 2"],type:"percent",need:0,help:"TIERED SHAPE ONLY. The higher rate applied to salary above the cap.",when:"planUnknown"},
+        {label:"Salary cap — tier 1",alt:["Salary threshold between tiers"],type:"money",need:0,help:"TIERED SHAPE ONLY. The salary level where the plan switches from the tier 1 rate to the tier 2 rate.",when:"planUnknown"},
+        {label:"Salary cap — tier 2",alt:["Salary threshold — tier 2"],type:"money",need:0,help:"TIERED SHAPE ONLY. Only if the plan applies a second, separate threshold; otherwise leave blank and the tier 1 cap is used.",when:"planUnknown"},
+        {label:"Discount factor at age 55",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. The factor the plan applies for taking the benefit at 55 rather than at normal retirement age (e.g. 0.75 = a 25% reduction).",when:"planUnknown"},
+        {label:"Discount factor at age 58",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. Same factor, at age 58.",when:"planUnknown"},
+        {label:"Discount factor at age 60",type:"number",need:0,help:"ACCRUAL SHAPE ONLY. Same factor, at age 60.",when:"planUnknown"},
+        {label:"Which formula applies to this plan?",alt:["Plan formula","Formula applied"],
+         type:"choice",choices:PLAN_VARIANTS.map(v=>v.label),need:1,
+         help:"Pick one from the list, copying the wording exactly. Choosing a listed formula is what "+
+              "lets the analysis apply it; anything typed as free text cannot be applied automatically."},
+        {label:"Is the formula above correct for this plan?",alt:["Formula confirmed"],
+         type:"yesno",need:1,when:"planKnown",
+         help:"Yes confirms the analysis can run on the stored formula. No means it must not be used "+
+              "as it stands — say what is wrong in the next row."},
+        {label:"If not, what should the formula be?",alt:["Formula correction"],
+         type:"text",need:0,when:"planKnown",
+         help:"Only if the answer above is No. The rate, the salary bands, the age factors, or the "+
+              "service term — whichever is wrong."},
         {label:"Basis and assumptions used",type:"text",need:0,help:"Anything the figures depend on — salary assumed, indexation, plan version. Recorded so the offset can be explained if an approver asks."}
       ]},
       {name:"Part III-B — Vesting and EMPP recognition",
@@ -1089,6 +1216,13 @@ function seedApplies(f,seed){
     /* the origin side is only Deloitte's when the employee is not an expatriate;
        on a Full Localization the TMO hypothetical tax is used */
     case "ohcFromDeloitte": return !full;
+    /* Formula parameters are properties of the plan, not of the employee, and
+       for a country we already hold they are constants GC&BD would only be
+       restating. resolve() fills any blank from the same stored values, so
+       omitting these rows changes no figure — proven identical for Canada and
+       Belgium. For a country not on file we still have to ask. */
+    case "planUnknown":     return !planDefaults(seed.ohc);
+    case "planKnown":       return !!planDefaults(seed.ohc);
     /* the destination side is only Deloitte's outside the U.S. */
     case "nhcFromDeloitte": return !intoUS;
     case "needsDeloitte":   return !full || !intoUS;
@@ -1120,7 +1254,10 @@ function buildTemplate(slot,seed){
     const fields=sec.fields.filter(f=>seedApplies(f,seed));
     if(!fields.length)return;
     span(push([C(sec.name,XS.section)],22),"A","D");
-    if(sec.note) span(push([C(sec.note,XS.sectionNote)],30),"A","D");
+    /* a note may be written as a function so it can describe only what this
+       case is actually being asked for */
+    const secNote=(typeof sec.note==="function")?sec.note(seed):sec.note;
+    if(secNote) span(push([C(secNote,XS.sectionNote)],30),"A","D");
     fields.forEach(f=>{
       const hint=f.type==="choice"?(f.choices||[]).join(" / "):(TYPE_HINT[f.type]||"");
       push([C(f.label+(f.need?" *":""),f.need?XS.labelReq:XS.label),
@@ -1745,6 +1882,7 @@ function resolve(){
     rate2:gN("Accrual rate — tier 2","Accrual rate tier 2"),
     thresh:gN("Salary threshold between tiers","Salary cap — tier 1"),
     thresh2:gN("Salary threshold — tier 2","Salary cap — tier 2"),
+    denom:gN("Credited service denominator"),
     basis:gS("Salary basis"),
     denom:gN("Credited service denominator"),
     discPerYr:gN("Early retirement discount per year"),
@@ -1798,6 +1936,9 @@ function resolve(){
     dcOHC:gS("OHC — is there a DC / savings plan?","OHC - Is there a DC / Savings Plan"),
     dcNHC:gS("NHC — is there a DC / savings plan?","NHC - Is there a DC / Savings Plan"),
     dcDesc:gS("DC plan description"),
+    planPick:gS("Which formula applies to this plan?","Plan formula","Formula applied"),
+    formulaOK:gS("Is the formula above correct for this plan?","Formula confirmed"),
+    formulaFix:gS("If not, what should the formula be?","Formula correction"),
     other:gS("Other core benefits / PGPs comments","Other Core Benefits / PGPs Comments"),
     by:gS("Completed by"), when:gS("Date completed"),
     pensionPlanName:gS("Original Home Country Pension Plan Name","Original Home Country Pension Plan name"),
@@ -1954,9 +2095,36 @@ function resolve(){
 
   /* Fall back to the country defaults for any parameter GC&BD left blank, and
      record which ones came from there so the panel can flag them. */
-  d.parFromDefaults=[];
+  /* An offset only arises where the origin country runs a defined benefit plan
+     and the employee is vested in it. Both come from GC&BD, so the stated
+     "Offset in NHC?" answer stays the source of record — this only records a
+     disagreement worth raising, rather than silently overriding them. */
+  d.offsetRule=null;
   {
-    const dflt=planDefaults(d.ohc);
+    const plan=planDefaults(d.ohc);
+    const stated=String(d.offset||"").trim();
+    if(plan&&plan.method==="none")
+      d.offsetRule={applies:false,why:(d.ohc||"The origin country")+" runs no defined benefit plan."};
+    else if(d.gc&&/^n/i.test(String(d.gc.vested||"")))
+      d.offsetRule={applies:false,why:"the employee is not vested in the origin country plan."};
+    d.offsetRuleClash = !!(d.offsetRule&&d.offsetRule.applies===false&&/^y/i.test(stated));
+  }
+  d.parFromDefaults=[];
+  /* What GC&BD picked outranks the country default: they own the plan rules,
+     and the pick is a named formula the app can actually apply. "Other" is the
+     one answer it cannot act on — the offset is held back and flagged instead
+     of being computed from a formula nobody validated. */
+  d.planPick=null; d.planPickOther=false;
+  {
+    const v=variantByLabel(d.gc&&d.gc.planPick);
+    if(v){
+      d.planPick=v;
+      if(v.k==="other")d.planPickOther=true;
+      else Object.keys(v.plan).forEach(k=>{ d.par[k]=v.plan[k]; });
+    }
+  }
+  {
+    const dflt=d.planPick&&!d.planPickOther?null:planDefaults(d.ohc);
     if(dflt)Object.keys(dflt).forEach(k=>{
       if(d.par[k]===null||d.par[k]===undefined||d.par[k]===""){
         d.par[k]=dflt[k]; d.parFromDefaults.push(k);
@@ -2140,13 +2308,133 @@ function ov(key,computed){
 }
 const isOv=key=>overrides["calc:"+key]!==undefined&&overrides["calc:"+key]!==null;
 
+
+/* ── Master pension table ────────────────────────────────────────────────────
+   Transcribed from the "Pension Multiplier" sheet of Localization Template
+   automation, plus the per-case formulas seen in real files. Reference only:
+   nothing here feeds a calculation. "src" records how solid each row is —
+   a row confirmed against a real case formula is worth more than one read
+   off the master sheet alone, and the viewer says which is which. */
+const PENSION_TABLE=[
+  {c:"United States",  mult:"1.60%",  top:null,      erf:{55:"75%",58:"90%",60:"100%"},
+   note:"New home country plan. 5% annual subsidised discount from 60 down to 55.",src:"master sheet"},
+  {c:"Canada",         mult:"1.50%",  top:null,      erf:{55:"75%",58:"88%",60:"94%"},
+   note:"Master sheet also lists 1.00% and 2.00% variants — which applies depends on the option elected.",
+   src:"confirmed against a case"},
+  {c:"United Kingdom", mult:"1.85%",  top:null,      erf:{55:"75%",58:"88%",60:"94%"},
+   note:"Same discount factors as Canada. Not listed separately on the master ERF table.",
+   src:"confirmed against a case"},
+  {c:"Belgium",        mult:"6.25%",  top:"23.125%", erf:{55:"n/a",58:"n/a",60:"100%"},
+   note:"Tiered: 6.25% up to 54,000 and 23.125% above 54,500. No age discount, so all three ages match. "+
+        "Early retirement at employee request from 60 without actuarial discount.",
+   src:"confirmed against a case"},
+  {c:"Brazil",         mult:"59.50%", top:null,      erf:{55:"80%",58:"92%",60:"100%"},
+   note:"Service is divided by 35, and the salary is MULTIPLIED by the rate rather than divided. "+
+        "Neither is true of the other countries.",
+   src:"confirmed against a case"},
+  {c:"Argentina",      mult:"1.00%",  top:"1.50%",   erf:{55:"100%",58:"100%",60:"100%"},
+   note:"Discount runs from 50 to 55; none from 55 on. Salary cap applies to the first tier.",
+   src:"master sheet"},
+  {c:"Germany",        mult:"0.40%",  top:"1.00%",   erf:{55:"76%",58:"85%",60:"91%"},
+   note:"Old age pension reduced 0.25% for each month taken before 63.",src:"master sheet"},
+  {c:"Egypt",          mult:"1.70%",  top:null,      erf:{55:"85%",58:"94%",60:"100%"},src:"master sheet"},
+  {c:"France",         mult:"1.65%",  top:null,      erf:{55:"n/a",58:"n/a",60:"n/a"},
+   note:"Two plans (Esso Supplementary and Mobil Supplementary); the master sheet flags this as unresolved. "+
+        "Earliest is up to 18 months before normal retirement age, which is between 62 and 67.",
+   src:"master sheet — flagged as open"},
+  {c:"Australia",      mult:null,     top:null,      erf:null,
+   note:"No DB plan, so no offset arises.",src:"stated"},
+  {c:"Singapore",      mult:null,     top:null,      erf:null,
+   note:"No active company pension plan, so no offset arises.",src:"stated"}
+];
+
+/* The offset only arises where the origin country has a DB plan and the
+   employee is vested in it; otherwise it is not applicable regardless of what
+   the formula would produce. */
+function pensionTableHTML(){
+  const cell=v=>v===null||v===undefined?'<span class="pt-na">—</span>':esc(v);
+  return `<div class="pt-wrap"><div class="pt-card">
+    <div class="pt-h">
+      <div><div class="pt-t">Pension multiplier — master table</div>
+        <div class="pt-s">origin country plan parameters · reference only, nothing here feeds a calculation</div></div>
+      <button class="mini-btn" onclick="closePensionTable()">Close</button>
+    </div>
+    <div class="pt-b">
+      <table class="pt-tbl"><thead><tr>
+        <th>Country</th><th>Multiplier</th><th>Top&nbsp;up</th>
+        <th>ERF 55</th><th>ERF 58</th><th>ERF 60</th><th>Source</th>
+      </tr></thead><tbody>
+      ${PENSION_TABLE.map(r=>`<tr>
+        <td class="pt-c">${esc(r.c)}</td>
+        <td>${cell(r.mult)}</td><td>${cell(r.top)}</td>
+        <td>${cell(r.erf?r.erf[55]:null)}</td>
+        <td>${cell(r.erf?r.erf[58]:null)}</td>
+        <td>${cell(r.erf?r.erf[60]:null)}</td>
+        <td class="pt-src ${/confirmed/.test(r.src)?"ok":""}">${esc(r.src)}</td>
+      </tr>${r.note?`<tr class="pt-n"><td colspan="7">${esc(r.note)}</td></tr>`:""}`).join("")}
+      </tbody></table>
+      <div class="note">An offset only arises where the origin country has a defined benefit plan and the
+        employee is vested in it. Where neither holds, the offset is not applicable whatever the formula
+        would give.</div>
+    </div>
+  </div></div>`;
+}
+function openPensionTable(){
+  const d=document.createElement("div"); d.id="pt-modal";
+  d.innerHTML=pensionTableHTML();
+  d.addEventListener("click",e=>{ if(e.target===d)closePensionTable(); });
+  document.body.appendChild(d);
+}
+function closePensionTable(){ const e=document.getElementById("pt-modal"); if(e)e.remove(); }
+
+/* The formula shown to GC&BD is rendered from OHC_PLANS — the same table the
+   calculation reads. Writing it out by hand would let the wording and the
+   arithmetic drift apart, and they would end up validating something other
+   than what runs. */
+function planFormulaText(country){
+  const p=planDefaults(country); if(!p)return null;
+  const pc=v=>(v*100).toFixed(v*100%1?3:2).replace(/\.?0+$/,"")+"%";
+  const n=v=>Number(v).toLocaleString("en-US");
+  const c=country||"the origin country";
+  if(p.method==="none")
+    return c+" is held as running no defined benefit plan, so no offset is calculated. "+
+           "Please correct this if a plan does apply.";
+  if(p.method==="tiered")
+    return "OFFSET = ( "+pc(p.rate1)+" x salary up to "+n(p.thresh)+" + "+pc(p.rate2)+
+           " x salary above "+n(p.thresh2??p.thresh)+" ) x years of service.  "+
+           "No adjustment for the age the benefit is drawn, so the offset is the same at 55, 58 and 60.";
+  /* the denominator divides the whole service term, so it has to sit outside
+     the bracket or the sentence reads as dividing only the second part */
+  const svc=(p.denom&&p.denom>1)
+    ? "( ( years of service + years to retirement ) / "+p.denom+" )"
+    : "( years of service + years to retirement )";
+  return "OFFSET = "+pc(p.mult)+" x US lump-sum factor for the age x salary x "+
+         svc+" x the age factor.  "+
+         "Age factors held: "+pc(p.f55)+" at 55, "+pc(p.f58)+" at 58, "+pc(p.f60)+" at 60.  "+
+         "US lump-sum factors: 14.5 at 55, 13.8 at 58, 13.3 at 60.";
+}
+
 /* Parameters seen before, by origin country. These are a starting point only:
    GC&BD remains the source of record, and anything they return overrides what
    is here. Plan rules change and vary by plan, not just by country, so a value
    that came from this table is labelled as needing confirmation. */
 const OHC_PLANS={
-  "canada":{method:"accrual",mult:0.015,f55:0.75,f58:0.88,f60:0.94},
-  "belgium":{method:"tiered",rate1:0.0625,rate2:0.23125,thresh:54000,thresh2:54500}
+  /* accrual = mult x lump-sum factor x salary x (service + years to retirement)
+              [ / denom ] x the age factor for that age.
+     tiered  = two rates split at a salary cap x service, no age factor.
+     none    = the country has no DB plan, so no offset can arise. */
+  "canada":        {method:"accrual",mult:0.015,  f55:0.75,f58:0.88,f60:0.94},
+  "united kingdom":{method:"accrual",mult:0.0185, f55:0.75,f58:0.88,f60:0.94},
+  /* Brazil divides service by 35 — no other plan seen does this */
+  "brazil":        {method:"accrual",mult:0.595,  denom:35, f55:0.80,f58:0.92,f60:1.00},
+  "egypt":         {method:"accrual",mult:0.017,  f55:0.85,f58:0.94,f60:1.00},
+  "germany":       {method:"accrual",mult:0.004,  f55:0.76,f58:0.85,f60:0.91},
+  /* Argentina: no discount from 55 on, so all three factors are 1 */
+  "argentina":     {method:"accrual",mult:0.01,   f55:1.00,f58:1.00,f60:1.00},
+  "belgium":       {method:"tiered", rate1:0.0625,rate2:0.23125,thresh:54000,thresh2:54500},
+  /* No DB plan, so the offset cannot arise whatever else is supplied. */
+  "australia":     {method:"none"},
+  "singapore":     {method:"none"}
 };
 function planDefaults(country){
   const k=norm(country||"");
@@ -2191,6 +2479,13 @@ function ohcOffsetFormula(d,age,yearsToRet){
   if(sal===null||sal===undefined||d.yos===null||d.yos===undefined)return null;
   const method=String(f.method||"").toLowerCase();
 
+  /* Some countries run no defined benefit plan at all. There is nothing to
+     offset, and a formula must not manufacture one. */
+  if(method==="none")return null;
+  /* GC&BD said the formula is not one we hold. Computing anything here would be
+     inventing it. */
+  if(d.planPickOther)return null;
+
   if(method.startsWith("tier")){
     if(f.rate1===null||f.rate2===null)return null;
     const cap1=f.thresh, cap2=f.thresh2??f.thresh;
@@ -2210,7 +2505,10 @@ function ohcOffsetFormula(d,age,yearsToRet){
   /* Returned in origin-country currency. The old template converted here AND
      again in Economic Analysis, dividing the salary by the rate twice; the
      conversion is applied once, by the caller, like every other OHC figure. */
-  return f.mult*ls*sal*(d.yos+yearsToRet)*disc;
+  /* A few plans express service as a fraction of a full career — Brazil
+     divides by 35. Absent a denominator the service term is used as it is. */
+  const denom=(f.denom&&+f.denom>0)?+f.denom:1;
+  return f.mult*ls*sal*((d.yos+yearsToRet)/denom)*disc;
 }
 
 function calc(d){
@@ -2601,6 +2899,16 @@ function pendingItems(d,c){
 
   if(d.empp&&d.empp.state==="unknown")
     out.push({tag:"GC&BD",t:"Part III-B is not fully answered, so recognition of prior service is undecided."});
+  if(d.planPickOther)
+    out.push({tag:"GC&BD",t:"GC&BD picked a formula that is not on the list, so the offset cannot be "+
+      "calculated. Key the offset amounts in by hand, or add the formula to the list."});
+  else if(d.planPick)
+    out.push({tag:"GC&BD",t:`Pension formula confirmed by GC&BD: ${d.planPick.label}.`,ok:1});
+  if(d.gc&&/^n/i.test(String(d.gc.formulaOK||"")))
+    out.push({tag:"GC&BD",t:"GC&BD say the stored pension formula is wrong for this plan"+
+      (d.gc.formulaFix?": "+String(d.gc.formulaFix).slice(0,110):"; no correction was given.")});
+  if(d.offsetRuleClash)
+    out.push({tag:"GC&BD",t:`Offset is answered Yes, but ${d.offsetRule.why}`});
   if(d.offsetClash)
     out.push({tag:"GC&BD",t:"GC&BD's answer on prior service disagrees with the detail behind it."});
   if(d.parFromDefaults&&d.parFromDefaults.length)
@@ -3177,6 +3485,506 @@ function copyLinks(which){
    approvers signed off on — same reports(), same calc(), no second source. */
 function exportGuide(){ exportPdf("offer"); }
 
+/* ═══ GUIDE ══════════════════════════════════════════════════════════════════
+   Written for someone opening this for the first time. It describes what the
+   app does and, where it matters, why — the conventions around blank figures,
+   country defaults and overrides are the ones that cause wrong answers when
+   they are not understood. */
+/* ═══ PRE-SEND VALIDATION ════════════════════════════════════════════════════
+   A different question from "what is outstanding". That list tracks work still
+   to do; this one asks whether what you have is safe to put in front of an
+   approver or an employee. Three levels:
+
+     BLOCK  something is wrong or missing such that a reader would be misled
+     CHECK  the figures are complete but look odd — worth a human eye
+     NOTE   fine to send, but say so knowingly
+
+   The CHECK level is the point of the exercise. Missing inputs announce
+   themselves; a figure that is present, plausible-looking and wrong does not.
+   Every rule below is one the app can actually evaluate. */
+function runValidation(d,c){
+  const out=[];
+  const add=(lvl,area,t,why)=>out.push({lvl,area,t,why:why||""});
+  if(!d){ add("block","Case","No case is loaded."); return out; }
+
+  /* ── completeness ─────────────────────────────────────────────────────── */
+  SLOTS.filter(x=>slotReq(x)&&!F[x.id]&&!x.db).forEach(x=>
+    add("block","Files",`${x.name} has not been loaded.`,"Required for this case."));
+  [["Employee name",d.name],["Origin country",d.ohc],["New home country",d.nhc],
+   ["Type of localization",d.locType],["OHC salary",d.ohcSalary],["NHC salary",d.nhcSalary]
+  ].forEach(([n,v])=>{ if(v===null||v===undefined||v==="")add("block","Inputs",`${n} is missing.`); });
+
+  if(c&&c.c&&(c.c.total===null||c.c.total===undefined))
+    add("block","Figures","Total annual cost cannot be worked out.",
+        "A report would show it blank, which reads as an unfinished case.");
+  if(c&&c.e&&(c.e.l.cash===null||c.e.l.cash===undefined))
+    add("block","Figures","Cash to the employee cannot be worked out.",
+        "This is the headline figure on the offer letter.");
+
+  /* ── policy ───────────────────────────────────────────────────────────── */
+  if(d.age!==null&&d.cutoff!==null&&d.age>d.cutoff)
+    add("block","Policy",`Age ${d.age.toFixed(1)} is past the ${d.nhc||"destination"} cut-off of ${d.cutoff}.`,
+        "The late-in-career principle applies; this needs an explicit exception before it goes forward.");
+  if(!d.immStrategy)
+    add("block","BAL","The immigration strategy has not been pasted in.","It goes to both approvers.");
+
+  /* ── the offset ───────────────────────────────────────────────────────── */
+  if(d.planPickOther)
+    add("block","Pension","GC&BD picked a formula that is not on the list, so no offset was calculated.",
+        "Key the amounts in by hand, or add the formula to the list.");
+  if(d.offsetRuleClash)
+    add("block","Pension",`Offset is answered Yes, but ${d.offsetRule.why}`);
+  if(d.gc&&/^n/i.test(String(d.gc.formulaOK||"")))
+    add("block","Pension","GC&BD say the stored pension formula is wrong for this plan.",
+        d.gc.formulaFix?("Their correction: "+String(d.gc.formulaFix)):"No correction was given.");
+  if(d.parFromDefaults&&d.parFromDefaults.length)
+    add("note","Pension",
+        `${d.parFromDefaults.length} pension parameter${d.parFromDefaults.length>1?"s are":" is"} a country default.`,
+        "Right for the plan as last understood, but not confirmed for this employee.");
+  if(d.empp&&d.empp.state==="unknown")
+    add("note","Pension","Part III-B is not fully answered, so recognition of prior service is undecided.");
+  if(d.offsetClash)
+    add("check","Pension","GC&BD's answer on prior service disagrees with the detail behind it.");
+
+  /* ── does the arithmetic look sane? ───────────────────────────────────── */
+  /* A salary left in origin-country currency is the failure that produced a
+     six-times overstatement on a real case, and it does not announce itself:
+     every figure is present and the report renders cleanly. */
+  if(d.ohcSalary&&d.nhcSalary&&d.fx){
+    const ohcUSD=d.ohcSalary*(d.ohcCcy===d.nhcCcy?1:d.fx);
+    const r=ohcUSD/d.nhcSalary;
+    if(r>3||r<0.33)
+      add("check","Figures",
+        `Converted OHC salary is ${r>1?r.toFixed(1)+"x higher":(1/r).toFixed(1)+"x lower"} than the NHC salary.`,
+        "A gap this size usually means the exchange rate went in the wrong direction, or a salary is still "+
+        "in its own currency. Check the rate before sending.");
+  }
+  if(c&&c.b&&c.b.ben!==null&&c.b.salary&&d.ohcSBR!==null){
+    const impl=(c.b.ben+(c.b.afp||0))/c.b.salary;
+    if(Math.abs(impl-d.ohcSBR)>0.02)
+      add("check","Figures",`Benefits work out at ${(impl*100).toFixed(1)}% of OHC salary, but the stated rate is ${(d.ohcSBR*100).toFixed(1)}%.`);
+  }
+  if(c&&c.scen){
+    const neg=SCEN.filter(a=>c.scen[a].incr!==null&&c.scen[a].incr<0);
+    if(neg.length===SCEN.length)
+      add("check","Pension","The offset exceeds the US pension at all three ages, so the incremental pension is negative throughout.",
+          "Possible, but it means localizing reduces the pension the company funds — worth confirming before an approver reads it.");
+  }
+  if(c&&c.e&&c.e.deltaPct!==null&&c.e.deltaPct!==undefined&&Math.abs(c.e.deltaPct)>0.5)
+    add("check","Figures",`Employee cash changes by ${(c.e.deltaPct*100).toFixed(0)}%.`,
+        "Large enough that the employee will ask. Make sure the transition payment position is right.");
+  if(c&&c.tp&&!c.tp.applies&&d.locType==="Full Localization"&&c.e&&c.e.deltaPct!==null&&c.e.deltaPct<0)
+    add("check","Transition","Cash falls on localizing but no transition payment was calculated.");
+
+  /* ── things a reader will notice ──────────────────────────────────────── */
+  if(d.clMoved)
+    add("note","Case",`Classification level differs between the request form (${d.clMoved.form}) and SuccessFactors (${d.clMoved.sf}).`,
+        "The form's level is the one used.");
+  if(d.cl!==null&&d.cl>=30&&!F.exec)
+    add("note","Files","This is a CL 30 case and the exec compensation request has not been loaded.");
+  if(!d.effDate)
+    add("note","Case","No effective date has been confirmed.","The implementation note needs it.");
+  const nv=(R_NOVA||[]).filter(r=>r.pending);
+  if(nv.length)
+    add("note","Nova",`${nv.length} field${nv.length>1?"s":""} the Nova report needs ${nv.length>1?"are":"is"} still blank.`);
+
+  return out;
+}
+
+function validationHTML(){
+  const c=D?calc(D):null, res=runValidation(D,c);
+  const n=l=>res.filter(r=>r.lvl===l).length;
+  const badge=l=>({block:"blocked",check:"check",note:"note"})[l];
+  const verdict = n("block") ? `<div class="vd-x">Not ready to send &mdash; ${n("block")} item${n("block")>1?"s":""} to resolve</div>`
+    : n("check") ? `<div class="vd-w">Nothing blocking, but ${n("check")} figure${n("check")>1?"s look":" looks"} worth a second look</div>`
+    : `<div class="vd-ok">Ready to send</div>`;
+  return `<div class="pt-wrap"><div class="pt-card">
+    <div class="pt-h">
+      <div><div class="pt-t">Quality check</div>
+        <div class="pt-s">run this before the case goes to an approver or the employee</div></div>
+      <button class="mini-btn" onclick="closeValidation()">Close</button>
+    </div>
+    <div class="pt-b">
+      ${verdict}
+      ${res.length?res.map(r=>`<div class="vd-row ${r.lvl}">
+        <div class="vd-b ${r.lvl}">${badge(r.lvl)}</div>
+        <div><div class="vd-t">${esc(r.t)}</div>
+          <div class="vd-a">${esc(r.area)}${r.why?" &middot; "+esc(r.why):""}</div></div>
+      </div>`).join(""):`<div class="note">Every check passed.</div>`}
+      <div class="note">A <b>blocked</b> item would mislead whoever reads the case. A <b>check</b> is a
+        figure that is present and complete but looks unusual &mdash; the app cannot tell whether it is
+        wrong, only that it is worth your eye. A <b>note</b> is fine to send knowingly.</div>
+    </div>
+  </div></div>`;
+}
+function openValidation(){
+  const el=document.createElement("div"); el.id="vd-modal";
+  el.innerHTML=validationHTML();
+  el.addEventListener("click",e=>{ if(e.target===el)closeValidation(); });
+  document.body.appendChild(el);
+}
+function closeValidation(){ const e=document.getElementById("vd-modal"); if(e)e.remove(); }
+
+const FAQ_DOCS={"emp": [{"n": 1, "sec": "Global — applicable to all employees", "q": "What is localization?", "a": "Localization is the permanent transfer of an employee's pay, payroll, benefits, and career orientation from their original home country to a new home country. The employee is then compensated and administered similarly to local employees in that country."}, {"n": 2, "sec": "Global — applicable to all employees", "q": "Why does the Company localize employees?", "a": "Localization supports long-term business needs when an employee's future career is expected to be primarily in another country. It also promotes pay equity among employees working in the same location."}, {"n": 3, "sec": "Global — applicable to all employees", "q": "Is localization driven by employee preference?", "a": "No. Localization is primarily driven by business needs, not personal preference. Management must determine that the employee's long-term career orientation has shifted to the new country."}, {"n": 4, "sec": "Global — applicable to all employees", "q": "What is the difference between Localization and Resign-Rehire?", "a": "Localization is a business-driven decision intended to support an employee's long-term career in a new country. Resign-Rehire (Reemployment) occurs when an employee resigns from one affiliate and is later hired by another affiliate, typically for personal or local hiring reasons. The resign-rehire process cannot be used to bypass localization guidelines."}, {"n": 5, "sec": "Global — applicable to all employees", "q": "Who is eligible for localization?", "a": "Employees may be eligible if: the principal need for their future services is in the new home country; most future assignments are expected to be in the new country; no future assignments are planned in the original home country; they meet the new organization's performance and qualification standards; and they have, or can obtain, permanent work and residence authorization in the new country."}, {"n": 6, "sec": "Global — applicable to all employees", "q": "What does “principal need” mean?", "a": "Principal need means management expects most future assignments to be in the new home country and none in the original home country."}, {"n": 7, "sec": "Global — applicable to all employees", "q": "Does localization require changing nationality?", "a": "No. Localization does not require employees to abandon their nationality or personal ties to their original home country."}, {"n": 8, "sec": "Global — applicable to all employees", "q": "Can an employee be localized without permanent residency or work authorization?", "a": "In some exceptional circumstances, the Company may sponsor the employee's permanent residence or work authorization application, subject to management and legal approvals."}, {"n": 9, "sec": "Global — applicable to all employees", "q": "Are all countries suitable for localization?", "a": "No. Localization may not be appropriate in countries with significant legal, economic, cultural, social, pension, or compliance challenges."}, {"n": 10, "sec": "Global — applicable to all employees", "q": "What compensation principles apply after localization?", "a": "Employees are aligned to the compensation structure of the new home country, including local salary ranges, local benefit programs and the local tax environment. The goal is to ensure equity among peers in the same location."}, {"n": 11, "sec": "Global — applicable to all employees", "q": "What happens if compensation in the new country is lower?", "a": "Pay is determined using local market practices, experience, performance, and classification levels in the new home country. Previous home-country salary levels do not determine future pay."}, {"n": 12, "sec": "Global — applicable to all employees", "q": "Will employees be protected from higher taxes in the new country?", "a": "No. After localization, employees are subject to the tax rules and obligations of the new home country, consistent with local peers."}, {"n": 13, "sec": "Global — applicable to all employees", "q": "Is localization intended to be permanent?", "a": "Yes. Localization is intended to represent a permanent shift in career orientation."}, {"n": 14, "sec": "Global — applicable to all employees", "q": "Can a localized employee return to the original home country as an expatriate?", "a": "Generally no. Returning to the original home country with full expatriate pay components requires special approvals and is considered an exception."}, {"n": 15, "sec": "Global — applicable to all employees", "q": "Can a localized employee be localized again to a third country?", "a": "Sequential localizations are rare and generally require special approval."}, {"n": 16, "sec": "Global — applicable to all employees", "q": "What if an employee declines localization?", "a": "Management may seek a role in the employee's original home country, or consider reassignment to another host country as an expatriate. If no role is available, alternative employment outcomes may be considered based on business needs and local policies."}, {"n": 17, "sec": "US only — eligibility and process", "q": "When should an employee be considered for localization to the US?", "a": "When management determines that the employee's career orientation has shifted primarily to the United States."}, {"n": 18, "sec": "US only — eligibility and process", "q": "When does localization become effective?", "a": "Typically on the first day of the second month following final Corporate approval."}, {"n": 19, "sec": "US only — eligibility and process", "q": "Can an employee localize to the US before obtaining a Green Card?", "a": "Yes. Employees may transfer to the US payroll before obtaining permanent residence, provided established immigration processes are followed."}, {"n": 20, "sec": "US only — compensation and transition assistance", "q": "Will I continue receiving expatriate allowances after localization?", "a": "No. Expatriate allowances are intended for temporary assignments and generally end when localization becomes effective."}, {"n": 21, "sec": "US only — compensation and transition assistance", "q": "Will transition payments be provided?", "a": "In many approved localization cases, employees may receive temporary transition payments designed to help bridge the difference between expatriate compensation and local compensation."}, {"n": 22, "sec": "US only — compensation and transition assistance", "q": "How long do transition payments last?", "a": "Typically 100% of the calculated transition amount for up to 12 months, then 50% of the calculated amount for the following 12 months. The exact timing depends on individual circumstances and approvals."}, {"n": 23, "sec": "US only — compensation and transition assistance", "q": "What happens to transition payments if I go on unpaid leave?", "a": "Payments are paused during unpaid leave and resume upon return."}, {"n": 24, "sec": "US only — compensation and transition assistance", "q": "What happens if I receive another expatriate assignment during the transition period?", "a": "Transition payments generally stop once a new expatriate assignment begins."}, {"n": 25, "sec": "US only — benefits", "q": "What benefits become available after moving to the US payroll?", "a": "Employees may become eligible for the ExxonMobil Pension Plan, the ExxonMobil Savings Plan, Life Insurance Programs, Disability Programs, US Medical, Dental and Vision Plans, Employee Assistance Programs and Wellness Programs."}, {"n": 26, "sec": "US only — benefits", "q": "Can previous home-country service be recognized?", "a": "In many cases, yes. Recognition depends on applicable plan rules, local legislation and pension plan provisions."}, {"n": 27, "sec": "US only — benefits", "q": "What happens to my pension?", "a": "Pension integration is reviewed individually. Previous service may be recognized, but offsets may apply for benefits earned under the original home-country pension plan."}, {"n": 28, "sec": "US only — benefits", "q": "Can I participate in the US Savings Plan before receiving a Green Card?", "a": "Yes. Participation is not restricted based on permanent residency status. Employees generally become eligible to participate in the ExxonMobil Savings Plan upon becoming eligible under the terms of the plan and completing the enrollment process. Participation typically begins on the first day of the pay period following enrollment. Employees will receive enrollment materials and instructions once eligibility is established."}, {"n": 29, "sec": "US only — benefits", "q": "How is vacation entitlement calculated upon transfer to a new home country payroll?", "a": "During the year of localization, employees retain their original home-country vacation entitlement, including any approved carryover, less any vacation already taken or paid out, unless applicable laws in the original home country require that unused vacation be paid upon localization. If the original home-country vacation program is not based on a calendar year, entitlement may be prorated. Beginning the following year, vacation entitlement is determined in accordance with the new home-country policy and applicable plan rules. Where required by law, statutory vacation entitlements will apply. In certain circumstances, HR may review vacation entitlement if the original home-country vacation benefit is less than the new home-country standard."}, {"n": 30, "sec": "US only — immigration", "q": "What if my Green Card application is denied?", "a": "If denial occurs through no fault of the employee, management will review alternative assignment options. Standard expatriate repatriation provisions may apply."}, {"n": 31, "sec": "US only — immigration", "q": "Will the Company continue paying immigration-related expenses?", "a": "Yes. Eligible visa and permanent residency expenses are generally covered until permanent residency is obtained."}, {"n": 32, "sec": "US only — mobility and relocation", "q": "Will the Company provide relocation assistance?", "a": "Yes. Depending on the localization category, assistance may include shipment of household goods, relocation support, home sale assistance (where applicable), travel allowances and certain education transition assistance provisions."}, {"n": 33, "sec": "US only — mobility and relocation", "q": "Is spousal relocation support available?", "a": "Yes. Eligible employees may receive reimbursement (up to policy limits) for qualifying spousal relocation assistance expenses."}, {"n": 34, "sec": "US only — mobility and relocation", "q": "Are educational transition benefits available for dependents?", "a": "Yes. Certain educational assistance provisions may be available, subject to policy eligibility requirements."}], "hr": [{"n": 1, "sec": "HR / Supervisor only — applicable globally", "q": "What approvals are required for localization?", "a": "Localization proposals require review and endorsement through the Personnel Matters Guide (PMG) process and applicable Corporate HR approvals."}, {"n": 2, "sec": "HR / Supervisor only — applicable globally", "q": "Does every localization require HR review?", "a": "Yes. All localization cases require centralized review to ensure consistency, fairness, compliance, and economic justification."}, {"n": 3, "sec": "HR / Supervisor only — applicable globally", "q": "Is Dallas HR endorsement required?", "a": "Yes. All localization cases require Dallas HR endorsement before proceeding."}, {"n": 4, "sec": "HR / Supervisor only — applicable globally", "q": "What should a localization business case include?", "a": "A strong business case should demonstrate specialized skills, strong performance and potential, long-term career need in the new country, future staffing requirements, relevant work permit or immigration considerations, and detailed assignment history."}, {"n": 5, "sec": "HR / Supervisor only — applicable globally", "q": "Can personal preferences justify localization?", "a": "No. Personal preference alone is not a sufficient business justification."}, {"n": 6, "sec": "HR / Supervisor only — applicable globally", "q": "Can staffing reductions in the home country justify localization?", "a": "Generally no. Home-country workforce reductions are typically not considered a sufficient business case."}, {"n": 7, "sec": "HR / Supervisor only — applicable globally", "q": "What economic factors must be reviewed?", "a": "HR should evaluate new home country compensation, benefits impact, tax implications, pension integration, retiree medical implications, and long-term company cost considerations."}, {"n": 8, "sec": "HR / Supervisor only — applicable globally", "q": "Why are late-career localizations reviewed more carefully?", "a": "They may significantly affect pension calculations, retiree medical benefits, retirement eligibility and long-service employee benefit outcomes."}, {"n": 9, "sec": "HR / Supervisor only — applicable globally", "q": "What are the different types of localization?", "a": "Regular Localization — employee is on an expatriate assignment in the new home country. Direct Localization — employee transfers directly from the home country to the new payroll without a prior expatriate assignment. Direct Localization from Third Country Assignment — employee localizes from an expatriate assignment in a different country."}, {"n": 10, "sec": "HR / Supervisor only — applicable globally", "q": "Which type is generally preferred?", "a": "Direct localization is generally preferred because it is typically more economical and avoids unnecessary expatriate transition costs."}, {"n": 11, "sec": "HR / Supervisor only — applicable globally", "q": "What happens if a localized employee later needs an assignment in their original home country?", "a": "Prior approval from the Vice President, Human Resources is required before any such assignment can occur."}, {"n": 12, "sec": "HR / Supervisor only — applicable globally", "q": "What is the Company position on international payrolls?", "a": "The Company generally does not support broad use of international payrolls because of concerns regarding cost, complexity, tax implications, and pay equity."}, {"n": 13, "sec": "HR / Supervisor only — applicable globally", "q": "What happens if an employee declines a localization opportunity?", "a": "Management will first seek a suitable position in the employee's home country. Where business needs allow, reassignment to another location under expatriate status may be considered, although this is not the preferred outcome. If no appropriate position is available, the employee's status will transition to Career Accommodation as soon as practicable. During this period the employee will receive home-country pay, along with hypotax and medical coverage, but will not receive expatriate pay components. Work authorization support in the current host country will conclude upon expiration of the existing visa, with no transition or localization payments applying. Once localization has been declined, no further localization offers will be made for the same host-country payroll, and future expatriate assignments in the current location are unlikely and subject to business determination."}, {"n": 14, "sec": "HR / Supervisor only — applicable globally", "q": "What assignment limitations apply following localization?", "a": "Localization represents a permanent change in career country orientation. As such, it carries important limitations on future assignment flexibility, to preserve the integrity of the localization decision, maintain equity, and manage long-term economic and career impacts."}, {"n": 15, "sec": "HR / Supervisor only — applicable globally", "q": "Is localization intended to be permanent, and can an employee be localized a second time?", "a": "Localization is intended to be a long-term and permanent change, rather than a rotational arrangement. Once an employee is localized, the new home country becomes the primary anchor for career progression, compensation and benefits. Sequential localization is uncommon and treated as an exception, requiring specific approval."}, {"n": 16, "sec": "HR / Supervisor only — applicable globally", "q": "Can a localized employee return to their original home country?", "a": "Localization establishes a new long-term home country orientation and is not intended to be reversed. A return to the original home country is generally discouraged and will only be considered in exceptional circumstances. Any assignment or relocation back must be clearly driven by a compelling business need, avoid effectively reversing the original localization decision, be conducted under non-expatriate terms or specially approved conditions, and receive prior approval from the Vice President, Human Resources, and the People Management Group (PMG)."}, {"n": 17, "sec": "HR / Supervisor only — applicable globally", "q": "Can a localized employee receive future expatriate assignments outside the new home country?", "a": "Following localization, opportunities for future expatriate assignments outside the new home country are expected to be limited. Such assignments may be considered only when there is a clear and compelling business justification, the assignment aligns with the employee's development path, and the long-term career, economic and equity implications have been fully assessed."}]};
+
+/* ═══ FAQ ════════════════════════════════════════════════════════════════════
+   Both guides are embedded rather than linked to a folder. A path to the LAN
+   breaks the moment the file moves or someone opens this from another machine;
+   embedded, it always opens and can be searched. The HR guide is marked
+   internal on its own document, so it is kept behind its own tab and labelled
+   rather than mixed in with the employee one. */
+let FAQ_TAB="emp", FAQ_Q="";
+function faqSetTab(t){ FAQ_TAB=t; faqPaint(); }
+function faqSearch(v){ FAQ_Q=String(v||"").trim().toLowerCase(); faqPaint(); }
+function faqRows(){
+  const rows=FAQ_DOCS[FAQ_TAB]||[];
+  if(!FAQ_Q)return rows;
+  return rows.filter(r=>(r.q+" "+r.a+" "+r.sec).toLowerCase().includes(FAQ_Q));
+}
+function faqBodyHTML(){
+  const rows=faqRows();
+  if(!rows.length)return `<div class="note">Nothing matches &ldquo;${esc(FAQ_Q)}&rdquo;.</div>`;
+  let out="", sec=null;
+  rows.forEach(r=>{
+    if(r.sec!==sec){ sec=r.sec; out+=`<div class="fq-sec">${esc(sec)}</div>`; }
+    out+=`<details class="fq"><summary><span class="fq-n">${r.n}</span>${esc(r.q)}</summary>
+      <div class="fq-a">${esc(r.a)}</div></details>`;
+  });
+  return out;
+}
+function faqPaint(){
+  const b=document.getElementById("fq-body"); if(b)b.innerHTML=faqBodyHTML();
+  const t=document.getElementById("fq-tabs");
+  if(t)t.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.t===FAQ_TAB));
+  const w=document.getElementById("fq-warn");
+  if(w)w.style.display=FAQ_TAB==="hr"?"block":"none";
+}
+function faqHTML(){
+  return `<div class="pt-wrap"><div class="pt-card">
+    <div class="pt-h">
+      <div><div class="pt-t">Localization FAQ</div>
+        <div class="pt-s">${FAQ_DOCS.emp.length} employee questions &middot; ${FAQ_DOCS.hr.length} for HR and supervisors</div></div>
+      <button class="mini-btn" onclick="closeFaq()">Close</button>
+    </div>
+    <div class="fq-bar">
+      <div id="fq-tabs" class="fq-tabs">
+        <button data-t="emp" class="on" onclick="faqSetTab('emp')">Employees</button>
+        <button data-t="hr" onclick="faqSetTab('hr')">HR &amp; supervisors</button>
+      </div>
+      <input class="fq-in" placeholder="Search the questions and answers"
+        oninput="faqSearch(this.value)" value="${esc(FAQ_Q)}">
+    </div>
+    <div id="fq-warn" class="fq-warn" style="display:none">Internal document &mdash; not to be distributed
+      to employees.</div>
+    <div id="fq-body" class="pt-b fq-body">${faqBodyHTML()}</div>
+  </div></div>`;
+}
+function openFaq(tab){
+  FAQ_TAB=tab||"emp"; FAQ_Q="";
+  const el=document.createElement("div"); el.id="fq-modal";
+  el.innerHTML=faqHTML();
+  el.addEventListener("click",e=>{ if(e.target===el)closeFaq(); });
+  document.body.appendChild(el);
+  faqPaint();
+}
+function closeFaq(){ const e=document.getElementById("fq-modal"); if(e)e.remove(); }
+
+/* ═══ PRECEDENTS ═════════════════════════════════════════════════════════════
+   The question an approver asks first is what was done last time. It has always
+   been answerable from the tracker; it just took someone remembering. */
+function precedents(d,limit){
+  if(!d||!DB||!DB.length||!d.ohc||!d.nhc)return [];
+  const norm=v=>String(v||"").trim().toLowerCase();
+  const here=norm(d.ohc)+">"+norm(d.nhc);
+  const cl=d.cl!==null&&d.cl!==undefined?+d.cl:null;
+  return DB.filter(r=>{
+      const pair=norm(r["Original Home Country"])+">"+norm(r["New Home Country"]);
+      if(pair!==here)return false;
+      /* not the case in front of you */
+      return norm(r["Full Name"])!==norm(d.name);
+    })
+    .map(r=>{
+      const rcl=num(r["CL"]);
+      return {name:r["Full Name"]||"—", cl:rcl, type:r["Type of Case"]||r["Subtype of Case"]||"",
+              status:r["Status"]||"", created:r["Date Created"]||"", impl:r["Implementation date"]||"",
+              bl:r["Business Line"]||"",
+              /* nearest classification level first: the closest peer is the useful one */
+              near:(cl!==null&&rcl!==null)?Math.abs(rcl-cl):999};
+    })
+    .sort((a,b)=>a.near-b.near)
+    .slice(0,limit||6);
+}
+
+function precedentsHTML(d){
+  if(!dbHandle)return "";
+  const rows=precedents(d,6);
+  const cnt=(!d||!DB)?0:DB.filter(r=>
+     String(r["Original Home Country"]||"").trim().toLowerCase()===String(d.ohc||"").trim().toLowerCase()&&
+     String(r["New Home Country"]||"").trim().toLowerCase()===String(d.nhc||"").trim().toLowerCase()).length;
+  return `<div class="panel"><div class="panel-h">
+      <div class="panel-t">Precedents</div>
+      <div class="panel-n">${cnt} case${cnt===1?"":"s"} on the same route in the tracker</div></div>
+    ${rows.length?`<div class="panel-b"><table class="tbl"><tbody>
+      ${rows.map(r=>`<tr>
+        <td>${esc(r.name)}</td>
+        <td class="dv">${r.cl!==null?"CL "+r.cl:"—"}</td>
+        <td class="dv">${esc(r.type)}</td>
+        <td class="dv">${esc(String(r.status||"—"))}</td>
+        <td class="ds">${esc(String(r.impl||r.created||""))}</td>
+      </tr>`).join("")}
+    </tbody></table></div>
+    <div class="note">Closest classification level first. What was decided on the same route is the first
+      thing an approver asks, and it is already in the tracker.</div>`
+    :`<div class="note">No other case on this route is in the tracker yet.</div>`}
+  </div>`;
+}
+
+/* ═══ WHAT-IF ════════════════════════════════════════════════════════════════
+   Approvers ask "and if we did it in January?" The case itself is not touched:
+   this recalculates a copy so the answer can be given without disturbing the
+   figures that were signed off. */
+let WHATIF={salary:null,eff:null,fx:null};
+function whatIfSet(k,v){ WHATIF[k]=String(v||"").trim()||null; render(); }
+function whatIfClear(){ WHATIF={salary:null,eff:null,fx:null}; render(); }
+function whatIfCalc(d){
+  if(!d)return null;
+  if(WHATIF.salary===null&&WHATIF.eff===null&&WHATIF.fx===null)return null;
+  const alt=Object.assign({},d);
+  if(WHATIF.salary!==null&&!isNaN(+WHATIF.salary))alt.nhcSalary=+WHATIF.salary;
+  if(WHATIF.fx!==null&&!isNaN(+WHATIF.fx))alt.fx=+WHATIF.fx;
+  if(WHATIF.eff!==null)alt.effDate=WHATIF.eff;
+  try{ return {d:alt,c:calc(alt)}; }catch(e){ return null; }
+}
+function whatIfHTML(d,c){
+  if(!d)return "";
+  const alt=whatIfCalc(d);
+  const row=(lab,now,then,ccy)=>{
+    const dv=(now!==null&&now!==undefined&&then!==null&&then!==undefined)?then-now:null;
+    return `<tr><td>${esc(lab)}</td>
+      <td class="dv">${now===null||now===undefined?"—":fmt(now)}</td>
+      <td class="dv">${!alt?"—":(then===null||then===undefined?"—":fmt(then))}</td>
+      <td class="dv ${dv!==null&&dv<0?"neg":""}">${dv===null?"—":(dv>0?"+":"")+fmt(dv)}</td></tr>`;
+  };
+  const A=alt?alt.c:null;
+  return `<div class="panel"><div class="panel-h">
+      <div class="panel-t">What if</div>
+      <div class="panel-n">${alt?"comparing against the case":"the case is not changed"}</div>
+      ${alt?`<button class="mini-btn" onclick="whatIfClear()">Reset</button>`:""}</div>
+    <div class="panel-b"><div class="fgrid">
+      <div class="f"><div class="f-l">NHC salary</div>
+        <input value="${WHATIF.salary??""}" placeholder="${d.nhcSalary!==null?fmt(d.nhcSalary):""}"
+          onchange="whatIfSet('salary',this.value)"></div>
+      <div class="f"><div class="f-l">Exchange rate</div>
+        <input value="${WHATIF.fx??""}" placeholder="${d.fx??""}"
+          onchange="whatIfSet('fx',this.value)"></div>
+      <div class="f"><div class="f-l">Effective date</div>
+        <input value="${WHATIF.eff??""}" placeholder="${esc(String(d.effDate||""))}"
+          onchange="whatIfSet('eff',this.value)"></div>
+    </div></div>
+    <div class="panel-b"><table class="tbl"><thead><tr>
+      <th></th><th class="dv">Case</th><th class="dv">What if</th><th class="dv">Change</th>
+    </tr></thead><tbody>
+      ${row("Total annual cost",c&&c.c?c.c.total:null,A&&A.c?A.c.total:null)}
+      ${row("Cash to the employee",c&&c.e?c.e.l.cash:null,A&&A.e?A.e.l.cash:null)}
+      ${row("Benefits",c&&c.c?c.c.ben:null,A&&A.c?A.c.ben:null)}
+    </tbody></table></div>
+    <div class="note">Nothing here changes the case or the reports &mdash; it recalculates a copy so the
+      question can be answered on the spot.</div>
+  </div>`;
+}
+
+/* ═══ HOME ═══════════════════════════════════════════════════════════════════
+   The first screen used to say "load the case files" and nothing else, which
+   wastes the one moment when someone is looking at the whole picture rather
+   than one case. With the tracker linked it shows where the caseload stands. */
+function homeHTML(){
+  const load=`<div class="empty"><div class="empty-fig">&#8595;</div>
+      <div class="empty-h">Load the case files</div>
+      <div class="empty-p">Start with the SuccessFactors employee profile. Add the vendor returns as they
+      arrive &mdash; the analysis recalculates each time.</div></div>`;
+  if(!dbHandle||!DB||!DB.length)return load;
+
+  const open=DB.filter(r=>{
+    const st=String(r["Status"]||"").trim().toLowerCase();
+    return st&&!/complete|closed|cancel|withdraw|declin/.test(st);
+  });
+  const stuck=[];
+  open.forEach(r=>{
+    const nx=LOC_STEPS.map(([col,label])=>({label,state:stepState(stepValue(r,col))}))
+      .filter(x=>x.state==="doing"||x.state==="todo")[0];
+    if(nx)stuck.push({name:r["Full Name"]||"—",
+      route:(String(r["Original Home Country"]||"").trim()||"?")+" \u2192 "+(String(r["New Home Country"]||"").trim()||"?"),
+      stage:nx.label});
+  });
+  const byStage={};
+  stuck.forEach(x=>{ byStage[x.stage]=(byStage[x.stage]||0)+1; });
+  const stages=Object.entries(byStage).sort((a,b)=>b[1]-a[1]);
+  const top=stages.length?stages[0]:null;
+
+  const card=(n,l,s)=>`<div class="hm-c"><div class="hm-n">${n}</div><div class="hm-l">${esc(l)}</div>
+    ${s?`<div class="hm-s">${esc(s)}</div>`:""}</div>`;
+
+  return `<div class="canvas">
+    <div class="hm-h">
+      <div><div class="hm-t">Localization caseload</div>
+        <div class="hm-sub">${DB.length} cases on file &middot; ${dbName?esc(dbName):"tracker"}</div></div>
+      <button class="btn btn-p" onclick="setView('case')">Open a case</button>
+    </div>
+    <div class="hm-row">
+      ${card(open.length,"open now")}
+      ${card(DB.length-open.length,"closed")}
+      ${top?card(top[1],"waiting at one stage",top[0]):card(0,"waiting","nothing outstanding")}
+    </div>
+    ${stages.length?`<div class="panel"><div class="panel-h"><div class="panel-t">Where the open cases sit</div>
+      <div class="panel-n">next stage due, most crowded first</div></div>
+      <div class="panel-b">${barsHTML(stages,open.length)}</div>
+      <div class="note">Read from the tracker as it stands. It says where cases are, not how long they have
+        been there &mdash; that needs a date in the stage columns.</div>
+    </div>`:""}
+    ${stuck.length?`<div class="panel"><div class="panel-h"><div class="panel-t">Open cases</div></div>
+      <div class="panel-b"><table class="tbl"><tbody>
+      ${stuck.slice(0,12).map(x=>`<tr><td>${esc(x.name)}</td>
+        <td class="ds">${esc(x.route)}</td><td class="dv">${esc(x.stage)}</td></tr>`).join("")}
+      </tbody></table></div>${stuck.length>12?`<div class="note">Showing 12 of ${stuck.length}.</div>`:""}
+    </div>`:""}
+    <div class="note" style="margin-top:14px">Load the case files in the rail to open a case, or go to
+      Analytics for the full picture.</div>
+  </div>`;
+}
+
+function renderGuide(){
+  const sec=(t,body)=>`<div class="panel"><div class="panel-h"><div class="panel-t">${t}</div></div>
+    <div class="panel-b gd">${body}</div></div>`;
+  document.getElementById("body").innerHTML=`<div class="canvas">
+  <div class="panel"><div class="panel-h"><div class="panel-t">Guide</div>
+    <div class="panel-n">how this works, and the conventions worth knowing</div></div>
+    <div class="panel-b gd"><p>This runs one localization or resign-rehire case at a time. It reads the
+    files the vendors and teams return, works out the economics, and produces the reports the approvers
+    and the employee see. Nothing is sent anywhere: everything happens in this page, on your machine.</p></div>
+  </div>
+
+  ${sec("The shape of a case",`
+    <p>Pick the case type at the top of the left rail &mdash; <b>Localization</b> or <b>Resign-rehire</b>.
+    They ask for different files and produce different outputs, and each keeps its own files, so loading
+    something on one does not show up on the other.</p>
+    <p>Below that is the file rail. Each slot is one file the process expects. Click a slot to load it.
+    A slot marked required is one the analysis cannot finish without; optional ones fill in detail.
+    <b>Exec compensation</b> only counts as required at CL 30 and above, so on a lower-level case it stays
+    optional and is not counted against you.</p>`)}
+
+  ${sec("Case",`
+    <p>The main view. It is built from the files, not typed by hand, and it shows where every figure came
+    from &mdash; the tag next to each field names the source.</p>
+    <ul>
+      <li><b>Assumptions you can override</b> &mdash; the few figures you are allowed to change. Everything
+        else is locked because it is read from a file. An override sticks until you clear it.</li>
+      <li><b>What was read</b> &mdash; every input, its value, and which file it came from. This is the
+        first place to look when a number seems wrong.</li>
+      <li><b>GC&amp;BD</b> &mdash; benefits rates, pension formula, vesting and prior service.</li>
+      <li><b>Retirement scenarios</b> &mdash; the case at ages 55, 58 and 60.</li>
+    </ul>
+    <p>Every section collapses by clicking its header, and stays collapsed while you work.</p>`)}
+
+  ${sec("Blank is not zero",`
+    <p>This is the convention that matters most. A figure that has not been supplied is reported
+    <b>blank</b>, never as zero. A zero is a real answer &mdash; it says the cost is nil &mdash; and
+    treating a missing figure as zero would understate what the company is taking on.</p>
+    <p>So a blank in a report is not a bug. It means something has not come back yet, and the running
+    bar across the top tells you what.</p>`)}
+
+  ${sec("The pension offset",`
+    <p>The US pension is reduced by an offset representing what the employee already earns in the origin
+    country plan. It is the figure approvers question most, so it is worth knowing how it is produced.</p>
+    <p>An offset only arises where the origin country runs a defined benefit plan <b>and</b> the employee
+    is vested in it. Australia and Singapore run no such plan, so no offset arises there whatever else is
+    supplied.</p>
+    <p>Where a plan applies, the app holds the formula for the countries seen so far and asks GC&amp;BD to
+    confirm it rather than re-enter it. GC&amp;BD pick the formula by name from a list in their template;
+    picking a listed one is what lets the app apply it. If they pick <em>Other</em>, the app will not
+    compute an offset &mdash; it does not run arithmetic handed to it as free text &mdash; and says so.</p>
+    <p><b>Master table</b> opens the full set of country parameters, marked by whether each was confirmed
+    against a real case or only read off the master sheet.</p>`)}
+
+  ${sec("Country defaults, and why they are flagged",`
+    <p>Where a parameter is not supplied, the app falls back to what it holds for that country. Anything
+    filled that way is flagged as <em>still a country default, not confirmed for this case</em>.</p>
+    <p>Treat that flag seriously. It means the figure is right for the plan as we last understood it, not
+    that anyone has confirmed it for this employee. A plan change nobody told us about would look exactly
+    like this.</p>`)}
+
+  ${sec("Communications",`
+    <p>Generates the vendor request files and the covering emails. <b>Generate</b> writes the file;
+    <b>Email</b> writes the file and opens a draft with the note already written. A browser cannot attach
+    a file to a mail draft, so attach the one that lands in your downloads folder &mdash; the draft names
+    it for you.</p>
+    <p>Column A of a generated file is what the reader matches on when the file comes back. Ask vendors to
+    complete column B and leave the labels alone. Extra rows they add following the same wording are still
+    read.</p>
+    <p><b>Offer letter material</b> is here too: the link set for the destination, and the employee offer
+    letter itself.</p>`)}
+
+  ${sec("Reports",`
+    <p><b>Export</b> produces the approver packs and the employee output. They are built from the same
+    calculation, so the figures the employee sees are the ones the approvers signed off on.</p>
+    <p>They print to PDF from the browser. Leave the print dialog on its defaults; the layout allows for
+    them.</p>`)}
+
+  ${sec("FAQ",`
+    <p><b>FAQ</b> in Useful links holds both guides &mdash; ${FAQ_DOCS.emp.length} questions written for
+    employees and ${FAQ_DOCS.hr.length} for HR and supervisors. They are embedded in this file rather than
+    linked to a folder, so they open wherever the app is opened and the text can be searched.</p>
+    <p>The HR guide is marked internal on its own document. It sits behind its own tab and carries that
+    warning on screen; it is not part of anything the employee receives.</p>`)}
+
+  ${sec("Precedents and What if",`
+    <p>With the tracker linked, a case shows <b>Precedents</b> &mdash; other cases on the same country
+    route, closest classification level first. It is the first thing an approver asks, and it was always
+    in the tracker; it just needed someone to remember.</p>
+    <p><b>What if</b> recalculates a copy of the case with a different salary, exchange rate or effective
+    date, side by side with the real figures. Nothing it shows touches the case or the reports, so the
+    question an approver asks on the spot can be answered without disturbing anything that was signed
+    off.</p>`)}
+
+  ${sec("The opening screen",`
+    <p>With the tracker linked and no case open, the first screen shows where the caseload stands: how many
+    are open, and which stage the most of them are waiting at. It reads the tracker as it is &mdash; it says
+    where cases are, not how long they have been there.</p>`)}
+
+  ${sec("Analytics and the tracker",`
+    <p>Reads the full tracker and shows the shape of the caseload &mdash; case types, business lines,
+    potential, classification level. It needs the tracker loaded in the rail. It describes cases already
+    logged; it does not affect the case open in front of you.</p>`)}
+
+  ${sec("Run validation",`
+    <p>Before a case goes to an approver or the employee, <b>Run validation</b> checks it. It answers a
+    different question from the bar across the top: that bar tracks work still to do, this asks whether
+    what you have is safe for someone else to read.</p>
+    <ul>
+      <li><b>Blocked</b> &mdash; would mislead the reader. A required file missing, a headline figure that
+        cannot be worked out, an age past the cut-off, an offset GC&amp;BD have not confirmed.</li>
+      <li><b>Check</b> &mdash; the figures are complete but look unusual. A converted salary far out of
+        line with the destination one, benefits that do not match the stated rate, an offset that exceeds
+        the US pension at every age. The app cannot tell whether these are wrong, only that they are worth
+        your eye &mdash; and this is the level that earns its keep, because missing inputs announce
+        themselves while a plausible-looking wrong number does not.</li>
+      <li><b>Note</b> &mdash; fine to send, as long as you know. A country default not confirmed for this
+        case, no effective date yet.</li>
+    </ul>`)}
+
+  ${sec("When something looks wrong",`
+    <ul>
+      <li>Check <b>What was read</b> first. Most surprises are an input that did not come through.</li>
+      <li>The bar across the top lists what is outstanding on the case.</li>
+      <li>A figure in red is negative, not an error.</li>
+      <li>Hover a calculated figure to see the formula behind it.</li>
+      <li>Blank means missing, not zero.</li>
+    </ul>
+    <p>The app reproduces the existing template's figures, with two deliberate departures: it does not
+    double-count the pension in the total, and it applies the currency conversion once rather than twice.
+    Where it differs from a template for those reasons, the app is the corrected one.</p>`)}
+  </div>`;
+}
+
 function renderLinks(){
   const grp=k=>{
     const g=LINKS[k];
@@ -3192,7 +4000,9 @@ function renderLinks(){
   };
   document.getElementById("body").innerHTML=`<div class="canvas">
     <div class="panel">
-      <div class="panel-h"><div class="panel-t">Useful links</div></div>
+      <div class="panel-h"><div class="panel-t">Useful links</div>
+        <button class="mini-btn" onclick="openFaq('emp')">FAQ</button>
+        <button class="mini-btn" onclick="openPensionTable()">Pension multiplier table</button></div>
       <div class="note">Reference only &mdash; the main articles on localization policy, and the two link sets
         that go out with an offer letter. Everything that <em>generates</em> the offer letter material lives
         under <strong>Communications</strong>.</div>
@@ -3740,6 +4550,17 @@ function gcbdHTML(d,c){
     </div></div>
     ${g.elig?`<div class="note"><strong>Eligibility.</strong> ${esc(String(g.elig))}</div>`:""}
     ${g.formula?`<div class="note"><strong>Formula.</strong> ${esc(String(g.formula))}</div>`:""}
+    ${(()=>{
+      /* The offset rests on the stored formula, so GC&BD's verdict on it belongs
+         next to the figure rather than buried in the returned file. */
+      const v=String((g&&g.formulaOK)||"").trim();
+      if(!v)return "";
+      if(/^y/i.test(v))return `<div class="note">GC&amp;BD confirmed the stored formula for the
+        ${esc(d.ohc||"origin country")} plan.</div>`;
+      return `<div class="note warn"><strong>GC&amp;BD say the stored formula is wrong.</strong>
+        ${g.formulaFix?esc(String(g.formulaFix)):"No correction was given."}
+        The offset below still uses the stored formula &mdash; treat it as unconfirmed until this is settled.</div>`;
+    })()}
     ${g.retNotes?`<div class="note"><strong>Notes on retirement ages.</strong> ${esc(String(g.retNotes))}</div>`:""}
 
     ${anyPar?`<div class="sub-h">Part III-A — Origin country pension formula</div>
@@ -3814,7 +4635,8 @@ function gcbdHTML(d,c){
     <!-- No longer a part of the request form: GC&BD are not asked for these
          amounts any more, so the heading names what it is rather than a part
          number the vendor would not recognise. -->
-    <div class="sub-h">Prior service recognition and OHC offset</div>
+    <div class="sub-h">Prior service recognition and OHC offset
+      <button class="mini-btn" style="margin-left:10px" onclick="openPensionTable()">Master table</button></div>
     <div class="panel-b"><div class="fgrid">
       <div class="f"><div class="f-l">Prior service recognised in the NHC<span class="f-src">${esc(d.offsetSrc||"not answered")}</span></div>
         <select onchange="setOv('offset',this.value)">
@@ -4011,6 +4833,7 @@ function scenHTML(d,c){
 
 function render(){
   if(VIEW==="links"){renderLinks();railHTML();return;}
+  if(VIEW==="guide"){renderGuide();railHTML();return;}
   if(VIEW==="analytics"){renderAnalytics();return;}
   /* Loading a file re-renders. Without this the case canvas replaced whatever
      view you were on while the nav still highlighted it — load a TMO file from
@@ -4023,7 +4846,20 @@ function render(){
      (and its tape) gets silently replaced by the Localization canvas the
      moment any of those actions fires while MODE is "rr". */
   if(MODE==="rr"){renderRR();return;}
-  D=resolve(); const c=calc(D);
+  D=resolve();
+  /* With nothing loaded there is no case to draw. Rather than an empty prompt,
+     show where the caseload stands — the one moment someone is looking at the
+     whole picture instead of a single case. */
+  if(!SLOTS.some(x=>!x.db&&F[x.id])){
+    document.getElementById("body").innerHTML=homeHTML();
+    document.getElementById("crumb").textContent="No case loaded";
+    document.getElementById("subject").textContent="—";
+    document.getElementById("route").textContent="";
+    document.getElementById("btn-exp").disabled=true;
+    document.getElementById("btn-log").disabled=true;
+    railHTML(); return;
+  }
+  const c=calc(D);
   document.getElementById("crumb").textContent=D.locType||"Case";
   document.getElementById("subject").textContent=D.name||"—";
   document.getElementById("route").textContent=
@@ -4045,6 +4881,8 @@ function render(){
     ${fieldsHTML(D)}
     ${diagHTML(D,c)}
     ${gcbdHTML(D,c)}
+    ${whatIfHTML(D,c)}
+    ${precedentsHTML(D)}
     ${novaHTML(D)}
     ${empHTML(D,c)}
     ${costHTML(D,c)}
@@ -5024,7 +5862,10 @@ function setView(v){
   document.getElementById("nav-an").classList.toggle("on",v==="analytics");
   const nl=document.getElementById("nav-links");
   if(nl)nl.classList.toggle("on",v==="links");
+  const ng=document.getElementById("nav-guide");
+  if(ng)ng.classList.toggle("on",v==="guide");
   if(v==="analytics")renderAnalytics();
+  else if(v==="guide")renderGuide();
   else if(v==="start")document.getElementById("body").innerHTML=startCaseHTML();
   else render();
 }
@@ -5430,6 +6271,8 @@ recallDb().then(ok=>{ railHTML(); if(ok&&D)render(); });
   if(!body||!window.MutationObserver)return;
   new MutationObserver(()=>wirePanels()).observe(body,{childList:true,subtree:false});
   wirePanels();
+  /* the static markup in #body is only a placeholder until the first render */
+  if(!SLOTS.some(x=>!x.db&&F[x.id])&&MODE!=="rr")body.innerHTML=homeHTML();
 })();
 </script>
 </body>
