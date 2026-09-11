@@ -139,6 +139,8 @@ input,select{font:inherit;color:inherit}
 /* ── EMPTY ── */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 32px;text-align:center}
 .empty-fig{width:88px;height:88px;border:2px dashed var(--line-2);border-radius:5px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;font-family:var(--mono);font-size:26px;color:var(--ink-3)}
+.empty-fig[role="button"]{cursor:pointer;transition:border-color .15s,color .15s}
+.empty-fig[role="button"]:hover{border-color:var(--accent);color:var(--accent)}
 .empty-h{font-family:var(--cond);font-size:23px;font-weight:700;margin-bottom:9px}
 .empty-p{color:var(--ink-2);max-width:400px;line-height:1.62;font-size:13.5px}
 
@@ -595,7 +597,8 @@ input[type=file]{display:none}
   </div>
   <div id="body">
     <div class="empty">
-      <div class="empty-fig">↓</div>
+      <div class="empty-fig" role="button" tabindex="0" title="Load the SuccessFactors employee profile"
+        onclick="pickFile('sf')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickFile('sf')}">↓</div>
       <div class="empty-h">Load the case files</div>
       <div class="empty-p">Start with the SuccessFactors employee profile. Add the vendor returns as they arrive — the analysis recalculates each time.</div>
     </div>
@@ -3889,7 +3892,10 @@ function whatIfHTML(d,c){
    wastes the one moment when someone is looking at the whole picture rather
    than one case. With the tracker linked it shows where the caseload stands. */
 function homeHTML(){
-  const load=`<div class="empty"><div class="empty-fig">&#8595;</div>
+  const load=`<div class="empty"><div class="empty-fig" role="button" tabindex="0"
+      title="Load the SuccessFactors employee profile"
+      onclick="pickFile('sf')"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pickFile('sf')}">&#8595;</div>
       <div class="empty-h">Load the case files</div>
       <div class="empty-p">Start with the SuccessFactors employee profile. Add the vendor returns as they
       arrive &mdash; the analysis recalculates each time.</div></div>`;
@@ -5854,7 +5860,7 @@ async function recallDb(){
       t.onsuccess=()=>res(t.result||null); t.onerror=()=>res(null);
     });
     if(!h)return false;
-    const perm=await h.queryPermission({mode:"readwrite"});
+    const perm=await h.queryPermission({mode:"read"});
     if(perm==="granted"){ dbHandle=h; dbName=h.name; await readDb(); return true; }
     pendingDb=h;                       /* needs a click before it can be read */
     return false;
@@ -5864,7 +5870,11 @@ let pendingDb=null;
 async function resumeDb(){
   if(!pendingDb)return pickDb();
   try{
-    const r=await pendingDb.requestPermission({mode:"readwrite"});
+    /* Reading the tracker needs read permission only. Asking for readwrite here
+       raised a "will be able to edit this file" prompt every time the tracker
+       was reconnected, which is alarming and unnecessary — write access is
+       requested at the point something is actually written. */
+    const r=await pendingDb.requestPermission({mode:"read"});
     if(r!=="granted"){ toast("Permission not granted"); return; }
     dbHandle=pendingDb; dbName=pendingDb.name; pendingDb=null;
     await readDb(); railHTML(); render(); toast("Reloaded "+dbName);
@@ -5888,9 +5898,9 @@ async function pickDb(){
 async function refreshDb(){
   if(!dbHandle){pickDb();return;}
   try{
-    const perm=await dbHandle.queryPermission({mode:"readwrite"});
+    const perm=await dbHandle.queryPermission({mode:"read"});
     if(perm!=="granted"){
-      const r=await dbHandle.requestPermission({mode:"readwrite"});
+      const r=await dbHandle.requestPermission({mode:"read"});
       if(r!=="granted"){alert("Permission to read the database was not granted.");return;}
     }
     await readDb(); renderAnalytics(); toast("Reloaded from "+dbName);
@@ -5954,6 +5964,14 @@ async function logCase(){
     if(ws["!cols"])ws2["!cols"]=ws["!cols"];
     wb.Sheets[sh]=ws2;
     const out=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+    /* this is the one operation that edits the tracker, so this is where the
+       browser should be asked for permission to do it */
+    if((await dbHandle.queryPermission({mode:"readwrite"}))!=="granted"){
+      if((await dbHandle.requestPermission({mode:"readwrite"}))!=="granted"){
+        alert("Permission to edit "+dbName+" was not granted, so the case was not added.");
+        return;
+      }
+    }
     const wr=await dbHandle.createWritable();
     await wr.write(out); await wr.close();
     await readDb();
