@@ -86,11 +86,16 @@ input,select{font:inherit;color:inherit}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
 .topbar{top:32px !important;background:rgba(255,255,255,.92);backdrop-filter:saturate(1.6) blur(8px);
   border-bottom:1px solid var(--line);padding:13px 32px;display:flex;align-items:center;
-  justify-content:space-between;gap:24px;position:sticky;top:0;z-index:20}
-.crumb{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+  justify-content:space-between;gap:24px;position:sticky;top:0;z-index:20;flex-wrap:wrap}
+/* The nav grew from three buttons to eight. With no width reserved the left
+   block was squeezed to nothing and the case name wrapped underneath the nav;
+   it now keeps a minimum, and the bar takes a second row before they collide. */
+.topbar>div:first-child{flex:1 1 240px;min-width:0}
+.crumb{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .subject{font-family:var(--cond);font-size:21px;font-weight:700;margin-top:2px;line-height:1.1}
 .route{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-top:3px}
-.topbar-act{display:flex;align-items:center;gap:14px}
+.topbar-act{display:flex;align-items:center;gap:14px;flex:0 1 auto;flex-wrap:wrap;justify-content:flex-end}
 
 /* Views sit in a segmented control because they are one choice, not three
    separate actions; the file and export commands stay outside it. */
@@ -232,6 +237,13 @@ input,select{font:inherit;color:inherit}
 .fq summary::-webkit-details-marker{display:none}
 .fq-n{font-family:var(--mono);font-size:11px;color:var(--ink-3);flex-shrink:0;min-width:20px}
 .fq-a{font-size:12.5px;color:var(--ink-2);line-height:1.65;padding:0 0 12px 29px}
+/* the master table scrolls inside its card rather than running past the window */
+#pt-modal .pt-card{display:flex;flex-direction:column;max-height:calc(100vh - 80px)}
+#pt-modal .pt-h{flex:0 0 auto}
+#pt-modal .pt-b{flex:1 1 auto;overflow:auto;min-height:0}
+#pt-modal .pt-tbl thead th{position:sticky;top:0;z-index:1}
+#vd-modal .pt-card{display:flex;flex-direction:column;max-height:calc(100vh - 80px)}
+#vd-modal .pt-b{flex:1 1 auto;overflow:auto;min-height:0}
 /* collapsible sections — everything but the header hides when collapsed */
 .panel-h{cursor:pointer;user-select:none}
 .panel.collapsed>*:not(.panel-h){display:none}
