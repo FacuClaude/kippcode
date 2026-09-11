@@ -15,7 +15,7 @@
   --line:#dde3e7; --line-2:#c6cfd6;
   --accent:#b3282d; --accent-bg:#fdf2f2; --accent-line:#e9c3c4; --accent-dark:#8f1f24;
   --accent-rail:#f28b8f;
-  --rail-bg:#8c3236; --rail-dim:rgba(255,255,255,.58);
+  --rail-bg:#24272b; --rail-dim:rgba(255,255,255,.52);
   --ochre:#a85d00; --ochre-bg:#fdf6ec; --ochre-line:#e8c99a;
   --pos:#1a6b47; --neg:#b02a2a;
   --mono:'IBM Plex Mono',monospace;
@@ -530,7 +530,7 @@ input[type=file]{display:none}
     <select class="rail-theme" onchange="setTheme(this.value)">
       <option value="brick">Brick red</option>
       <option value="slate">Grey</option>
-      <option value="charcoal">Black</option>
+      <option value="charcoal" selected>Black</option>
       <option value="forest">Green</option>
       <option value="navy">Blue</option>
     </select>
@@ -552,7 +552,10 @@ input[type=file]{display:none}
         <button class="btn" id="nav-case" onclick="setView('case')">Case</button>
         <button class="btn" id="nav-an" onclick="setView('analytics')">Analytics</button>
       <button class="btn" id="nav-links" onclick="setView('links')">Useful links</button>
+      <button class="btn" id="nav-sim" onclick="setView('sim')">Simulation</button>
       <button class="btn" id="nav-guide" onclick="setView('guide')">Guide</button>
+      <button class="btn" id="nav-faq" onclick="openFaq('emp')">FAQ</button>
+      <button class="btn" id="nav-pt" onclick="openPensionTable()">Pension table</button>
       </nav>
       <span class="topbar-sep"></span>
       <button class="btn btn-q" id="btn-db" onclick="pickDb()">Link database</button>
@@ -3689,6 +3692,24 @@ function openFaq(tab){
 }
 function closeFaq(){ const e=document.getElementById("fq-modal"); if(e)e.remove(); }
 
+/* The tracker returns dates as Date objects, Excel serials or plain text, and
+   a Date printed raw carries a timezone that means nothing here. Reduce all
+   three to the calendar date. */
+function onlyDate(v){
+  if(v===null||v===undefined||v==="")return "";
+  if(v instanceof Date&&!isNaN(v))return v.toISOString().slice(0,10);
+  if(typeof v==="number"&&v>20000&&v<80000){
+    const d=new Date(Date.UTC(1899,11,30)+v*86400000);
+    return isNaN(d)?"":d.toISOString().slice(0,10);
+  }
+  const t=String(v).trim();
+  const iso=/^(\d{4})-(\d{2})-(\d{2})/.exec(t);       if(iso)return iso[0];
+  const dmy=/^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(t);
+  if(dmy)return dmy[3]+"-"+String(dmy[1]).padStart(2,"0")+"-"+String(dmy[2]).padStart(2,"0");
+  const d=new Date(t);
+  return isNaN(d)?t:d.toISOString().slice(0,10);
+}
+
 /* ═══ PRECEDENTS ═════════════════════════════════════════════════════════════
    The question an approver asks first is what was done last time. It has always
    been answerable from the tracker; it just took someone remembering. */
@@ -3705,8 +3726,12 @@ function precedents(d,limit){
     })
     .map(r=>{
       const rcl=num(r["CL"]);
+      const raw=r["Implementation date"]||r["Date Created"]||"";
+      const dt=onlyDate(raw);
       return {name:r["Full Name"]||"—", cl:rcl, type:r["Type of Case"]||r["Subtype of Case"]||"",
-              status:r["Status"]||"", created:r["Date Created"]||"", impl:r["Implementation date"]||"",
+              status:r["Status"]||"", date:dt, year:dt?dt.slice(0,4):"",
+              route:(String(r["Original Home Country"]||"").trim()||"?")+" \u2192 "+
+                    (String(r["New Home Country"]||"").trim()||"?"),
               bl:r["Business Line"]||"",
               /* nearest classification level first: the closest peer is the useful one */
               near:(cl!==null&&rcl!==null)?Math.abs(rcl-cl):999};
@@ -3724,13 +3749,18 @@ function precedentsHTML(d){
   return `<div class="panel"><div class="panel-h">
       <div class="panel-t">Precedents</div>
       <div class="panel-n">${cnt} case${cnt===1?"":"s"} on the same route in the tracker</div></div>
-    ${rows.length?`<div class="panel-b"><table class="tbl"><tbody>
+    ${rows.length?`<div class="panel-b"><table class="tbl"><thead><tr>
+        <th>Employee</th><th>Route</th><th class="dv">Level</th><th class="dv">Type</th>
+        <th class="dv">Outcome</th><th class="dv">Year</th><th class="ds">Effective</th>
+      </tr></thead><tbody>
       ${rows.map(r=>`<tr>
         <td>${esc(r.name)}</td>
+        <td class="ds">${esc(r.route)}</td>
         <td class="dv">${r.cl!==null?"CL "+r.cl:"—"}</td>
         <td class="dv">${esc(r.type)}</td>
         <td class="dv">${esc(String(r.status||"—"))}</td>
-        <td class="ds">${esc(String(r.impl||r.created||""))}</td>
+        <td class="dv">${esc(r.year||"—")}</td>
+        <td class="ds">${esc(r.date||"—")}</td>
       </tr>`).join("")}
     </tbody></table></div>
     <div class="note">Closest classification level first. What was decided on the same route is the first
@@ -3743,16 +3773,41 @@ function precedentsHTML(d){
    Approvers ask "and if we did it in January?" The case itself is not touched:
    this recalculates a copy so the answer can be given without disturbing the
    figures that were signed off. */
-let WHATIF={salary:null,eff:null,fx:null};
-function whatIfSet(k,v){ WHATIF[k]=String(v||"").trim()||null; render(); }
-function whatIfClear(){ WHATIF={salary:null,eff:null,fx:null}; render(); }
+let WHATIF={salary:null,ohcSalary:null,eff:null,fx:null,locType:null,nhcSBR:null,retAge:null};
+function whatIfSet(k,v){
+  WHATIF[k]=String(v||"").trim()||null;
+  if(VIEW==="sim")renderSim(); else render();
+}
+function whatIfClear(){
+  Object.keys(WHATIF).forEach(k=>WHATIF[k]=null);
+  if(VIEW==="sim")renderSim(); else render();
+}
+function whatIfOn(){ return Object.keys(WHATIF).some(k=>WHATIF[k]!==null&&WHATIF[k]!==""); }
 function whatIfCalc(d){
-  if(!d)return null;
-  if(WHATIF.salary===null&&WHATIF.eff===null&&WHATIF.fx===null)return null;
+  if(!d||!whatIfOn())return null;
   const alt=Object.assign({},d);
-  if(WHATIF.salary!==null&&!isNaN(+WHATIF.salary))alt.nhcSalary=+WHATIF.salary;
-  if(WHATIF.fx!==null&&!isNaN(+WHATIF.fx))alt.fx=+WHATIF.fx;
-  if(WHATIF.eff!==null)alt.effDate=WHATIF.eff;
+  const n=(k,f)=>{ const v=WHATIF[k]; if(v!==null&&v!==""&&!isNaN(+v))f(+v); };
+  n("salary",   v=>alt.nhcSalary=v);
+  n("ohcSalary",v=>alt.ohcSalary=v);
+  n("fx",       v=>alt.fx=v);
+  n("retAge",   v=>alt.retAgeNHC=v);
+  /* a rate may be keyed as 35.6 or as 0.356 */
+  n("nhcSBR",   v=>alt.nhcSBR=v>1?v/100:v);
+  if(WHATIF.eff)alt.effDate=WHATIF.eff;
+  /* the type drives whether the expatriate scenario carries expat components,
+     so it is the one that moves the figures most */
+  if(WHATIF.locType){
+    alt.locType=WHATIF.locType;
+    const full=/full/i.test(WHATIF.locType);
+    alt.isExpat=full;
+    /* A direct localization has no expatriate assignment to leave, so the
+       expatriate components and the tax equalisation drop out of the scenario
+       the employee is coming from. Going the other way cannot be simulated:
+       there are no expatriate figures to invent, so that is said rather than
+       guessed. */
+    if(!full){ alt.expatTotal=0; alt.taxEq=0; alt.taxeqHome=0; alt.taxeqHost=0; }
+    alt.whatIfTypeUp = full && !/full/i.test(String(d.locType||""));
+  }
   try{ return {d:alt,c:calc(alt)}; }catch(e){ return null; }
 }
 function whatIfHTML(d,c){
@@ -3768,15 +3823,30 @@ function whatIfHTML(d,c){
   const A=alt?alt.c:null;
   return `<div class="panel"><div class="panel-h">
       <div class="panel-t">What if</div>
-      <div class="panel-n">${alt?"comparing against the case":"the case is not changed"}</div>
+      <div class="panel-n">${alt?"comparing against the case":"change any field to compare"}</div>
       ${alt?`<button class="mini-btn" onclick="whatIfClear()">Reset</button>`:""}</div>
     <div class="panel-b"><div class="fgrid">
+      <div class="f"><div class="f-l">Type of localization</div>
+        <select onchange="whatIfSet('locType',this.value)">
+          <option value=""${WHATIF.locType?"":" selected"}>${esc(d.locType||"as the case has it")}</option>
+          ${["Full Localization","Direct from Home Country","Direct from 3rd Country"]
+            .map(t=>`<option${WHATIF.locType===t?" selected":""}>${t}</option>`).join("")}
+        </select></div>
       <div class="f"><div class="f-l">NHC salary</div>
         <input value="${WHATIF.salary??""}" placeholder="${d.nhcSalary!==null?fmt(d.nhcSalary):""}"
           onchange="whatIfSet('salary',this.value)"></div>
+      <div class="f"><div class="f-l">OHC salary</div>
+        <input value="${WHATIF.ohcSalary??""}" placeholder="${d.ohcSalary!==null?fmt(d.ohcSalary):""}"
+          onchange="whatIfSet('ohcSalary',this.value)"></div>
       <div class="f"><div class="f-l">Exchange rate</div>
         <input value="${WHATIF.fx??""}" placeholder="${d.fx??""}"
           onchange="whatIfSet('fx',this.value)"></div>
+      <div class="f"><div class="f-l">NHC benefits rate</div>
+        <input value="${WHATIF.nhcSBR??""}" placeholder="${d.nhcSBR!==null?(d.nhcSBR*100).toFixed(2)+"%":""}"
+          onchange="whatIfSet('nhcSBR',this.value)"></div>
+      <div class="f"><div class="f-l">Retirement age in NHC</div>
+        <input value="${WHATIF.retAge??""}" placeholder="${d.retAgeNHC??""}"
+          onchange="whatIfSet('retAge',this.value)"></div>
       <div class="f"><div class="f-l">Effective date</div>
         <input value="${WHATIF.eff??""}" placeholder="${esc(String(d.effDate||""))}"
           onchange="whatIfSet('eff',this.value)"></div>
@@ -3787,7 +3857,16 @@ function whatIfHTML(d,c){
       ${row("Total annual cost",c&&c.c?c.c.total:null,A&&A.c?A.c.total:null)}
       ${row("Cash to the employee",c&&c.e?c.e.l.cash:null,A&&A.e?A.e.l.cash:null)}
       ${row("Benefits",c&&c.c?c.c.ben:null,A&&A.c?A.c.ben:null)}
+      ${row("Cost today",c&&c.b?c.b.total:null,A&&A.b?A.b.total:null)}
+      ${row("Transition payments",c&&c.tp&&c.tp.applies?c.tp.total:null,
+             A&&A.tp&&A.tp.applies?A.tp.total:null)}
+      ${row("Employment / retirement cost at 60",
+             c&&c.scen&&c.scen[60]?c.scen[60].total:null,
+             A&&A.scen&&A.scen[60]?A.scen[60].total:null)}
     </tbody></table></div>
+    ${alt&&alt.d&&alt.d.whatIfTypeUp?`<div class="note warn">Switching a direct case to a full
+      localization cannot be simulated: the expatriate components would have to be invented. The figures
+      above ignore that part of the change.</div>`:""}
     <div class="note">Nothing here changes the case or the reports &mdash; it recalculates a copy so the
       question can be answered on the spot.</div>
   </div>`;
@@ -3852,6 +3931,22 @@ function homeHTML(){
   </div>`;
 }
 
+/* Kept out of the case view: sitting mid-analysis, they broke the read from
+   inputs through to figures. Neither changes the case. */
+function renderSim(){
+  const c=D?calc(D):null;
+  document.getElementById("body").innerHTML=`<div class="canvas">
+    <div class="panel"><div class="panel-h"><div class="panel-t">Case simulation</div>
+      <div class="panel-n">nothing here changes the case or the reports</div></div>
+      <div class="panel-b gd"><p>Two questions that come up while a case is being discussed: what the
+      figures would look like under different assumptions, and what was decided on comparable cases
+      before. Both read the case without writing to it.</p></div>
+    </div>
+    ${D?whatIfHTML(D,c):`<div class="panel"><div class="note">Load a case to simulate against.</div></div>`}
+    ${precedentsHTML(D)}
+  </div>`;
+}
+
 function renderGuide(){
   const sec=(t,body)=>`<div class="panel"><div class="panel-h"><div class="panel-t">${t}</div></div>
     <div class="panel-b gd">${body}</div></div>`;
@@ -3902,7 +3997,7 @@ function renderGuide(){
     confirm it rather than re-enter it. GC&amp;BD pick the formula by name from a list in their template;
     picking a listed one is what lets the app apply it. If they pick <em>Other</em>, the app will not
     compute an offset &mdash; it does not run arithmetic handed to it as free text &mdash; and says so.</p>
-    <p><b>Master table</b> opens the full set of country parameters, marked by whether each was confirmed
+    <p><b>Pension table</b> in the top bar opens the full set of country parameters, marked by whether each was confirmed
     against a real case or only read off the master sheet.</p>`)}
 
   ${sec("Country defaults, and why they are flagged",`
@@ -3930,20 +4025,24 @@ function renderGuide(){
     them.</p>`)}
 
   ${sec("FAQ",`
-    <p><b>FAQ</b> in Useful links holds both guides &mdash; ${FAQ_DOCS.emp.length} questions written for
+    <p><b>FAQ</b> in the top bar holds both guides &mdash; ${FAQ_DOCS.emp.length} questions written for
     employees and ${FAQ_DOCS.hr.length} for HR and supervisors. They are embedded in this file rather than
     linked to a folder, so they open wherever the app is opened and the text can be searched.</p>
     <p>The HR guide is marked internal on its own document. It sits behind its own tab and carries that
     warning on screen; it is not part of anything the employee receives.</p>`)}
 
-  ${sec("Precedents and What if",`
-    <p>With the tracker linked, a case shows <b>Precedents</b> &mdash; other cases on the same country
+  ${sec("Simulation",`
+    <p><b>Simulation</b> holds two things that answer questions raised while a case is discussed, kept out
+    of the case view because there they interrupted the read from inputs through to figures.</p>
+    <p>With the tracker linked, <b>Precedents</b> &mdash; other cases on the same country
     route, closest classification level first. It is the first thing an approver asks, and it was always
     in the tracker; it just needed someone to remember.</p>
     <p><b>What if</b> recalculates a copy of the case with a different salary, exchange rate or effective
-    date, side by side with the real figures. Nothing it shows touches the case or the reports, so the
-    question an approver asks on the spot can be answered without disturbing anything that was signed
-    off.</p>`)}
+    date, side by side with the real figures. Changing the type of localization drops the expatriate
+    components and the tax equalisation from the scenario the employee is coming from, since a direct
+    localization has no expatriate assignment to leave. Nothing it shows touches the case or the reports,
+    so the question an approver asks on the spot can be answered without disturbing anything that was
+    signed off.</p>`)}
 
   ${sec("The opening screen",`
     <p>With the tracker linked and no case open, the first screen shows where the caseload stands: how many
@@ -3979,9 +4078,7 @@ function renderGuide(){
       <li>Hover a calculated figure to see the formula behind it.</li>
       <li>Blank means missing, not zero.</li>
     </ul>
-    <p>The app reproduces the existing template's figures, with two deliberate departures: it does not
-    double-count the pension in the total, and it applies the currency conversion once rather than twice.
-    Where it differs from a template for those reasons, the app is the corrected one.</p>`)}
+`)}
   </div>`;
 }
 
@@ -4001,8 +4098,7 @@ function renderLinks(){
   document.getElementById("body").innerHTML=`<div class="canvas">
     <div class="panel">
       <div class="panel-h"><div class="panel-t">Useful links</div>
-        <button class="mini-btn" onclick="openFaq('emp')">FAQ</button>
-        <button class="mini-btn" onclick="openPensionTable()">Pension multiplier table</button></div>
+</div>
       <div class="note">Reference only &mdash; the main articles on localization policy, and the two link sets
         that go out with an offer letter. Everything that <em>generates</em> the offer letter material lives
         under <strong>Communications</strong>.</div>
@@ -4145,6 +4241,7 @@ function mailHTML(d){
       does not carry is left as a <em>[bracketed placeholder]</em>, so the same button gives a clean blank
       template with no case loaded and every gap stays visible. Attachments are named in the draft for you to add.</div>
   </div>
+  ${novaHTML(D)}
   <div class="panel">
     <div class="panel-h"><div class="panel-t">Offer letter material</div>
       <div class="panel-n">${d&&d.nhc?(d.nhc==="United States"?"into the U.S.":"into "+esc(d.nhc)):"destination not set"}</div></div>
@@ -4525,7 +4622,7 @@ function gcbdHTML(d,c){
   }</div><div class="f-v">${v===null||v===undefined||v===""?"—":esc(String(v))}</div></div>`;
   return `<div class="panel">
     <div class="panel-h"><div class="panel-t">GC&amp;BD</div>
-      <div class="panel-n">${g.by?esc(String(g.by))+" · ":""}${g.when?esc(String(g.when)):"as returned"}</div></div>
+      <div class="panel-n">${g.by?esc(String(g.by))+" · ":""}${g.when?esc(onlyDate(g.when)):"as returned"}</div></div>
 
     <div class="sub-h">Part I — Standard benefits rate</div>
     <div class="panel-b"><div class="fgrid">
@@ -4599,9 +4696,8 @@ function gcbdHTML(d,c){
          <code>multiplier &times; lump-sum factor &times; salary &times; (years of service + years to retirement)
          &times; the discount factor for that age</code><br>
          That reduction is why the three retirement ages give different amounts.`}
-      <br><br>The shape is a property of the plan, not of the country. The Canadian plan is accrual and
-      the Belgian plan is tiered, but those are the plans seen so far rather than a rule &mdash; another
-      country's plan can take either shape, and GC&amp;BD state which one applies.
+      <br><br>The shape is a property of the plan, not of the country: another plan in the same country
+      could take the other shape. GC&amp;BD state which one applies to this employee.
       </div>
     <div class="note">These parameters come from GC&amp;BD. They are only used when no offset amounts are
       supplied: if GC&amp;BD return the amounts at 55, 58 and 60 outright, those are used instead and this
@@ -4643,10 +4739,23 @@ function gcbdHTML(d,c){
           ${["","Yes","No"].map(o=>`<option value="${o}"${(d.offset||"")===o?" selected":""}>${o||"— not answered"}</option>`).join("")}
         </select></div>
     </div></div>
-    <div class="note">${/^y/i.test(d.offset||"")
-      ? `Prior service is recognised, so an offset applies. Leave the amounts empty to let the origin country formula fill them.`
+    <div class="note ${d.offsetClash?"note-warn":""}">${/^y/i.test(d.offset||"")
+      ? (d.offsetClash
+        /* Saying "prior service is recognised" flatly, directly under a panel
+           that has just derived the opposite, reads as the app contradicting
+           itself. It is one answer disagreeing with another, and it should say
+           so here rather than only in the warning above. */
+        ? `<strong>Recognised as answered, but unconfirmed.</strong> GC&amp;BD answered <em>Yes</em>, so an
+           offset is being applied and the figures below use it. The Part III-B answers above point the
+           other way, so treat the offset as unsettled until GC&amp;BD reconcile the two.`
+        : `Prior service is recognised, so an offset applies. Leave the amounts empty to let the origin country formula fill them.`)
       : /^n/i.test(d.offset||"")
-      ? `Prior service is not recognised, so the offset is zero and the full new home country pension is incremental cost.`
+      ? (d.offsetClash
+        ? `<strong>Not recognised as answered, but unconfirmed.</strong> GC&amp;BD answered <em>No</em>, so
+           the offset is zero and the whole new home country pension is counted as incremental cost. The
+           Part III-B answers above point the other way, which would reduce that cost &mdash; settle it
+           before the figure goes into an endorsement.`
+        : `Prior service is not recognised, so the offset is zero and the full new home country pension is incremental cost.`)
       : `<strong>Not answered yet.</strong> Until GC&amp;BD confirm, the offset is left blank rather than zero &mdash;
          a zero here would overstate the incremental pension the company takes on.`}</div>
     <div class="panel-b"><div class="fgrid">
@@ -4833,6 +4942,7 @@ function scenHTML(d,c){
 
 function render(){
   if(VIEW==="links"){renderLinks();railHTML();return;}
+  if(VIEW==="sim"){renderSim();railHTML();return;}
   if(VIEW==="guide"){renderGuide();railHTML();return;}
   if(VIEW==="analytics"){renderAnalytics();return;}
   /* Loading a file re-renders. Without this the case canvas replaced whatever
@@ -4881,9 +4991,7 @@ function render(){
     ${fieldsHTML(D)}
     ${diagHTML(D,c)}
     ${gcbdHTML(D,c)}
-    ${whatIfHTML(D,c)}
-    ${precedentsHTML(D)}
-    ${novaHTML(D)}
+
     ${empHTML(D,c)}
     ${costHTML(D,c)}
     ${scenHTML(D,c)}
@@ -5864,7 +5972,10 @@ function setView(v){
   if(nl)nl.classList.toggle("on",v==="links");
   const ng=document.getElementById("nav-guide");
   if(ng)ng.classList.toggle("on",v==="guide");
+  const ns=document.getElementById("nav-sim");
+  if(ns)ns.classList.toggle("on",v==="sim");
   if(v==="analytics")renderAnalytics();
+  else if(v==="sim")renderSim();
   else if(v==="guide")renderGuide();
   else if(v==="start")document.getElementById("body").innerHTML=startCaseHTML();
   else render();
@@ -6229,21 +6340,25 @@ const THEMES={
   forest:  {bg:"#33513f", dim:"rgba(255,255,255,.58)"},
   navy:    {bg:"#28405e", dim:"rgba(255,255,255,.58)"}
 };
-function setTheme(k){
-  const t=THEMES[k]||THEMES.brick, r=document.documentElement.style;
+function setTheme(k,persist){
+  const t=THEMES[k]||THEMES.charcoal, r=document.documentElement.style;
   r.setProperty("--rail-bg",t.bg);
   r.setProperty("--rail-dim",t.dim);
   /* a pale panel needs dark text on it, the dark ones need light */
   r.setProperty("--rail-ink",t.ink||"#fff");
-  try{ caseStore().then(db=>db.transaction("h","readwrite").objectStore("h").put(k,"theme")); }catch(e){}
+  if(persist!==false){
+    try{ caseStore().then(db=>db.transaction("h","readwrite").objectStore("h").put(k,"theme2")); }catch(e){}
+  }
   const sel=document.querySelector(".rail-theme"); if(sel)sel.value=k;
 }
 async function recallTheme(){
   try{
     const db=await caseStore();
-    const k=await new Promise(res=>{const t=db.transaction("h","readonly").objectStore("h").get("theme");
+    /* read under a new key: the old one holds a value that was written by the
+       default itself, so it cannot be told apart from a deliberate choice */
+    const k=await new Promise(res=>{const t=db.transaction("h","readonly").objectStore("h").get("theme2");
       t.onsuccess=()=>res(t.result); t.onerror=()=>res(null);});
-    setTheme(k||"forest");
+    setTheme(k||"charcoal",false);
   }catch(e){}
 }
 
