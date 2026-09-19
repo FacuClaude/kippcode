@@ -1,46 +1,109 @@
 from pathlib import Path
-from pypdf import PdfReader
 
-# Ubicación de la carpeta de documentos
+from pypdf import PdfReader
+from docx import Document
+from openpyxl import load_workbook
+from pptx import Presentation
+
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DOCUMENTS_FOLDER = PROJECT_ROOT / "documents"
 
 
-def read_pdf(pdf_path):
-    """Extrae el texto de un archivo PDF."""
-    reader = PdfReader(str(pdf_path))
+def read_pdf(path):
+    reader = PdfReader(str(path))
+    return "\n".join(page.extract_text() or "" for page in reader.pages)
+
+
+def read_word(path):
+    document = Document(str(path))
+    return "\n".join(paragraph.text for paragraph in document.paragraphs)
+
+
+def read_excel(path):
+    workbook = load_workbook(filename=path, data_only=True)
     text = []
 
-    for page in reader.pages:
-        text.append(page.extract_text() or "")
+    for sheet in workbook.worksheets:
+        text.append(f"[Hoja: {sheet.title}]")
+
+        for row in sheet.iter_rows(values_only=True):
+            values = [str(value) for value in row if value is not None]
+
+            if values:
+                text.append(" | ".join(values))
 
     return "\n".join(text)
 
 
+def read_powerpoint(path):
+    presentation = Presentation(str(path))
+    text = []
+
+    for slide_number, slide in enumerate(presentation.slides, start=1):
+        text.append(f"[Diapositiva {slide_number}]")
+
+        for shape in slide.shapes:
+            if hasattr(shape, "text") and shape.text.strip():
+                text.append(shape.text)
+
+    return "\n".join(text)
+
+
+def read_document(path):
+    extension = path.suffix.lower()
+
+    if extension == ".pdf":
+        return read_pdf(path)
+
+    if extension == ".docx":
+        return read_word(path)
+
+    if extension == ".xlsx":
+        return read_excel(path)
+
+    if extension == ".pptx":
+        return read_powerpoint(path)
+
+    return None
+
+
 def main():
-    print("=== CORPORATE AI — Document Reader ===")
-    print(f"Carpeta de documentos: {DOCUMENTS_FOLDER}")
+    print("=== CORPORATE AI — DOCUMENT READER ===")
+    print(f"Carpeta: {DOCUMENTS_FOLDER}")
     print()
 
-    pdf_files = list(DOCUMENTS_FOLDER.glob("*.pdf"))
+    supported_extensions = {".pdf", ".docx", ".xlsx", ".pptx"}
 
-    if not pdf_files:
-        print("No se encontraron archivos PDF.")
-        print("Colocá un PDF de prueba dentro de la carpeta documents.")
+    files = [
+        file for file in DOCUMENTS_FOLDER.iterdir()
+        if file.is_file() and file.suffix.lower() in supported_extensions
+    ]
+
+    if not files:
+        print("No se encontraron documentos compatibles.")
         return
 
-    for pdf_path in pdf_files:
-        print(f"Archivo: {pdf_path.name}")
+    for file in files:
+        print("=" * 60)
+        print(f"ARCHIVO: {file.name}")
 
         try:
-            text = read_pdf(pdf_path)
+            text = read_document(file)
+
             print(f"Caracteres extraídos: {len(text)}")
-            print("-" * 50)
-            print(text[:1000])
-            print("-" * 50)
+            print("-" * 60)
+
+            print(text[:1500])
+
+            if len(text) > 1500:
+                print("\n[...contenido restante omitido...]")
 
         except Exception as error:
-            print(f"Error al leer el archivo: {error}")
+            print(f"ERROR: {error}")
+
+    print("=" * 60)
+    print("Proceso terminado.")
 
 
 if __name__ == "__main__":
