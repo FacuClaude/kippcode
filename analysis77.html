@@ -23,6 +23,44 @@ def normalize(text):
     return re.findall(r"\b\w+\b", text)
 
 
+def create_chunks(text, chunk_size=500):
+    paragraphs = [
+        paragraph.strip()
+        for paragraph in text.split("\n")
+        if paragraph.strip()
+    ]
+
+    chunks = []
+    current_chunk = ""
+
+    for paragraph in paragraphs:
+
+        if len(current_chunk) + len(paragraph) <= chunk_size:
+            current_chunk += paragraph + "\n"
+
+        else:
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+
+            current_chunk = paragraph + "\n"
+
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+
+    return chunks
+
+
+def calculate_score(question_words, chunk):
+    chunk_words = normalize(chunk)
+
+    score = sum(
+        1 for word in chunk_words
+        if word in question_words
+    )
+
+    return score
+
+
 def search_documents(question):
     question_words = set(normalize(question))
 
@@ -42,21 +80,24 @@ def search_documents(question):
             if not text:
                 continue
 
-            document_words = normalize(text)
+            chunks = create_chunks(text)
 
-            score = sum(
-                1 for word in document_words
-                if word in question_words
-            )
+            for chunk_number, chunk in enumerate(chunks, start=1):
 
-            if score > 0:
-                results.append(
-                    {
-                        "file": file.name,
-                        "score": score,
-                        "text": text
-                    }
+                score = calculate_score(
+                    question_words,
+                    chunk
                 )
+
+                if score > 0:
+                    results.append(
+                        {
+                            "file": file.name,
+                            "chunk": chunk_number,
+                            "score": score,
+                            "text": chunk
+                        }
+                    )
 
         except Exception as error:
             print(f"Error leyendo {file.name}: {error}")
@@ -72,7 +113,7 @@ def search_documents(question):
 def main():
 
     print()
-    print("=== CORPORATE AI ===")
+    print("=== CORPORATE AI — SEARCH V2 ===")
     print()
 
     question = input("¿Qué querés saber? ")
@@ -85,17 +126,19 @@ def main():
         print("No encontré información relacionada.")
         return
 
-    print("Información encontrada:")
+    print("Resultados más relevantes:")
     print()
 
-    for result in results[:3]:
+    for position, result in enumerate(results[:5], start=1):
 
         print("=" * 60)
+        print(f"RESULTADO {position}")
         print(f"Fuente: {result['file']}")
+        print(f"Fragmento: {result['chunk']}")
         print(f"Relevancia: {result['score']}")
         print("-" * 60)
 
-        print(result["text"][:1000])
+        print(result["text"])
         print()
 
 
