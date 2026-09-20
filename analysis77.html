@@ -50,13 +50,45 @@ def create_chunks(text, chunk_size=500):
     return chunks
 
 
-def calculate_score(question_words, chunk):
+def calculate_score(question_words, chunk, question):
     chunk_words = normalize(chunk)
+    chunk_normalized = " ".join(chunk_words)
 
-    score = sum(
-        1 for word in chunk_words
-        if word in question_words
-    )
+    stop_words = {
+        "que", "como", "cual", "cuales",
+        "cuanto", "cuantos", "cuanta", "cuantas",
+        "de", "del", "la", "las", "el", "los",
+        "un", "una", "unos", "unas",
+        "y", "o", "en", "por", "para", "con",
+        "puede", "pueden", "tener", "tiene",
+        "empleado", "empleados"
+    }
+
+    important_words = {
+        word
+        for word in question_words
+        if word not in stop_words and len(word) > 2
+    }
+
+    score = 0
+
+    # Coincidencias de palabras importantes
+    for word in important_words:
+        if word in chunk_words:
+            score += 3
+
+    # Coincidencias de frases de dos palabras
+    question_list = normalize(question)
+
+    for i in range(len(question_list) - 1):
+        phrase = (
+            question_list[i]
+            + " "
+            + question_list[i + 1]
+        )
+
+        if phrase in chunk_normalized:
+            score += 10
 
     return score
 
@@ -82,11 +114,15 @@ def search_documents(question):
 
             chunks = create_chunks(text)
 
-            for chunk_number, chunk in enumerate(chunks, start=1):
+            for chunk_number, chunk in enumerate(
+                chunks,
+                start=1
+            ):
 
                 score = calculate_score(
                     question_words,
-                    chunk
+                    chunk,
+                    question
                 )
 
                 if score > 0:
@@ -100,7 +136,9 @@ def search_documents(question):
                     )
 
         except Exception as error:
-            print(f"Error leyendo {file.name}: {error}")
+            print(
+                f"Error leyendo {file.name}: {error}"
+            )
 
     results.sort(
         key=lambda result: result["score"],
@@ -113,7 +151,7 @@ def search_documents(question):
 def main():
 
     print()
-    print("=== CORPORATE AI — SEARCH V2 ===")
+    print("=== CORPORATE AI — SEARCH V3 ===")
     print()
 
     question = input("¿Qué querés saber? ")
@@ -123,13 +161,20 @@ def main():
     print()
 
     if not results:
-        print("No encontré información relacionada.")
+        print(
+            "No encontré información relacionada "
+            "con la pregunta."
+
+        )
         return
 
     print("Resultados más relevantes:")
     print()
 
-    for position, result in enumerate(results[:5], start=1):
+    for position, result in enumerate(
+        results[:5],
+        start=1
+    ):
 
         print("=" * 60)
         print(f"RESULTADO {position}")
