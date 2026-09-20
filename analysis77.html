@@ -1,84 +1,102 @@
 from pathlib import Path
+import re
+import unicodedata
 
-from docx import Document
-from openpyxl import Workbook
-from pptx import Presentation
+from main import read_document
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DOCUMENTS_FOLDER = PROJECT_ROOT / "documents"
 
-
-def create_word():
-    document = Document()
-
-    document.add_heading("Política de Vacaciones", level=1)
-    document.add_paragraph(
-        "Los empleados con más de 5 años de antigüedad tienen derecho "
-        "a 21 días corridos de vacaciones por año."
-    )
-    document.add_paragraph(
-        "Las vacaciones deben solicitarse con al menos 30 días de anticipación."
-    )
-
-    document.save(DOCUMENTS_FOLDER / "politica_vacaciones.docx")
+SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".pptx"}
 
 
-def create_excel():
-    workbook = Workbook()
-    sheet = workbook.active
-    sheet.title = "Beneficios"
+def normalize(text):
+    text = text.lower()
 
-    sheet.append(["Beneficio", "Condición", "Detalle"])
-    sheet.append([
-        "Seguro médico",
-        "Todos los empleados",
-        "Cobertura para empleado y grupo familiar"
-    ])
-    sheet.append([
-        "Bono anual",
-        "Empleados elegibles",
-        "Se paga durante el mes de marzo"
-    ])
-    sheet.append([
-        "Home office",
-        "Según función",
-        "Hasta 3 días por semana"
-    ])
-
-    workbook.save(DOCUMENTS_FOLDER / "beneficios.xlsx")
-
-
-def create_powerpoint():
-    presentation = Presentation()
-
-    slide = presentation.slides.add_slide(
-        presentation.slide_layouts[1]
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(
+        char for char in text
+        if unicodedata.category(char) != "Mn"
     )
 
-    slide.shapes.title.text = "Proceso de incorporación"
+    return re.findall(r"\b\w+\b", text)
 
-    slide.placeholders[1].text = (
-        "1. Recursos Humanos registra al empleado.\n"
-        "2. IT crea las cuentas y accesos.\n"
-        "3. El manager solicita los equipos.\n"
-        "4. El empleado recibe la capacitación inicial."
+
+def search_documents(question):
+    question_words = set(normalize(question))
+
+    results = []
+
+    for file in DOCUMENTS_FOLDER.iterdir():
+
+        if (
+            not file.is_file()
+            or file.suffix.lower() not in SUPPORTED_EXTENSIONS
+        ):
+            continue
+
+        try:
+            text = read_document(file)
+
+            if not text:
+                continue
+
+            document_words = normalize(text)
+
+            score = sum(
+                1 for word in document_words
+                if word in question_words
+            )
+
+            if score > 0:
+                results.append(
+                    {
+                        "file": file.name,
+                        "score": score,
+                        "text": text
+                    }
+                )
+
+        except Exception as error:
+            print(f"Error leyendo {file.name}: {error}")
+
+    results.sort(
+        key=lambda result: result["score"],
+        reverse=True
     )
 
-    presentation.save(DOCUMENTS_FOLDER / "proceso_incorporacion.pptx")
+    return results
 
 
 def main():
-    DOCUMENTS_FOLDER.mkdir(exist_ok=True)
 
-    create_word()
-    create_excel()
-    create_powerpoint()
-
-    print("Documentos de prueba creados correctamente.")
     print()
-    print(f"Ubicación: {DOCUMENTS_FOLDER}")
+    print("=== CORPORATE AI ===")
+    print()
 
+    question = input("¿Qué querés saber? ")
+
+    results = search_documents(question)
+
+    print()
+
+    if not results:
+        print("No encontré información relacionada.")
+        return
+
+    print("Información encontrada:")
+    print()
+
+    for result in results[:3]:
+
+        print("=" * 60)
+        print(f"Fuente: {result['file']}")
+        print(f"Relevancia: {result['score']}")
+        print("-" * 60)
+
+        print(result["text"][:1000])
+        print()
 
 
 if __name__ == "__main__":
