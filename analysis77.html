@@ -122,7 +122,10 @@ input,select{font:inherit;color:inherit}
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .subject{font-family:var(--cond);font-size:21px;font-weight:700;margin-top:2px;line-height:1.1}
 .route{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin-top:3px}
-.topbar-act{display:flex;align-items:center;gap:14px;flex:0 1 auto;flex-wrap:wrap;justify-content:flex-end}
+.topbar-act{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+/* the nav group is the widest child; without this it refuses to wrap and
+   pushes Run validation and Export past the edge of the window */
+.topbar-act .navseg{flex-wrap:wrap;min-width:0}
 
 /* Views sit in a segmented control because they are one choice, not three
    separate actions; the file and export commands stay outside it. */
@@ -148,7 +151,10 @@ input,select{font:inherit;color:inherit}
 /* the case title can run long, so it yields space and the controls never wrap
    into the heading */
 .topbar>div:first-child{min-width:0;flex:1 1 auto}
-.topbar-act{flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end}
+/* flex:0 0 auto kept this group at its full content width, so with eight nav
+   buttons plus the actions it ran past the right edge of the window and took
+   Run validation and Export with it */
+.topbar-act{flex:1 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end}
 .subject{overflow-wrap:anywhere}
 @media (max-width:1280px){
   .topbar{padding:11px 20px;gap:16px}
@@ -273,6 +279,25 @@ input,select{font:inherit;color:inherit}
 #pt-modal .pt-tbl thead th{position:sticky;top:0;z-index:1}
 #vd-modal .pt-card{display:flex;flex-direction:column;max-height:calc(100vh - 80px)}
 #vd-modal .pt-b{flex:1 1 auto;overflow:auto;min-height:0}
+/* one band per chart — the same red on every chart made them read as one series */
+.bar-fill.t-blue{background:#3d6b9e}
+.bar-fill.t-teal{background:#2f7d72}
+.bar-fill.t-amber{background:#b5762a}
+.bar-fill.t-plum{background:#7a4a72}
+.bar-fill.t-slate{background:#5c6672}
+.bar-fill.t-green{background:#4a7a45}
+.cx-o{display:flex;gap:9px;align-items:center;padding:8px 20px;border-bottom:1px solid var(--line);
+  font-size:13px;cursor:pointer}
+.cx-o:hover{background:var(--surface-2)}
+.cx-act{display:flex;gap:8px;padding:14px 20px 4px;flex-wrap:wrap}
+.mini-btn.solid{background:var(--accent);color:#fff;border-color:var(--accent)}
+#cx-modal{position:fixed;inset:0;z-index:9000;background:rgba(20,22,26,.55);
+  display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow:auto}
+#cx-modal .pt-card{max-width:520px;display:flex;flex-direction:column;max-height:calc(100vh - 80px)}
+#cx-modal .pt-b{flex:1 1 auto;overflow:auto;min-height:0}
+.f-search{background:var(--surface);border:1px solid var(--border2);border-radius:999px;
+  padding:5px 12px;font-size:12px;font-family:inherit;color:var(--ink);min-width:170px;outline:none}
+.f-search:focus{border-color:var(--accent)}
 /* collapsible sections — everything but the header hides when collapsed */
 .panel-h{cursor:pointer;user-select:none}
 .panel.collapsed>*:not(.panel-h){display:none}
@@ -445,7 +470,7 @@ input,select{font:inherit;color:inherit}
 .kpi-l{font-family:var(--mono);font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-top:7px}
 .kpi-s{font-size:11px;color:var(--ink-2);margin-top:3px}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.chart{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:18px 20px 16px}
+.chart{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:18px 20px 16px}
 .chart.wide{grid-column:1/-1}
 .chart-t{font-family:var(--cond);font-size:14px;font-weight:700;margin-bottom:2px}
 .chart-s{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-bottom:16px}
@@ -484,19 +509,39 @@ input,select{font:inherit;color:inherit}
 .undo{margin-left:5px;color:var(--ochre);font-size:12px;line-height:1;opacity:.75}
 .undo:hover{opacity:1}
 .calc{cursor:pointer}
-.filters{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:13px 16px;margin-bottom:20px;
-  display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-.filters label{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-right:-4px}
-.filters select{background:var(--surface-2);border:1px solid var(--border2);border-radius:5px;font-size:12px;
-  padding:5px 8px;outline:none;color:var(--ink)}
-.fdd{position:relative}
-.fdd>summary{list-style:none;cursor:pointer;background:var(--surface-2);border:1px solid var(--border2);
-  border-radius:5px;font-size:12px;padding:5px 24px 5px 9px;color:var(--ink);white-space:nowrap;
-  max-width:190px;overflow:hidden;text-overflow:ellipsis;position:relative}
+.filters{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%);
+  border:1px solid var(--line);border-radius:10px;padding:11px 14px;margin-bottom:20px;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  box-shadow:0 1px 2px rgba(22,25,29,.04)}
+/* Label and control travel together. As two loose flex children the line break
+   could fall between them, leaving a label stranded on the row above. */
+.f-grp{display:inline-flex;align-items:center;gap:7px;background:var(--surface);
+  border:1px solid var(--border2);border-radius:999px;padding:3px 4px 3px 11px;
+  transition:border-color .15s,background .15s;max-width:100%}
+.f-grp:hover{border-color:var(--ink-3)}
+/* a filter in use is tinted, so what is narrowing the selection is visible
+   without opening anything */
+.f-grp.on{background:var(--accent-bg);border-color:var(--accent)}
+.f-grp.on>label{color:var(--accent)}
+.filters label{font-family:var(--mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);white-space:nowrap;flex:none}
+.filters select{background:var(--surface-2);border:1px solid var(--border2);border-radius:999px;font-size:12px;
+  padding:4px 10px;outline:none;color:var(--ink)}
+.f-grp>select{background:none;border:0;padding:4px 6px;font-size:12px;color:var(--ink);max-width:170px}
+.fdd{position:relative;min-width:0}
+/* set by script when a panel would otherwise open past the window edge */
+.fdd-b.flip{left:auto;right:0}
+.fdd>summary{list-style:none;cursor:pointer;background:none;border:0;
+  border-radius:999px;font-size:12px;padding:4px 22px 4px 4px;color:var(--ink);white-space:nowrap;
+  max-width:200px;overflow:hidden;text-overflow:ellipsis;position:relative}
 .fdd>summary::-webkit-details-marker{display:none}
-.fdd>summary::after{content:"▾";position:absolute;right:8px;top:4px;color:var(--ink-3);font-size:10px}
-.fdd[open]>summary{border-color:var(--accent);color:var(--accent)}
-.fdd-b{position:absolute;z-index:30;top:calc(100% + 4px);left:0;min-width:220px;max-height:280px;
+.fdd>summary::after{content:"▾";position:absolute;right:6px;top:3px;color:var(--ink-3);font-size:10px}
+.fdd[open]>summary{color:var(--accent)}
+.f-grp:has(.fdd[open]){border-color:var(--accent)}
+/* anchored to whichever edge keeps it on screen: opened from the filters on the
+   right it used to run past the window */
+.fdd-b{position:absolute;z-index:30;top:calc(100% + 4px);left:0;min-width:220px;max-width:min(320px,90vw);
+  max-height:280px;
   overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;
   box-shadow:0 8px 24px rgba(22,25,29,.14);padding:6px}
 .fdd-o{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;border-radius:5px;
@@ -506,7 +551,8 @@ input,select{font:inherit;color:inherit}
 .fdd-clr{width:100%;text-align:left;padding:5px 8px;font-size:11px;color:var(--accent);
   background:none;border:0;cursor:pointer;border-bottom:1px solid var(--line);margin-bottom:4px}
 .filters select:focus{border-color:var(--accent)}
-.f-count{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-2)}
+.f-count{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;white-space:nowrap}
 .f-count b{color:var(--accent)}
 .corr{display:flex;flex-direction:column;gap:6px}
 .corr-r{display:flex;align-items:center;gap:10px;font-size:12px}
@@ -521,7 +567,7 @@ input,select{font:inherit;color:inherit}
 .corr-v{width:92px;white-space:nowrap}
 .corr-n{min-width:40px;text-align:right}
 .corr-p{min-width:38px;text-align:right;color:var(--ink-3)}
-.cyc{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.cyc{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:16px}
 .cyc-b{text-align:center;padding:14px 8px;background:var(--surface-2);border-radius:4px}
 .cyc-n{font-family:var(--cond);font-size:26px;font-weight:700;line-height:1}
 .cyc-l{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
@@ -2845,9 +2891,9 @@ function insights(R){
   const count=(f)=>R.filter(f).length;
 
   /* concentration of the portfolio */
-  const pairs=tally(R,r=>{
+  const pairs=tallyBy(R,r=>{
     const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
-    return a&&b?a+" \u2192 "+b:null;}).filter(([k])=>k);
+    return a&&b?a+" \u2192 "+b:null;}).map(([,v,label])=>[label,v]);
   if(pairs.length&&n>=8){
     const [top,tv]=pairs[0];
     if(tv/n>=.35)out.push({tag:"concentration",
@@ -3772,6 +3818,127 @@ function onlyDate(v){
   return isNaN(d)?t:d.toISOString().slice(0,10);
 }
 
+/* ═══ EMPLOYEE LOOKUP ════════════════════════════════════════════════════════
+   The dashboard answers questions about the caseload; this answers "what
+   happened with this person", which is the other half of what the tracker is
+   asked for. It narrows the same selection, so every chart follows it. */
+function flQuery(v){ FL.q=String(v||"").trim(); renderAnalytics(); }
+function employeeCard(rows){
+  if(!FL.q)return "";
+  if(!rows.length)return `<div class="panel"><div class="note">No case matches
+    &ldquo;${esc(FL.q)}&rdquo;.</div></div>`;
+  const one=rows.length===1?rows[0]:null;
+  if(!one)return `<div class="panel"><div class="panel-h"><div class="panel-t">Matches</div>
+      <div class="panel-n">${rows.length} cases contain &ldquo;${esc(FL.q)}&rdquo;</div></div>
+      <div class="panel-b"><table class="tbl"><tbody>
+      ${rows.slice(0,12).map(r=>`<tr><td>${esc(String(r["Full Name"]||"—"))}</td>
+        <td class="ds">${esc(String(r["Original Home Country"]||"?"))} &rarr; ${esc(String(r["New Home Country"]||"?"))}</td>
+        <td class="dv">${esc(String(r["Status"]||"—"))}</td>
+        <td class="ds">${esc(onlyDate(r["Implementation date"])||"")}</td></tr>`).join("")}
+      </tbody></table></div>${rows.length>12?`<div class="note">Showing 12 of ${rows.length}. Narrow the search to see one case in full.</div>`:""}
+    </div>`;
+  const f=(lab,v)=>`<div class="f"><div class="f-l">${esc(lab)}</div><div class="f-v">${v===null||v===undefined||v===""?"&mdash;":esc(String(v))}</div></div>`;
+  return `<div class="panel"><div class="panel-h">
+      <div class="panel-t">${esc(String(one["Full Name"]||"—"))}</div>
+      <div class="panel-n">${esc(String(one["Original Home Country"]||"?"))} &rarr; ${esc(String(one["New Home Country"]||"?"))}</div></div>
+    <div class="panel-b"><div class="fgrid">
+      ${f("Status",one["Status"])}
+      ${f("Type",one["Type of Case"])}
+      ${f("Subtype",one["Subtype of Case"])}
+      ${f("Stage",one["Stage"])}
+      ${f("Classification level",one["CL"]!==undefined&&one["CL"]!==null?"CL "+one["CL"]:null)}
+      ${f("Business line",one["Business Line"])}
+      ${f("Potential",one["POTENTIAL"])}
+      ${f("Age",one["AGE"])}
+      ${f("Years of service",one["YOS"])}
+      ${f("Created",onlyDate(one["Date Created"]))}
+      ${f("Implementation",onlyDate(one["Implementation date"]))}
+      ${f("Approved by GC&BD",one["Approved by GC&BD?"])}
+      ${f("Career steward",one["Career Steward"])}
+    </div></div>
+    ${one["Comments"]?`<div class="note"><b>Comments.</b> ${esc(String(one["Comments"]))}</div>`:""}
+    ${one["Action Required?"]?`<div class="note"><b>Action required.</b> ${esc(String(one["Action Required?"]))}</div>`:""}
+  </div>`;
+}
+
+/* ═══ CHART EXPORT ═══════════════════════════════════════════════════════════
+   Prints the charts as they are on screen. The styles are copied from this
+   document so the printed page matches what was reviewed, rather than a
+   second rendering that could drift from it. */
+function chartEls(){
+  return [...document.querySelectorAll("#body .chart")].filter(el=>el.querySelector(".chart-t"));
+}
+function chartName(el){ return (el.querySelector(".chart-t")||{}).textContent.trim(); }
+
+let CHART_PICK=null;
+function openChartExport(){
+  /* each chart is named by its own heading, so the list cannot drift out of
+     step with the charts themselves */
+  const els=chartEls();
+  const names=els.map(chartName);
+  if(!names.length){ toast("Link the tracker first"); return; }
+  if(!CHART_PICK)CHART_PICK=new Set(names);
+  const el=document.createElement("div"); el.id="cx-modal";
+  el.innerHTML=`<div class="pt-wrap"><div class="pt-card">
+    <div class="pt-h"><div><div class="pt-t">Export charts</div>
+      <div class="pt-s">pick what goes in &middot; prints with the filters as they stand</div></div>
+      <button class="mini-btn" onclick="closeChartExport()">Close</button></div>
+    <div class="pt-b">
+      ${names.map(n=>`<label class="cx-o"><input type="checkbox" ${CHART_PICK.has(n)?"checked":""}
+        onchange="chartPick('${esc(n).replace(/'/g,"\\'")}',this.checked)"><span>${esc(n)}</span></label>`).join("")}
+      <div class="cx-act">
+        <button class="mini-btn" onclick="chartPickAll(true)">All</button>
+        <button class="mini-btn" onclick="chartPickAll(false)">None</button>
+        <button class="mini-btn solid" onclick="printCharts()">Export to PDF</button>
+      </div>
+      <div class="note">Opens the print dialogue &mdash; choose &ldquo;Save as PDF&rdquo; as the
+        destination. The filters in force are printed alongside, so the figures can be traced back.</div>
+    </div>
+  </div></div>`;
+  el.addEventListener("click",e=>{ if(e.target===el)closeChartExport(); });
+  document.body.appendChild(el);
+}
+function closeChartExport(){ const e=document.getElementById("cx-modal"); if(e)e.remove(); }
+function chartPick(n,on){ on?CHART_PICK.add(n):CHART_PICK.delete(n); }
+function chartPickAll(on){
+  CHART_PICK=new Set(on?chartEls().map(chartName):[]);
+  closeChartExport(); openChartExport();
+}
+function printCharts(){
+  const picked=chartEls().filter(el=>CHART_PICK.has(chartName(el)));
+  if(!picked.length){ toast("Nothing selected"); return; }
+  const styles=[...document.querySelectorAll("style")].map(s=>s.textContent).join("\n");
+  const active=[];
+  document.querySelectorAll(".filters .f-grp.on").forEach(g=>{
+    const lab=(g.querySelector("label")||{}).textContent||"";
+    const val=(g.querySelector("summary")||g.querySelector("select")||{});
+    active.push(lab+": "+(val.textContent||val.value||"").trim());
+  });
+  if(FL.q)active.push("Search: "+FL.q);
+  const count=(document.querySelector(".f-count")||{}).textContent||"";
+  const w=window.open("","_blank");
+  if(!w){ toast("The browser blocked the print window"); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    <title>Localization analytics</title><style>${styles}</style>
+    <style>
+      body{background:#fff;padding:24px 28px;font-family:"IBM Plex Sans",system-ui,sans-serif}
+      .cx-h{border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:6px}
+      .cx-t{font-size:20px;font-weight:700;color:var(--ink)}
+      .cx-m{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;line-height:1.7}
+      .chart{break-inside:avoid;page-break-inside:avoid;margin:16px 0;border:1px solid var(--line);
+        border-radius:8px;padding:16px}
+      .chart.wide{width:auto}
+      @page{size:A4 portrait;margin:14mm}
+    </style></head><body>
+    <div class="cx-h"><div class="cx-t">Localization analytics</div>
+      <div class="cx-m">${esc(count)}${active.length?" &middot; "+esc(active.join(" &middot; ")):" &middot; no filters applied"}
+      <br>${esc(dbName||"tracker")} &middot; ${new Date().toISOString().slice(0,10)}</div></div>
+    ${picked.map(el=>`<div class="chart">${el.innerHTML}</div>`).join("")}
+    </body></html>`);
+  w.document.close();
+  setTimeout(()=>{ w.focus(); w.print(); },350);
+}
+
 /* ═══ PRECEDENTS ═════════════════════════════════════════════════════════════
    The question an approver asks first is what was done last time. It has always
    been answerable from the tracker; it just took someone remembering. */
@@ -3981,7 +4148,7 @@ function homeHTML(){
     </div>
     ${stages.length?`<div class="panel"><div class="panel-h"><div class="panel-t">Where the open cases sit</div>
       <div class="panel-n">next stage due, most crowded first</div></div>
-      <div class="panel-b">${barsHTML(stages,open.length)}</div>
+      <div class="panel-b">${barsHTML(stages,open.length,"slate")}</div>
       <div class="note">Read from the tracker as it stands. It says where cases are, not how long they have
         been there &mdash; that needs a date in the stage columns.</div>
     </div>`:""}
@@ -5791,7 +5958,7 @@ const DB_COLS=["Date Created","Original Home Country PERNR","New Home Country PE
 const DB_FIN=["Currency","FX Rate","Annual Cost OHC","Annual Cost NHC","Annual Delta",
  "Transition Payments","Lifetime Cost at 60","Cut-off Status","Analysis Date"];
 let dbHandle=null, DB=[], dbName="";
-let FL={top:[],type:[],yr:[],status:[],dest:"",bl:[],ohc:[]};
+let FL={top:[],type:[],yr:[],status:[],dest:"",bl:[],ohc:[],q:""};
 function setFl(k,v){FL[k]=v;renderAnalytics();}
 /* multi-selects hand back a list of chosen options */
 function toggleFl(k,v,on){
@@ -5799,7 +5966,7 @@ function toggleFl(k,v,on){
   FL[k]=on?[...new Set([...cur,v])]:cur.filter(x=>x!==v);
   renderAnalytics();
 }
-function clearFl(){FL={top:[],type:[],yr:[],status:[],dest:"",bl:[],ohc:[]};renderAnalytics();}
+function clearFl(){FL={top:[],type:[],yr:[],status:[],dest:"",bl:[],ohc:[],q:""};renderAnalytics();}
 
 /* On hold is kept apart from in progress: a case that has stalled is a
    different problem from one that is moving. */
@@ -5827,30 +5994,22 @@ function subtypeOf(r){
 
 function applyFl(rows){
   return rows.filter(r=>{
-    if(!has(FL.top,String(r["Type of Case"]||"").trim()))return false;
-    if(!has(FL.type,subtypeOf(r)))return false;
+    if(!has(FL.top,labelKey(r["Type of Case"])))return false;
+    if(!has(FL.type,labelKey(subtypeOf(r))))return false;
     if(!has(FL.yr,yearOf(r["Date Created"])))return false;
     if(!has(FL.status,statusOf(r)))return false;
     if(FL.dest==="us"&&!/united states/i.test(String(r["New Home Country"]||"")))return false;
     if(FL.dest==="non"&&/united states/i.test(String(r["New Home Country"]||"")))return false;
     if(!has(FL.bl,labelKey(r["Business Line"])))return false;
     if(!has(FL.ohc,labelKey(r["Original Home Country"])))return false;
+    if(FL.q&&!String(r["Full Name"]||"").toLowerCase().includes(FL.q.toLowerCase()))return false;
     return true;
   });
 }
 /* days between creation and implementation, guarding against transposed dates */
-function cycleDays(rows){
-  const out=[];
-  rows.forEach(r=>{
-    const a=r["Date Created"], b=r["Implementation date"];
-    const da=(a instanceof Date)?a:(typeof a==="number"&&a>20000?new Date(Date.UTC(1899,11,30+Math.floor(a))):null);
-    const db=(b instanceof Date)?b:(typeof b==="number"&&b>20000?new Date(Date.UTC(1899,11,30+Math.floor(b))):null);
-    if(!da||!db)return;
-    const d=Math.round((db-da)/864e5);
-    if(d>-30&&d<2000)out.push(d);
-  });
-  return out.sort((x,y)=>x-y);
-}
+/* Removed: "Date Created" is not accurate enough in the tracker to measure
+   case duration from, and there is no other column that reliably marks when a
+   case started. Re-add only once a trustworthy start date exists. */
 const quant=(a,q)=>a.length?a[Math.min(a.length-1,Math.floor(a.length*q))]:null;
 
 function dbRowFromCase(){
@@ -6093,12 +6252,15 @@ const yearOf=v=>{
   const m=/(\d{4})/.exec(String(v||"")); return m?+m[1]:null;
 };
 
-function barsHTML(data,total,alt){
+/* tone names a colour band so each chart reads as its own series; passing true
+   stays supported for the calls written before this existed */
+function barsHTML(data,total,tone){
   if(!data.length)return '<div style="color:var(--ink-3);font-size:12px;padding:14px 0">No data</div>';
   const max=data[0][1];
+  const cls=tone===true?"alt":(tone?"t-"+tone:"");
   return `<div class="bars">${data.map(([k,v])=>`<div class="bar-r">
     <div class="bar-lab" title="${esc(k)}">${esc(k)}</div>
-    <div class="bar-track"><div class="bar-fill ${alt?"alt":""}" style="width:${Math.max(2,v/max*100)}%"></div></div>
+    <div class="bar-track"><div class="bar-fill ${cls}" style="width:${Math.max(2,v/max*100)}%"></div></div>
     <div class="bar-v"><span class="bv-n">${v}</span>${total?`<span class="bv-p">${Math.round(v/total*100)}%</span>`:""}</div></div>`).join("")}</div>`;
 }
 function colsHTML(pairs){
@@ -6146,8 +6308,11 @@ function renderAnalytics(){
       </div></details>`;
   };
 
-  const tops=tally(ALL,r=>String(r["Type of Case"]||"").trim()).filter(([k])=>k).map(([k,v])=>[k,`${k} (${v})`]);
-  const types=tally(ALL,r=>subtypeOf(r)).map(([k,v])=>[k,`${k} (${v})`]);
+  /* grouped the same way as origin and business line: without it the same
+     value written with different capitalisation appears twice, each with its
+     own count, and neither shows the real total */
+  const tops=tallyBy(ALL,r=>r["Type of Case"]).map(([k,v,label])=>[k,`${label} (${v})`]);
+  const types=tallyBy(ALL,r=>subtypeOf(r)).map(([k,v,label])=>[k,`${label} (${v})`]);
   const yrs=tally(ALL,r=>yearOf(r["Date Created"])).filter(([y])=>y&&y>1990&&y<2100)
             .sort((a,b)=>b[0]-a[0]).map(([y,v])=>[String(y),`${y} (${v})`]);
   /* no cap: a capped list silently hides real business lines, which is how
@@ -6162,10 +6327,10 @@ function renderAnalytics(){
   const anyFl=Object.values(FL).some(v=>Array.isArray(v)?v.length:v);
 
   /* country pairs */
-  const corr=tally(R,r=>{
+  const corr=tallyBy(R,r=>{
     const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
     return (a&&b)?a+" \u2192 "+b:null;
-  });
+  }).map(([,v,label])=>[label,v]);
   const corrTop=corr.slice(0,10), corrMax=corrTop.length?corrTop[0][1]:1;
   const corrHTML=corrTop.length?`<div class="corr">${corrTop.map(([k,v])=>{
     const [a,b]=k.split(" \u2192 ");
@@ -6228,13 +6393,16 @@ function renderAnalytics(){
 
   body.innerHTML=`<div class="canvas">
     <div class="filters">
-      <label>Case</label>${multi(FL.top,tops,"top","All cases")}
-      <label>Subtype</label>${multi(FL.type,types,"type","All subtypes")}
-      <label>Year</label>${multi(FL.yr,yrs,"yr","All years")}
-      <label>Status</label>${multi(FL.status,STATUSES.map(x=>[x,x]),"status","All")}
-      <label>Origin</label>${multi(FL.ohc,ohcs,"ohc","All origins")}
-      <label>Destination</label>${opts(FL.dest,[["us","Into the US"],["non","Everywhere else"]],"dest","All")}
-      <label>Business line</label>${multi(FL.bl,bls,"bl","All")}
+      <div class="f-grp${FL.top.length?" on":""}"><label>Case</label>${multi(FL.top,tops,"top","All cases")}</div>
+      <div class="f-grp${FL.type.length?" on":""}"><label>Subtype</label>${multi(FL.type,types,"type","All subtypes")}</div>
+      <div class="f-grp${FL.yr.length?" on":""}"><label>Year</label>${multi(FL.yr,yrs,"yr","All years")}</div>
+      <div class="f-grp${FL.status.length?" on":""}"><label>Status</label>${multi(FL.status,STATUSES.map(x=>[x,x]),"status","All")}</div>
+      <div class="f-grp${FL.ohc.length?" on":""}"><label>Origin</label>${multi(FL.ohc,ohcs,"ohc","All origins")}</div>
+      <div class="f-grp${FL.dest?" on":""}"><label>Destination</label>${opts(FL.dest,[["us","Into the US"],["non","Everywhere else"]],"dest","All")}</div>
+      <div class="f-grp${FL.bl.length?" on":""}"><label>Business line</label>${multi(FL.bl,bls,"bl","All")}</div>
+      <input class="f-search" placeholder="Search an employee" value="${esc(FL.q||"")}"
+        onchange="flQuery(this.value)" onkeydown="if(event.key==='Enter')flQuery(this.value)">
+      <button class="mini-btn" onclick="openChartExport()">Export charts</button>
       ${anyFl?`<button class="btn" style="padding:5px 12px;font-size:11.5px" onclick="clearFl()">Clear</button>`:""}
       <div class="f-count"><b>${R.length.toLocaleString("en-US")}</b> of ${ALL.length.toLocaleString("en-US")} cases</div>
     </div>
@@ -6247,6 +6415,8 @@ function renderAnalytics(){
       <div class="kpi"><div class="kpi-n">${R.length?Math.round(cancelled.length/R.length*100):0}%</div><div class="kpi-l">Cancelled</div><div class="kpi-s">${cancelled.length} cases</div></div>
       <div class="kpi"><div class="kpi-n">${R.length?Math.round(intoUS.length/R.length*100):0}%</div><div class="kpi-l">Into the US</div><div class="kpi-s">${intoUS.length.toLocaleString("en-US")} cases</div></div>
     </div>
+
+    ${employeeCard(R)}
 
     <div class="charts">
       <div class="chart wide ins-card">
@@ -6281,7 +6451,7 @@ function renderAnalytics(){
       <div class="chart">
         <div class="chart-t">Type of case</div>
         <div class="chart-s">full, direct, resign-rehire and PRV</div>
-        ${barsHTML(tally(R,r=>subtypeOf(r)).slice(0,8),R.length)}
+        ${barsHTML(tallyBy(R,r=>subtypeOf(r)).slice(0,8).map(([,v,label])=>[label,v]),R.length,"blue")}
       </div>
 
       <div class="chart">
@@ -6290,13 +6460,13 @@ function renderAnalytics(){
           const shown=t.slice(0,8).reduce((a,[,v])=>a+v,0);
           return t.length>8?`top 8 of ${t.length} &middot; ${Math.round(shown/Math.max(R.length,1)*100)}% of the selection`
                            :`all ${t.length} in this selection`;})()}</div>
-        ${barsHTML(tallyBy(R,r=>r["Business Line"]).slice(0,8).map(([,v,label])=>[label,v]),R.length,true)}
+        ${barsHTML(tallyBy(R,r=>r["Business Line"]).slice(0,8).map(([,v,label])=>[label,v]),R.length,"teal")}
       </div>
 
       <div class="chart">
         <div class="chart-t">Potential</div>
         <div class="chart-s">target band is 34 to 38</div>
-        ${barsHTML(potBands,pots.length)}
+        ${barsHTML(potBands,pots.length,"amber")}
         <div class="basis">Recorded on ${pots.length} of ${R.length} cases in this selection.
         Every case logged from here on carries it.</div>
       </div>
@@ -6304,7 +6474,7 @@ function renderAnalytics(){
       <div class="chart">
         <div class="chart-t">Classification level</div>
         <div class="chart-s">at the time of the request</div>
-        ${barsHTML(clBands,clv.length)}
+        ${barsHTML(clBands,clv.length,"plum")}
         <div class="basis">Recorded on ${clv.length} of ${R.length} cases in this selection.</div>
       </div>
 
@@ -6475,6 +6645,19 @@ document.addEventListener("click",e=>{
 
 railHTML();
 renderCaseList();
+/* Which filter ends up nearest the right edge depends on the window width and
+   where the bar wraps, so it cannot be decided in CSS. Measure on open and
+   flip the panel only when it would run off the window. */
+document.addEventListener("toggle",e=>{
+  const d=e.target;
+  if(!d.classList||!d.classList.contains("fdd")||!d.open)return;
+  const panel=d.querySelector(".fdd-b");
+  if(!panel)return;
+  panel.classList.remove("flip");
+  const r=panel.getBoundingClientRect();
+  if(r.right>document.documentElement.clientWidth-8)panel.classList.add("flip");
+},true);
+
 recallTheme();
 caseStore().then(db=>{
   const t=db.transaction("h","readonly").objectStore("h").get("mode");
