@@ -2110,7 +2110,23 @@ function resolve(){
   d.taxAssump = tS("Assumptions applied");
 
   /* -- NHC plan rules -- */
-  const R=NHC_RULES[d.nhc]||{};
+  const R0=NHC_RULES[d.nhc]||{};
+  /* These are the company's own standard plan figures for the new home
+     country, not something a vendor file supplies — but they are not
+     necessarily the same for every origin country paired with this
+     destination (e.g. the age-55/58/60 figures hardcoded for the U.S. plan
+     were taken from a Canada-origin case and never re-verified against
+     other pairings), so a coordinator can correct any of them by hand. Clone
+     rather than mutate the shared constant. */
+  const R={...R0, ls:{...(R0.ls||{})}, erf:{...(R0.erf||{})}};
+  /* setOv coerces these to plain numbers (nhcMult as whole percentage points,
+     e.g. 1.6 for 1.6%), so only the /100 on the multiplier is done here. */
+  if(typeof overrides.nhcMult==="number")R.mult=overrides.nhcMult/100;
+  SCEN.forEach(a=>{
+    if(typeof overrides["nhcLs"+a]==="number")R.ls[a]=overrides["nhcLs"+a];
+    if(typeof overrides["nhcErf"+a]==="number")R.erf[a]=overrides["nhcErf"+a];
+  });
+  d.ruleFromDefault=R0; // what the coordinator is overriding away from, for the source tag
   d.rule=R;
   /* Two different retirement ages, and they must not be confused.
        OHC — what GC&BD report for the plan the employee is leaving
@@ -3936,7 +3952,7 @@ function employeeCard(rows){
       <div class="panel-b"><table class="tbl"><tbody>
       ${rows.slice(0,12).map(r=>`<tr><td>${esc(String(r["Full Name"]||"—"))}</td>
         <td class="ds">${esc(String(r["Original Home Country"]||"?"))} &rarr; ${esc(String(r["New Home Country"]||"?"))}</td>
-        <td class="dv">${esc(/resign/i.test(subtypeOf(r))?"Resign-rehire":"Localization")}</td>
+        <td class="dv">${esc(isRR(r)?"Resign-rehire":"Localization")}</td>
         <td class="dv">${esc(String(r["Status"]||"—"))}</td>
         <td class="ds">${esc(onlyDate(r["Implementation date"])||"")}</td></tr>`).join("")}
       </tbody></table></div>${rows.length>12?`<div class="note">Showing 12 of ${rows.length}. Narrow the search to see one case in full.</div>`:""}
@@ -3944,7 +3960,7 @@ function employeeCard(rows){
   const f=(lab,v)=>`<div class="f"><div class="f-l">${esc(lab)}</div><div class="f-v">${v===null||v===undefined||v===""?"&mdash;":esc(String(v))}</div></div>`;
   return `<div class="panel"><div class="panel-h">
       <div class="panel-t">${esc(String(one["Full Name"]||"—"))}</div>
-      <div class="panel-n">${esc(/resign/i.test(subtypeOf(one))?"Resign-rehire":"Localization")} &middot;
+      <div class="panel-n">${esc(isRR(one)?"Resign-rehire":"Localization")} &middot;
         ${esc(String(one["Original Home Country"]||"?"))} &rarr; ${esc(String(one["New Home Country"]||"?"))}</div></div>
     <div class="panel-b"><div class="fgrid">
       ${f("Status",one["Status"])}
@@ -4286,7 +4302,7 @@ function homeHTML(){
     const nx=resolvedSteps(r).filter(x=>x.state==="doing"||x.state==="todo")[0];
     if(nx)stuck.push({name:r["Full Name"]||"—",
       route:(String(r["Original Home Country"]||"").trim()||"?")+" \u2192 "+(String(r["New Home Country"]||"").trim()||"?"),
-      stage:nx.label, kind:/resign/i.test(subtypeOf(r))?"Resign-rehire":"Localization"});
+      stage:nx.label, kind:isRR(r)?"Resign-rehire":"Localization"});
   });
   const byStage={};
   stuck.forEach(x=>{ byStage[x.stage]=(byStage[x.stage]||0)+1; });
@@ -4706,7 +4722,7 @@ function mailHTML(d){
    — the existing "na" state already keeps it out of the stage count and out
    of the next-stage read. */
 function resolvedSteps(row){
-  const rr=/resign/i.test(subtypeOf(row));
+  const rr=isRR(row);
   const intoUS=/united states|^us$/i.test(String(row["New Home Country"]||"").trim());
   const base=rr?RR_STEPS:LOC_STEPS;
   return base.map(([col,label])=>{
@@ -5375,15 +5391,60 @@ function scenHTML(d,c){
     }).join("")+'</tr>';
   };
 
+  /* The lump-sum/multiplier/early-retirement shape is specific to the U.S.
+     plan — other countries' formulas don't share that structure at all, not
+     just different numbers in it. Rather than try to model every country's
+     shape, this is a formula-or-manual switch: the U.S. shape when it fits,
+     and the same per-age hand entry every non-U.S. destination already uses
+     when it doesn't — flipped per case, never touching the shared default. */
+  const useFormula = d.intoUS && !overrides.nhcManual;
   const pensionRow=()=>{
-    if(d.intoUS)return line("Estimated NHC pension","nhcPension",
+    if(useFormula)return line("Estimated NHC pension","nhcPension",
       a=>`${R.ls[a]} × ${(R.mult*100).toFixed(1)}% × NHC salary × (${(c.scen[a].yearsToRet??0).toFixed(1)} + ${(d.yos??0).toFixed(1)} yrs) × ${R.erf[a]}`);
     return `<tr><td>Estimated NHC pension</td>`+SCEN.map(a=>
       `<td><input style="text-align:right;width:100%" value="${overrides["nhcPension"+a]??""}"
         placeholder="from GC&BD" onchange="setOv('nhcPension${a}',this.value)"></td>`).join("")+"</tr>";
   };
 
-  return `<div class="panel">
+  /* These lump-sum and early-retirement figures are the company's standard
+     U.S. plan assumptions, hardcoded once rather than supplied per case — but
+     they were only ever verified against a Canada-origin case, so they are
+     not guaranteed to hold for every origin/destination pairing. Letting a
+     coordinator correct any of them here means the fix lands on the formula
+     itself, and all three ages recompute together, instead of three separate
+     one-off overrides on the final dollar figures below. If the formula's
+     shape itself doesn't fit — not just its numbers — the switch above drops
+     out of it entirely into hand entry. */
+  const planParamsHTML=()=>{
+    if(!d.intoUS)return "";
+    if(!useFormula)return `<div class="panel">
+      <div class="panel-h"><div class="panel-t">NHC plan assumptions</div>
+        <button class="mini-btn" onclick="setOv('nhcManual','')">Use the U.S. lump-sum formula instead</button></div>
+      <div class="note">This case is set to enter the NHC pension by hand at each age below, instead of using
+        the U.S. plan's lump-sum formula &mdash; for when that formula's shape doesn't fit, not just its numbers.</div>
+    </div>`;
+    const src=k=>overrides[k]!==undefined&&overrides[k]!==""?"entered by hand":"company plan default";
+    return `<div class="panel">
+      <div class="panel-h"><div class="panel-t">NHC plan assumptions</div>
+        <button class="mini-btn" onclick="setOv('nhcManual','1')">This isn't the right formula &mdash; enter by hand</button></div>
+      <div class="panel-n">the ${esc(d.nhc||"destination")} plan &mdash; correct any figure that does not
+        hold for this origin/destination pairing, or switch to hand entry above if the formula itself
+        doesn't apply</div>
+      <div class="panel-b"><div class="fgrid">
+        <div class="f"><div class="f-l">Plan multiplier<span class="f-src">${src("nhcMult")}</span></div>
+          <input style="width:100%" value="${overrides.nhcMult??(R.mult!==null&&R.mult!==undefined?+(R.mult*100).toFixed(3):"")}"
+            placeholder="% per year of service" onchange="setOv('nhcMult',this.value)"></div>
+        ${SCEN.map(a=>`<div class="f"><div class="f-l">Lump-sum factor at ${a}<span class="f-src">${src("nhcLs"+a)}</span></div>
+          <input style="width:100%" value="${overrides["nhcLs"+a]??(R.ls[a]??"")}"
+            onchange="setOv('nhcLs${a}',this.value)"></div>`).join("")}
+        ${SCEN.map(a=>`<div class="f"><div class="f-l">Early retirement factor at ${a}<span class="f-src">${src("nhcErf"+a)}</span></div>
+          <input style="width:100%" value="${overrides["nhcErf"+a]??(R.erf[a]??"")}"
+            onchange="setOv('nhcErf${a}',this.value)"></div>`).join("")}
+      </div></div>
+    </div>`;
+  };
+
+  return `${planParamsHTML()}<div class="panel">
     <div class="panel-h"><div class="panel-t">Retirement scenarios</div>
       <div class="panel-n">${cc} · ${/^y/i.test(d.offset||"")?"offset applies":"no offset in NHC"}</div></div>
     <table class="tbl">
@@ -6225,6 +6286,14 @@ function subtypeOf(r){
   return top||"Not recorded";
 }
 
+/* A case is resign-rehire when "Type of Case" (tracker column H) OR the subtype
+   says so. The subtype used to be read first and the type only when the subtype
+   was empty, so a resign-rehire row whose subtype held anything else was counted
+   as a localization. */
+function isRR(r){
+  return /resign/i.test(String(r["Type of Case"]||""))||/resign/i.test(String(r["Subtype of Case"]||""));
+}
+
 function applyFl(rows){
   return rows.filter(r=>{
     if(!has(FL.top,labelKey(r["Type of Case"])))return false;
@@ -6762,7 +6831,7 @@ function renderAnalytics(){
 }
 
 function setOv(k,v){
-  if(k==="yos"||k==="life"||k==="homeTax"||k==="hostTax"||k==="taxNHC"||k==="taxOHC"||k==="ohcSalary"||k==="yeAge"||k.startsWith("medical")||k.startsWith("nhcPension")||k.startsWith("ohcOffset")||k==="fx"||k.startsWith("calc:")){
+  if(k==="yos"||k==="life"||k==="homeTax"||k==="hostTax"||k==="taxNHC"||k==="taxOHC"||k==="ohcSalary"||k==="yeAge"||k.startsWith("medical")||k.startsWith("nhcPension")||k.startsWith("ohcOffset")||k==="fx"||k.startsWith("calc:")||k==="nhcMult"||k.startsWith("nhcLs")||k.startsWith("nhcErf")){
     const n=num(v); if(n===null)delete overrides[k]; else overrides[k]=n;
   }else if(v===""){delete overrides[k];}
   else overrides[k]=v;
