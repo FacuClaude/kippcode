@@ -6647,7 +6647,7 @@ function renderAnalytics(){
     const a=String(r["Original Home Country"]||"").trim(), b=String(r["New Home Country"]||"").trim();
     return (a&&b)?a+" \u2192 "+b:null;
   }).map(([,v,label])=>[label,v]);
-  const corrTop=corr.slice(0,10), corrMax=corrTop.length?corrTop[0][1]:1;
+  const corrTop=corr, corrMax=corrTop.length?corrTop[0][1]:1; /* every pair, not a top 10 */
   const corrHTML=corrTop.length?`<div class="corr">${corrTop.map(([k,v])=>{
     const [a,b]=k.split(" \u2192 ");
     return `<div class="corr-r">
@@ -6765,7 +6765,7 @@ function renderAnalytics(){
 
       <div class="chart wide">
         <div class="chart-t">Country pairs</div>
-        <div class="chart-s">origin to destination · ${corr.length} distinct in this selection · top 10</div>
+        <div class="chart-s">origin to destination · all ${corr.length} distinct pairs in this selection, localizations and resign-rehires together</div>
         ${corrHTML}
       </div>
 
